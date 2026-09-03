@@ -6,6 +6,10 @@ class ControladorCompartir{
         return ModeloCompartir::mdlMostrarActivo();
     }
 
+    static public function ctrMostrarPorToken($token){
+        return ModeloCompartir::mdlMostrarPorToken($token);
+    }
+
     static public function ctrGuardar(){
         if(!isset($_POST["guardarCompartir"])){ return; }
         $titulo = trim($_POST["tituloCompartir"] ?? "");

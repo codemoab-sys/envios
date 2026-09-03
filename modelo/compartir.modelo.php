@@ -25,8 +25,10 @@ class ModeloCompartir{
             $conexion = self::prepararTabla();
             $stmt = $conexion->query("SELECT * FROM formularios_compartir WHERE estado = 1 ORDER BY id DESC LIMIT 1");
             $formulario = $stmt->fetch(PDO::FETCH_ASSOC);
-            if($formulario && strpos($formulario["enlace"], "localhost./form") !== false){
-                $formulario["enlace"] = str_replace("localhost./form", "localhost/form", $formulario["enlace"]);
+            if($formulario && (strpos($formulario["enlace"], "localhost./form") !== false || strpos($formulario["enlace"], "/form?merchant=") !== false || strpos($formulario["enlace"], "localhost/compartir?") !== false)){
+                $formulario["enlace"] = str_replace("localhost./form", "localhost/compartir", $formulario["enlace"]);
+                $formulario["enlace"] = str_replace("/form?merchant=", "/compartir?merchant=", $formulario["enlace"]);
+                $formulario["enlace"] = str_replace("localhost/compartir?", "localhost/envios/compartir?", $formulario["enlace"]);
                 $stmt = $conexion->prepare("UPDATE formularios_compartir SET enlace = :enlace WHERE id = :id");
                 $stmt->execute(array(":enlace" => $formulario["enlace"], ":id" => $formulario["id"]));
             }
@@ -52,7 +54,7 @@ class ModeloCompartir{
         $protocolo = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
         $directorio = rtrim(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/");
         if($directorio == "."){ $directorio = ""; }
-        return $protocolo . "://" . ($_SERVER["HTTP_HOST"] ?? "localhost") . $directorio . "/form?merchant=" . $token;
+        return $protocolo . "://" . ($_SERVER["HTTP_HOST"] ?? "localhost") . $directorio . "/compartir?merchant=" . $token;
     }
 
     static public function mdlGuardar($datos){
@@ -67,6 +69,17 @@ class ModeloCompartir{
             return $stmt->execute() ? "ok" : "error";
         }catch(PDOException $e){
             return "error";
+        }
+    }
+
+    static public function mdlMostrarPorToken($token){
+        try{
+            $stmt = self::prepararTabla()->prepare("SELECT * FROM formularios_compartir WHERE token = :token AND estado = 1 LIMIT 1");
+            $stmt->bindValue(":token", $token, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();
+        }catch(PDOException $e){
+            return array();
         }
     }
 
