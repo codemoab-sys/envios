@@ -54,7 +54,7 @@ $dias = array(
     .configuracion-page .help-text { color: #61728d; font-size: 12px; margin: 7px 5px 0; }
     .configuracion-page .config-topbar { display: flex; justify-content: space-between; align-items: center; }
     .configuracion-page .btn-save, .configuracion-page .btn-update { border: 0; border-radius: 15px; color: #fff; font-size: 16px; font-weight: 700; padding: 14px 28px; }
-    .configuracion-page .btn-save { background: #3987fa; }
+    .configuracion-page .btn-save { background: #3987fa; padding-top: 5px; padding-bottom: 5px; }
     .configuracion-page .btn-update { background: #5547e6; height: 54px; white-space: nowrap; }
     .configuracion-page .password-row { display: flex; gap: 15px; align-items: end; }
     .configuracion-page .password-row .form-group { flex: 1; margin: 0; }
