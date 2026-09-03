@@ -161,9 +161,14 @@ class ModeloProductos{
 	=============================================*/
     static public function mdlActualizarProducto($tabla, $item1, $valor1, $valor){
 
-        $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET $item1 = :$item1 WHERE id = :id");
+        $columnasPermitidas = ["estado", "stock"];
+        if(!in_array($item1, $columnasPermitidas)){
+            return "error";
+        }
 
-        $stmt -> bindParam(":".$item1, $valor1, PDO::PARAM_STR);
+        $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET $item1 = :valor WHERE id = :id");
+
+        $stmt -> bindParam(":valor", $valor1, PDO::PARAM_STR);
 		$stmt -> bindParam(":id", $valor, PDO::PARAM_STR);
 
         	if($stmt -> execute()){

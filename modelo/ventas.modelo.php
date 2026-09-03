@@ -156,7 +156,7 @@ static public function mdlRangoFechasVentas($tabla,$fechaInicial,$fechaFinal){
 
 	}else if($fechaInicial ==$fechaFinal){
 
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE fecha like '%$fechaFinal%'");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE fecha LIKE :fecha");
 
 			$stmt -> bindParam(":fecha", $fechaFinal, PDO::PARAM_STR);
 
@@ -177,10 +177,9 @@ static public function mdlRangoFechasVentas($tabla,$fechaInicial,$fechaFinal){
 
 		if($fechaInicial != $fechaFinal){
 
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE fecha BETWEEN '$fechaInicial' and '$fechaFinal' ");
-
-
-
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE fecha BETWEEN :fechaInicial and :fechaFinal");
+			$stmt -> bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
+			$stmt -> bindParam(":fechaFinal", $fechaFinal, PDO::PARAM_STR);
 
 		}
 
