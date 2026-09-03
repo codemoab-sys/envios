@@ -1,0 +1,10 @@
+# Archivos sensibles
+password*.txt
+*.sql
+
+# Archivos de sistema
+Thumbs.db
+Desktop.ini
+
+# Archivos de configuración local
+.env
