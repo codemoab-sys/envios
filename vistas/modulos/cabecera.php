@@ -19,6 +19,12 @@
           <div class="navbar-custom-menu">
               <ul class="nav navbar-nav">
 
+                  <li>
+                      <button id="themeToggle" class="theme-toggle" title="Cambiar tema">
+                          <i class="fa fa-moon-o"></i>
+                      </button>
+                  </li>
+
                   <li class="dropdown user user-menu">
                       <a href="inicio" class="dropdown-toggle" data-toggle="dropdown">
                           <img src="<?php  echo $_SESSION["foto"]; ?>" class="user-image" alt="User Image">
