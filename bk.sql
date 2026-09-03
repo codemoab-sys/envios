@@ -174,5 +174,38 @@ WHERE NOT EXISTS (SELECT 1 FROM `usuarios` WHERE `usuario` = 'admin');
 
 
 -- ============================================
+-- TABLA: formularios_compartir
+-- (Link compartible para formulario público)
+-- ============================================
+CREATE TABLE IF NOT EXISTS `formularios_compartir` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(150) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `token` varchar(64) NOT NULL,
+  `enlace` varchar(500) NOT NULL,
+  `estado` tinyint(1) NOT NULL DEFAULT 1,
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_formularios_compartir_token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- TABLA: respuestas_formulario
+-- (Respuestas del formulario compartido - usado en Envios)
+-- ============================================
+CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(150) NOT NULL,
+  `telefono` varchar(30) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `estado` varchar(30) NOT NULL DEFAULT 'pendiente',
+  `mensaje` text DEFAULT NULL,
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_respuestas_estado` (`estado`),
+  KEY `idx_respuestas_fecha` (`fecha`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
 -- FIN DEL ARCHIVO
 -- ============================================
