@@ -74,20 +74,24 @@ if(isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok"){
 
         if(isset($_GET["ruta"])){
 
-            if($_GET["ruta"] == "usuarios" ||
-                $_GET["ruta"] == "configuracion" ||
-                $_GET["ruta"] == "categorias" ||
-                $_GET["ruta"] == "ventas" ||
-                $_GET["ruta"] == "inicio" ||
-                $_GET["ruta"] == "reportes" ||
-                $_GET["ruta"] == "salir" ||
-                $_GET["ruta"] == "crear-venta" ||
-                $_GET["ruta"] == "productos"||
-                $_GET["ruta"] == "login"||
-                $_GET["ruta"] == "editar-venta"||
-                $_GET["ruta"] == "clientes"){
+            $ruta = strtolower($_GET["ruta"]);
 
-                include "modulos/".$_GET["ruta"].".php";
+            if($ruta == "usuarios" ||
+                $ruta == "configuracion" ||
+                $ruta == "categorias" ||
+                $ruta == "ventas" ||
+                $ruta == "inicio" ||
+                $ruta == "reportes" ||
+                $ruta == "salir" ||
+                $ruta == "crear-venta" ||
+                $ruta == "productos"||
+                $ruta == "login"||
+                $ruta == "editar-venta"||
+                $ruta == "clientes"||
+                $ruta == "compartir"||
+                $ruta == "envios"){
+
+                include "modulos/".$ruta.".php";
 
 
             }
