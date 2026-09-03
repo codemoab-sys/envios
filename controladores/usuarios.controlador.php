@@ -372,21 +372,11 @@ class ControladorUsuarios{
 
 
 
-
-
                         }
-                        
+                         
                  
-                        
-
-
-
-
-                        
-                        
-                        
-                        {
-
+ 
+        }
 
     }
 
@@ -402,18 +392,6 @@ class ControladorUsuarios{
         return $respuesta;
 
     }
-
-
-}
-
-
-
-
-
-
-
-    }
-
 
 
      /*=============================================
