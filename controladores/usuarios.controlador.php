@@ -388,10 +388,23 @@ class ControladorUsuarios{
                         {
 
 
-                    }
+    }
 
 
-        }
+    /*=============================================
+	ACTIVAR/DESACTIVAR USUARIO
+	=============================================*/
+
+    static public function ctrActualizarUsuario($tabla, $item1, $valor1, $item2, $valor2){
+
+        $respuesta = ModeloUsuarios::mdlActualizarUsuario($tabla, $item1, $valor1, $item2, $valor2);
+
+        return $respuesta;
+
+    }
+
+
+}
 
 
 
