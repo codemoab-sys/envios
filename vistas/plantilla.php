@@ -64,7 +64,9 @@ session_start();
 
     <?php
     
-if(isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok"){
+$esFormularioPublico = isset($_GET["ruta"]) && strtolower($_GET["ruta"]) == "compartir" && isset($_GET["merchant"]);
+
+if((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || $esFormularioPublico){
 
     echo'<div class="wrapper">';
 
