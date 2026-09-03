@@ -1,0 +1,189 @@
+/*=====================================
+MODO CLARO / OSCURO
+=====================================*/
+
+:root {
+    --bg-primary: #ecf0f5;
+    --bg-sidebar: #222d32;
+    --bg-content: #ffffff;
+    --bg-card: #ffffff;
+    --bg-navbar: #d2d6de;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-sidebar: #b8c7ce;
+    --border-color: #d2d6de;
+    --shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a1a2e;
+    --bg-sidebar: #0f0f1a;
+    --bg-content: #16213e;
+    --bg-card: #1a1a2e;
+    --bg-navbar: #1a1a2e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-sidebar: #a0a0a0;
+    --border-color: #2a2a4a;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+
+/* Body */
+body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    background-color: var(--bg-content) !important;
+}
+
+/* Navbar */
+.main-header .navbar {
+    background-color: var(--bg-navbar) !important;
+}
+
+.main-header .logo {
+    background-color: var(--bg-sidebar) !important;
+}
+
+/* Sidebar */
+.main-sidebar {
+    background-color: var(--bg-sidebar) !important;
+}
+
+.sidebar-menu > li.header {
+    color: var(--text-sidebar) !important;
+    background-color: var(--bg-sidebar) !important;
+}
+
+.sidebar-menu > li > a {
+    color: var(--text-sidebar) !important;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-menu > li > a:hover {
+    background-color: rgba(255,255,255,.1) !important;
+    color: #ffffff !important;
+}
+
+.sidebar .user-panel {
+    border-bottom: 1px solid rgba(255,255,255,.1) !important;
+}
+
+.sidebar .user-panel p {
+    color: #ffffff !important;
+}
+
+.sidebar .user-panel .info > a {
+    color: var(--text-sidebar) !important;
+}
+
+/* Cards */
+.box, .box-header, .box-body {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+.box-header .box-title {
+    color: var(--text-primary) !important;
+}
+
+.box-solid.box-primary > .box-header {
+    color: #fff !important;
+}
+
+/* Tables */
+.table > thead > tr > th,
+.table > tbody > tr > td {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--bg-card) !important;
+}
+
+/* Forms */
+.form-control {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control:focus {
+    border-color: #3c8dbc !important;
+}
+
+/* Small Box */
+.small-box {
+    box-shadow: var(--shadow) !important;
+}
+
+.small-box h3, .small-box p {
+    color: var(--text-primary) !important;
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color) !important;
+}
+
+.modal-footer {
+    border-top-color: var(--border-color) !important;
+}
+
+/* Labels */
+.label {
+    color: #fff !important;
+}
+
+/* Header */
+.main-header .navbar .nav > li > a {
+    color: var(--text-primary) !important;
+}
+
+/* Footer */
+.main-footer {
+    background-color: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+/* Toggle Button */
+.theme-toggle {
+    background: none;
+    border: 2px solid var(--text-primary);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-card);
+}
+
+/* Login page */
+.login-box, .login-logo, .login-logo a {
+    color: var(--text-primary) !important;
+}
+
+.login-box-body {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px;
+}

@@ -23,6 +23,8 @@ session_start();
     <link rel="stylesheet" href="vistas/bower_components/Ionicons/css/ionicons.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="vistas/dist/css/AdminLTE.min.css">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
@@ -159,6 +161,7 @@ if(isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok"){
     <script src="vistas/js/clientes.js"></script>
     <script src="vistas/js/ventas.js"></script>
     <script src="vistas/js/reportes.js"></script>
+    <script src="vistas/js/dark-mode.js"></script>
 
 
 
