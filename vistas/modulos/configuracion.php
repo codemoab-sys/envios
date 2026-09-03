@@ -104,7 +104,7 @@ $dias = array(
 
             <div class="config-card" style="margin-top: 30px;">
                 <h2><i class="fa fa-lock"></i> SEGURIDAD</h2>
-                <form method="post">
+                <form id="formPasswordConfiguracion" method="post">
                     <div class="password-row">
                         <div class="form-group">
                             <label class="form-label" for="nuevaPassword">NUEVA CONTRASEÑA</label>

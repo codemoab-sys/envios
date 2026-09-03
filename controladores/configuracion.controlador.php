@@ -73,6 +73,26 @@ class ControladorConfiguracion{
 
     }
 
+    static public function ctrActualizarPassword($password, $id){
+
+        if(trim($password) == ""){
+            return array("estado" => "error", "mensaje" => "Escribe una nueva contraseña");
+        }
+
+        if(strlen($password) < 6){
+            return array("estado" => "error", "mensaje" => "La contraseña debe tener al menos 6 caracteres");
+        }
+
+        $encriptar = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+        $respuesta = ModeloConfiguracion::mdlActualizarPassword("usuarios", $encriptar, $id);
+
+        return array(
+            "estado" => $respuesta == "ok" ? "ok" : "error",
+            "mensaje" => $respuesta == "ok" ? "La contraseña se actualizó correctamente" : "No se pudo actualizar la contraseña"
+        );
+
+    }
+
     static private function mostrarAlerta($tipo, $titulo, $ruta = ""){
 
         $redireccion = $ruta == "" ? "" : ".then(function(){window.location=\"".$ruta."\";})";
