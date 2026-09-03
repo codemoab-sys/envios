@@ -1,6 +1,9 @@
 # Archivos sensibles
 password*.txt
+
+# Archivos SQL (excepto bk.sql)
 *.sql
+!bk.sql
 
 # Archivos de sistema
 Thumbs.db
