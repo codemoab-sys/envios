@@ -8,3 +8,5 @@ Desktop.ini
 
 # Archivos de configuración local
 .env
+
+gcm-diagnose.log
