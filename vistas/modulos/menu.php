@@ -43,8 +43,8 @@
                   </a>
               </li>
               <li>
-                  <a href="categorias">
-                      <i class="fa fa-th"></i> <span>categorias</span>
+                  <a href="configuracion">
+                      <i class="fa fa-th"></i> <span>configuracion</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
