@@ -51,7 +51,7 @@
                   </a>
               </li>
               <li>
-                  <a href="Compartir">
+                  <a href="compartir">
                       <i class="fa fa-th"></i> <span>Compartir</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
@@ -59,7 +59,7 @@
                   </a>
               </li>
               <li>
-                  <a href="Envios">
+                  <a href="envios">
                       <i class="fa fa-th"></i> <span>Envios</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
