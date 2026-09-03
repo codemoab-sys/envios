@@ -51,34 +51,22 @@
                   </a>
               </li>
               <li>
-                  <a href="productos">
-                      <i class="fa fa-th"></i> <span>productos</span>
+                  <a href="Compartir">
+                      <i class="fa fa-th"></i> <span>Compartir</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
                   </a>
               </li>
               <li>
-                  <a href="clientes">
-                      <i class="fa fa-th"></i> <span>clientes</span>
+                  <a href="Envios">
+                      <i class="fa fa-th"></i> <span>Envios</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
                   </a>
               </li>
-              <li class="treeview">
-                  <a href="ventas">
-                      <i class="fa fa-dashboard"></i> <span>ventas</span>
-                      <span class="pull-right-container">
-                          <i class="fa fa-angle-left pull-right"></i>
-                      </span>
-                  </a>
-                  <ul class="treeview-menu">
-                      <li><a href="ventas"><i class="fa fa-circle-o"></i> administrar ventas</a></li>
-                      <li><a href="crear-venta"><i class="fa fa-circle-o"></i> crear ventas</a></li>
-                      <li><a href="reportes"><i class="fa fa-circle-o"></i> reportes</a></li>
-                  </ul>
-              </li>
+            
 
 
 
