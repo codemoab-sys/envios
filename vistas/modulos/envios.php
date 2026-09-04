@@ -50,16 +50,33 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
     .envios-view { padding: 0 27px; height: 61px; border: 0; border-radius: 13px; background: linear-gradient(100deg, #3c87ef, #4d38dc); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 18px rgba(47, 102, 237, .2); }
     .envios-view i { margin-right: 9px; }
     .envios-note { margin: 26px auto 0; padding-top: 20px; border-top: 1px solid #172034; color: #4f5b73; font-size: 13px; line-height: 1.45; }
-    @media (max-width: 700px) {
+    @media (max-width: 767px) {
         .envios-page { padding: 12px; }
         .envios-toolbar-row { flex-wrap: wrap; }
         .envios-search { order: 3; flex-basis: 100%; }
         .envios-date { flex: 1; min-width: 110px; }
+        .envios-toolbar-row:nth-child(2) .envios-button { flex: 1 1 calc(50% - 10px); }
+        .envios-toolbar-row:nth-child(2) .envios-button-icon { flex: 0 0 46px; }
+        .envios-spacer { display: none; }
         .envios-board { min-height: 520px; }
         .envios-locked p { font-size: 14px; }
+        .envios-view { max-width: 100%; padding: 0 20px; font-size: 16px; }
+    }
+    @media (max-width: 480px) {
+        .envios-page { padding: 8px; }
+        .envios-toolbar { padding: 14px 12px 16px; border-radius: 16px; }
+        .envios-toolbar-row { gap: 8px; }
+        .envios-control, .envios-search, .envios-button { font-size: 13px; }
+        .envios-control { min-width: 0; }
+        .envios-date { width: calc(50% - 4px); }
+        .envios-board { min-height: 440px; border-radius: 16px; }
+        .envios-lock { width: 58px; height: 58px; margin-bottom: 20px; font-size: 28px; }
+        .envios-locked h1 { font-size: 18px; }
+        .envios-note { font-size: 12px; }
     }
 </style>
 
+<div class="content-wrapper">
 <main class="envios-page">
     <section class="envios-toolbar" aria-label="Filtros de respuestas">
         <div class="envios-toolbar-row">
@@ -92,6 +109,7 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
         </div>
     </section>
 </main>
+</div>
 
 <script>
 $('#verRespuestas').on('click', function(){
