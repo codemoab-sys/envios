@@ -22,7 +22,7 @@ class ControladorUsuarios{
 
             $respuesta=ModeloUsuarios::mdlMostrarUsuarios($tabla,$item,$valor);
 
-            if($respuesta["usuario"] == $_POST["usuario"] && $respuesta["password"] == $encriptar){
+            if($respuesta && $respuesta["usuario"] == $_POST["usuario"] && $respuesta["password"] == $encriptar){
 
 
                 if($respuesta["estado"]==1){

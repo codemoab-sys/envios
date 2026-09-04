@@ -118,8 +118,14 @@ CREATE TABLE IF NOT EXISTS `configuracion` (
 -- (Password: admin123)
 -- ============================================
 INSERT INTO `usuarios` (`nombre`, `usuario`, `password`, `perfil`, `foto`, `estado`)
-SELECT 'Administrador', 'admin', '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$', 'administrador', '', 1
+SELECT 'Administrador', 'admin', '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S', 'administrador', '', 1
 WHERE NOT EXISTS (SELECT 1 FROM `usuarios` WHERE `usuario` = 'admin');
+
+-- Repara el usuario admin si una versión anterior guardó únicamente el salt.
+UPDATE `usuarios`
+SET `password` = '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S'
+WHERE `usuario` = 'admin'
+  AND `password` = '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$';
 
 
 -- ============================================
