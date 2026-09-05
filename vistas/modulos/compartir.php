@@ -8,6 +8,16 @@ if($esFormularioPublico):
     $tituloFormulario = htmlspecialchars($formularioCompartir["titulo"] ?? "Papu billas", ENT_QUOTES, "UTF-8");
     $configuracionPublica = ControladorConfiguracion::ctrMostrarConfiguracion();
     $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
+    $agenciasShalom = array();
+    if(in_array("shalom", $metodosConfigurados, true)){
+        try{
+            $conexionAgencias = Conexion::conectar();
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion, referencia FROM agencia_shalon ORDER BY nombre ASC");
+            $agenciasShalom = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            $agenciasShalom = array();
+        }
+    }
     $diasConfigurados = json_decode($configuracionPublica["dias_despacho"] ?? "[]", true) ?: array();
     $anticipacionPublica = (int) ($configuracionPublica["anticipacion"] ?? 0);
     $horaCortePublica = htmlspecialchars(substr($configuracionPublica["hora_corte"] ?? "18:00", 0, 5), ENT_QUOTES, "UTF-8");
@@ -51,6 +61,13 @@ if($esFormularioPublico):
     .formulario-publico-input { width: 100%; height: 52px; padding: 0 18px; border: 1px solid #e4e7eb; border-radius: 10px; outline: none; background: #fbfcfe; color: #5c6678; font-size: 16px; box-shadow: 0 1px 3px rgba(24, 32, 45, .05); transition: border-color 0.2s, box-shadow 0.2s; }
     .formulario-publico-input:focus { border-color: #3984ee; box-shadow: 0 0 0 3px rgba(57, 132, 238, .1); }
     .formulario-publico-input::placeholder { color: #9ca5b5; }
+    .formulario-publico-agencia-results { display: none; overflow: hidden; margin-top: -1px; border: 1px solid #e4e7eb; border-radius: 0 0 10px 10px; background: #fff; box-shadow: 0 5px 12px rgba(24, 32, 45, .1); }
+    .formulario-publico-agencia-results.visible { display: block; }
+    .formulario-publico-agencia-option { width: 100%; padding: 10px 14px; border: 0; border-bottom: 1px solid #edf0f3; background: #fff; color: #192437; cursor: pointer; text-align: left; }
+    .formulario-publico-agencia-option:last-child { border-bottom: 0; }
+    .formulario-publico-agencia-option:hover, .formulario-publico-agencia-option:focus { outline: none; background: #f3f7fd; }
+    .formulario-publico-agencia-title { display: block; overflow: hidden; font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .formulario-publico-agencia-address { display: block; margin-top: 4px; color: #7b8799; font-size: 13px; line-height: 1.25; }
     .formulario-publico-select { width: 100%; height: 52px; padding: 0 40px 0 18px; border: 1px solid #e4e7eb; border-radius: 10px; outline: none; background: #fbfcfe; color: #263143; font-size: 16px; box-shadow: 0 1px 3px rgba(24, 32, 45, .05); transition: border-color 0.2s, box-shadow 0.2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca5b5' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
     .formulario-publico-select:focus { border-color: #3984ee; box-shadow: 0 0 0 3px rgba(57, 132, 238, .1); }
     .formulario-publico-delivery-fields { display: none; }
@@ -154,6 +171,44 @@ if($esFormularioPublico):
                 </select>
             </div>
         </div>
+        <div id="camposShalom" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="agenciaShalomPublica">Busca tu Agencia *</label>
+                <input class="formulario-publico-input" id="agenciaShalomPublica" type="text" placeholder="Buscar sede Shalom..." autocomplete="off">
+                <input id="agenciaShalomId" type="hidden">
+                <div class="formulario-publico-agencia-results" id="resultadosAgenciasShalom">
+                    <?php foreach($agenciasShalom as $agencia): ?>
+                        <?php
+                        $ubicacion = implode(" / ", array_filter(array($agencia["departamento"], $agencia["provincia"], $agencia["distrito"], $agencia["nombre"]), function($valor){ return trim((string) $valor) !== ""; }));
+                        $direccionAgencia = trim((string) ($agencia["direccion"] ?? ""));
+                        $referenciaAgencia = trim((string) ($agencia["referencia"] ?? ""));
+                        if($referenciaAgencia !== "") $direccionAgencia .= ($direccionAgencia !== "" ? ", " : "") . "Ref. " . $referenciaAgencia;
+                        ?>
+                        <button class="formulario-publico-agencia-option" type="button" data-id="<?php echo (int) $agencia["id"]; ?>" data-nombre="<?php echo htmlspecialchars($agencia["nombre"], ENT_QUOTES, "UTF-8"); ?>" data-ubicacion="<?php echo htmlspecialchars($ubicacion, ENT_QUOTES, "UTF-8"); ?>" data-direccion="<?php echo htmlspecialchars($direccionAgencia, ENT_QUOTES, "UTF-8"); ?>">
+                            <span class="formulario-publico-agencia-title"><?php echo htmlspecialchars($ubicacion, ENT_QUOTES, "UTF-8"); ?></span>
+                            <span class="formulario-publico-agencia-address"><?php echo htmlspecialchars($direccionAgencia, ENT_QUOTES, "UTF-8"); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="formulario-publico-field">
+                <label for="dniShalomPublico">DNI/CE para Recoger *</label>
+                <input class="formulario-publico-input" id="dniShalomPublico" type="text" placeholder="Número de DNI / CE">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombreShalomPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreShalomPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaShalomPublica">Fecha de Envío</label>
+                <select class="formulario-publico-select" id="fechaShalomPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
         <div id="camposEncomienda" class="formulario-publico-delivery-fields">
             <div class="formulario-publico-field">
                 <label for="agenciaPublica">Busca tu Agencia *</label>
@@ -182,6 +237,46 @@ if($esFormularioPublico):
     </section>
 </main>
 <script>
+var resultadosAgenciasShalom = $('#resultadosAgenciasShalom');
+var opcionesAgenciasShalom = resultadosAgenciasShalom.find('.formulario-publico-agencia-option');
+
+function normalizarTextoAgencia(texto){
+    return (texto || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function filtrarAgenciasShalom(){
+    var busqueda = normalizarTextoAgencia($('#agenciaShalomPublica').val());
+    var visibles = 0;
+    opcionesAgenciasShalom.each(function(){
+        var opcion = $(this);
+        var coincide = !busqueda || normalizarTextoAgencia(opcion.text()).indexOf(busqueda) !== -1;
+        var mostrar = coincide && visibles < 8;
+        opcion.toggle(mostrar);
+        if(mostrar) visibles++;
+    });
+    resultadosAgenciasShalom.toggleClass('visible', visibles > 0 && $('#camposShalom').hasClass('visible'));
+}
+
+$('#agenciaShalomPublica').on('input focus', function(){
+    $('#agenciaShalomId').val('');
+    filtrarAgenciasShalom();
+});
+
+opcionesAgenciasShalom.on('click', function(){
+    var opcion = $(this);
+    var ubicacion = opcion.data('ubicacion');
+    var direccion = opcion.data('direccion');
+    $('#agenciaShalomPublica').val(ubicacion + (direccion ? ' | ' + direccion : ''));
+    $('#agenciaShalomId').val(opcion.data('id'));
+    resultadosAgenciasShalom.removeClass('visible');
+});
+
+$(document).on('click', function(evento){
+    if(!$(evento.target).closest('#agenciaShalomPublica, #resultadosAgenciasShalom').length){
+        resultadosAgenciasShalom.removeClass('visible');
+    }
+});
+
 $('#agendarPublico').on('click', function(){
     if(!$('#whatsappPublico').val().trim()) { $('#whatsappPublico').focus(); return; }
     if(!$('#metodoPublico').val()) { $('#metodoPublico').focus(); return; }
@@ -195,6 +290,16 @@ $('#agendarPublico').on('click', function(){
         $('#nombreRetiroPublico').focus();
         return;
     }
+    if($('#metodoPublico').val() == 'shalom') {
+        var camposShalom = ['#agenciaShalomPublica', '#dniShalomPublico', '#nombreShalomPublico'];
+        for(var k = 0; k < camposShalom.length; k++) {
+            if(!$(camposShalom[k]).val().trim()) { $(camposShalom[k]).focus(); return; }
+        }
+        if(!$('#agenciaShalomId').val()) {
+            $('#agenciaShalomPublica').focus();
+            return;
+        }
+    }
     if($('#metodoPublico').val() == 'encomienda') {
         var camposEncomienda = ['#agenciaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
         for(var j = 0; j < camposEncomienda.length; j++) {
@@ -207,11 +312,15 @@ $('#agendarPublico').on('click', function(){
 $('#metodoPublico').on('change', function(){
     var esDelivery = ['delivery_lima', 'delivery_trujillo'].indexOf($(this).val()) !== -1;
     var esRetiroTienda = $(this).val() == 'retiro_tienda';
+    var esShalom = $(this).val() == 'shalom';
     var esEncomienda = $(this).val() == 'encomienda';
     $('#camposDelivery').toggleClass('visible', esDelivery);
     $('#camposDelivery input').prop('required', esDelivery);
     $('#camposRetiroTienda').toggleClass('visible', esRetiroTienda);
     $('#nombreRetiroPublico').prop('required', esRetiroTienda);
+    $('#camposShalom').toggleClass('visible', esShalom);
+    $('#camposShalom input').prop('required', esShalom);
+    if(!esShalom) resultadosAgenciasShalom.removeClass('visible');
     $('#camposEncomienda').toggleClass('visible', esEncomienda);
     $('#camposEncomienda input').prop('required', esEncomienda);
 });
