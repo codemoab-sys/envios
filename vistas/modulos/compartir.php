@@ -9,6 +9,7 @@ if($esFormularioPublico):
     $configuracionPublica = ControladorConfiguracion::ctrMostrarConfiguracion();
     $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
     $agenciasShalom = array();
+    $agenciasOlva = array();
     if(in_array("shalom", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
@@ -16,6 +17,15 @@ if($esFormularioPublico):
             $agenciasShalom = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasShalom = array();
+        }
+    }
+    if(in_array("olva", $metodosConfigurados, true)){
+        try{
+            $conexionAgencias = Conexion::conectar();
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM agencia_olva ORDER BY nombre ASC");
+            $agenciasOlva = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            $agenciasOlva = array();
         }
     }
     $diasConfigurados = json_decode($configuracionPublica["dias_despacho"] ?? "[]", true) ?: array();
@@ -232,8 +242,41 @@ if($esFormularioPublico):
                 </select>
             </div>
         </div>
+        <div id="camposOlva" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="agenciaOlvaPublica">Busca tu Agencia *</label>
+                <input class="formulario-publico-input" id="agenciaOlvaPublica" type="text" placeholder="Buscar sede Olva Courier..." autocomplete="off">
+                <input id="agenciaOlvaId" type="hidden">
+                <div class="formulario-publico-agencia-results" id="resultadosAgenciasOlva">
+                    <?php foreach($agenciasOlva as $agencia): ?>
+                        <?php $ubicacionOlva = implode(" / ", array_filter(array($agencia["departamento"], $agencia["provincia"], $agencia["distrito"], $agencia["nombre"]), function($valor){ return trim((string) $valor) !== ""; })); ?>
+                        <button class="formulario-publico-agencia-option" type="button" data-id="<?php echo (int) $agencia["id"]; ?>" data-ubicacion="<?php echo htmlspecialchars($ubicacionOlva, ENT_QUOTES, "UTF-8"); ?>" data-direccion="<?php echo htmlspecialchars(trim((string) ($agencia["direccion"] ?? "")), ENT_QUOTES, "UTF-8"); ?>">
+                            <span class="formulario-publico-agencia-title"><?php echo htmlspecialchars($ubicacionOlva, ENT_QUOTES, "UTF-8"); ?></span>
+                            <span class="formulario-publico-agencia-address"><?php echo htmlspecialchars(trim((string) ($agencia["direccion"] ?? "")), ENT_QUOTES, "UTF-8"); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="formulario-publico-field">
+                <label for="dniOlvaPublico">DNI/CE para Recoger *</label>
+                <input class="formulario-publico-input" id="dniOlvaPublico" type="text" placeholder="Número de DNI / CE">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombreOlvaPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreOlvaPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaOlvaPublica">Fecha de Envío</label>
+                <select class="formulario-publico-select" id="fechaOlvaPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
         <button class="formulario-publico-submit" type="button" id="agendarPublico">Agendar y ver resumen <i class="fa fa-calendar-o"></i></button>
-        <footer class="formulario-publico-footer">FORMULARIO LOGÍSTICO • CREADO POR LATAM5S</footer>
+        <footer class="formulario-publico-footer">GRACIAS POR ELEGIRNOS</footer>
     </section>
 </main>
 <script>
@@ -242,6 +285,12 @@ var opcionesAgenciasShalom = resultadosAgenciasShalom.find('.formulario-publico-
 
 function normalizarTextoAgencia(texto){
     return (texto || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function presentarTextoAgencia(texto){
+    return (texto || '').toString().toLowerCase().replace(/(^|[\s\/|,-])([a-záéíóúñ])/g, function(match, separador, letra){
+        return separador + letra.toUpperCase();
+    });
 }
 
 function filtrarAgenciasShalom(){
@@ -266,7 +315,7 @@ opcionesAgenciasShalom.on('click', function(){
     var opcion = $(this);
     var ubicacion = opcion.data('ubicacion');
     var direccion = opcion.data('direccion');
-    $('#agenciaShalomPublica').val(ubicacion + (direccion ? ' | ' + direccion : ''));
+    $('#agenciaShalomPublica').val(presentarTextoAgencia(ubicacion) + (direccion ? ' | ' + presentarTextoAgencia(direccion) : ''));
     $('#agenciaShalomId').val(opcion.data('id'));
     resultadosAgenciasShalom.removeClass('visible');
 });
@@ -275,6 +324,36 @@ $(document).on('click', function(evento){
     if(!$(evento.target).closest('#agenciaShalomPublica, #resultadosAgenciasShalom').length){
         resultadosAgenciasShalom.removeClass('visible');
     }
+});
+
+var resultadosAgenciasOlva = $('#resultadosAgenciasOlva');
+var opcionesAgenciasOlva = resultadosAgenciasOlva.find('.formulario-publico-agencia-option');
+
+function filtrarAgenciasOlva(){
+    var busqueda = normalizarTextoAgencia($('#agenciaOlvaPublica').val());
+    var visibles = 0;
+    opcionesAgenciasOlva.each(function(){
+        var opcion = $(this);
+        var coincide = !busqueda || normalizarTextoAgencia(opcion.text()).indexOf(busqueda) !== -1;
+        var mostrar = coincide && visibles < 8;
+        opcion.toggle(mostrar);
+        if(mostrar) visibles++;
+    });
+    resultadosAgenciasOlva.toggleClass('visible', visibles > 0 && $('#camposOlva').hasClass('visible'));
+}
+
+$('#agenciaOlvaPublica').on('input focus', function(){
+    $('#agenciaOlvaId').val('');
+    filtrarAgenciasOlva();
+});
+
+opcionesAgenciasOlva.on('click', function(){
+    var opcion = $(this);
+    var ubicacion = opcion.data('ubicacion');
+    var direccion = opcion.data('direccion');
+    $('#agenciaOlvaPublica').val(presentarTextoAgencia(ubicacion) + (direccion ? ' | ' + presentarTextoAgencia(direccion) : ''));
+    $('#agenciaOlvaId').val(opcion.data('id'));
+    resultadosAgenciasOlva.removeClass('visible');
 });
 
 $('#agendarPublico').on('click', function(){
@@ -300,6 +379,16 @@ $('#agendarPublico').on('click', function(){
             return;
         }
     }
+    if($('#metodoPublico').val() == 'olva') {
+        var camposOlva = ['#agenciaOlvaPublica', '#dniOlvaPublico', '#nombreOlvaPublico'];
+        for(var l = 0; l < camposOlva.length; l++) {
+            if(!$(camposOlva[l]).val().trim()) { $(camposOlva[l]).focus(); return; }
+        }
+        if(!$('#agenciaOlvaId').val()) {
+            $('#agenciaOlvaPublica').focus();
+            return;
+        }
+    }
     if($('#metodoPublico').val() == 'encomienda') {
         var camposEncomienda = ['#agenciaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
         for(var j = 0; j < camposEncomienda.length; j++) {
@@ -313,6 +402,7 @@ $('#metodoPublico').on('change', function(){
     var esDelivery = ['delivery_lima', 'delivery_trujillo'].indexOf($(this).val()) !== -1;
     var esRetiroTienda = $(this).val() == 'retiro_tienda';
     var esShalom = $(this).val() == 'shalom';
+    var esOlva = $(this).val() == 'olva';
     var esEncomienda = $(this).val() == 'encomienda';
     $('#camposDelivery').toggleClass('visible', esDelivery);
     $('#camposDelivery input').prop('required', esDelivery);
@@ -321,6 +411,9 @@ $('#metodoPublico').on('change', function(){
     $('#camposShalom').toggleClass('visible', esShalom);
     $('#camposShalom input').prop('required', esShalom);
     if(!esShalom) resultadosAgenciasShalom.removeClass('visible');
+    $('#camposOlva').toggleClass('visible', esOlva);
+    $('#camposOlva input').prop('required', esOlva);
+    if(!esOlva) resultadosAgenciasOlva.removeClass('visible');
     $('#camposEncomienda').toggleClass('visible', esEncomienda);
     $('#camposEncomienda input').prop('required', esEncomienda);
 });
