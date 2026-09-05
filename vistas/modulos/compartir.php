@@ -10,6 +10,8 @@ if($esFormularioPublico):
     $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
     $agenciasShalom = array();
     $agenciasOlva = array();
+    $agenciasMarvisur = array();
+    $agenciasDinsides = array();
     if(in_array("shalom", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
@@ -26,6 +28,24 @@ if($esFormularioPublico):
             $agenciasOlva = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasOlva = array();
+        }
+    }
+    if(in_array("marvisur", $metodosConfigurados, true)){
+        try{
+            $conexionAgencias = Conexion::conectar();
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM agencia_marvisur ORDER BY nombre ASC");
+            $agenciasMarvisur = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            $agenciasMarvisur = array();
+        }
+    }
+    if(in_array("dinsides", $metodosConfigurados, true)){
+        try{
+            $conexionAgencias = Conexion::conectar();
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, observacion FROM agencia_dinsides ORDER BY nombre ASC");
+            $agenciasDinsides = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            $agenciasDinsides = array();
         }
     }
     $diasConfigurados = json_decode($configuracionPublica["dias_despacho"] ?? "[]", true) ?: array();
@@ -46,9 +66,16 @@ if($esFormularioPublico):
     $fechasRecojo = array();
     $fechaBusqueda = new DateTime("today");
     $fechaBusqueda->modify("+" . $anticipacionPublica . " days");
-    for($i = 0; $i < 60 && count($fechasRecojo) < 4; $i++){
-        if(in_array($fechaBusqueda->format("N"), array_map(function($dia) use ($diasSemana){ return $diasSemana[$dia] ?? 0; }, $diasConfigurados))){
-            $fechasRecojo[] = array("valor" => $fechaBusqueda->format("Y-m-d"), "texto" => $nombresDias[(int) $fechaBusqueda->format("N")] . " " . $fechaBusqueda->format("j M"));
+    $diasDespachoNumericos = array_map(function($dia) use ($diasSemana){ return $diasSemana[$dia] ?? 0; }, $diasConfigurados);
+    for($i = 0; $i <= 15; $i++){
+        if(in_array((int) $fechaBusqueda->format("N"), $diasDespachoNumericos, true)){
+            $textoFecha = $nombresDias[(int) $fechaBusqueda->format("N")] . " " . $fechaBusqueda->format("j M");
+            if($fechaBusqueda->format("Y-m-d") === (new DateTime("today"))->format("Y-m-d")){
+                $textoFecha = "¡HOY! - " . $textoFecha;
+            }elseif($fechaBusqueda->format("Y-m-d") === (new DateTime("tomorrow"))->format("Y-m-d")){
+                $textoFecha = "Mañana - " . $textoFecha;
+            }
+            $fechasRecojo[] = array("valor" => $fechaBusqueda->format("Y-m-d"), "texto" => $textoFecha);
         }
         $fechaBusqueda->modify("+1 day");
     }
@@ -96,6 +123,11 @@ if($esFormularioPublico):
     .formulario-publico-page.modo-oscuro .formulario-publico-input,
     .formulario-publico-page.modo-oscuro .formulario-publico-select { border-color: #37465d; background-color: #1b2638; color: #f3f4f6; box-shadow: none; }
     .formulario-publico-page.modo-oscuro .formulario-publico-input::placeholder { color: #93a0b5; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-agencia-results { border-color: #37465d; background: #1b2638; box-shadow: 0 5px 12px rgba(0, 0, 0, .3); }
+    .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option { border-color: #2f3d52; background: #1b2638; color: #f3f4f6; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option:hover,
+    .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option:focus { background: #26364e; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-agencia-address { color: #9ca8ba; }
     .formulario-publico-page.modo-oscuro .formulario-publico-footer { border-color: #2b3648; color: #8e9aae; }
     .formulario-publico-page.modo-oscuro .formulario-publico-theme-toggle { border-color: #475569; background: #1b2638; color: #facc15; }
     .formulario-publico-submit { width: 100%; height: 52px; margin-top: 40px; border: 0; border-radius: 10px; background: #3984ee; color: #fff; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(39, 116, 223, .25); cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; }
@@ -163,7 +195,12 @@ if($esFormularioPublico):
             </div>
             <div class="formulario-publico-field">
                 <label for="fechaPublica">Fecha de Envío</label>
-                <input class="formulario-publico-input" id="fechaPublica" type="date">
+                <select class="formulario-publico-select" id="fechaPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
         </div>
         <div id="camposRetiroTienda" class="formulario-publico-delivery-fields">
@@ -275,6 +312,72 @@ if($esFormularioPublico):
                 </select>
             </div>
         </div>
+        <div id="camposMarvisur" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="agenciaMarvisurPublica">Busca tu Agencia *</label>
+                <input class="formulario-publico-input" id="agenciaMarvisurPublica" type="text" placeholder="Buscar sede Marvisur..." autocomplete="off">
+                <input id="agenciaMarvisurId" type="hidden">
+                <div class="formulario-publico-agencia-results" id="resultadosAgenciasMarvisur">
+                    <?php foreach($agenciasMarvisur as $agencia): ?>
+                        <?php $ubicacionMarvisur = implode(" / ", array_filter(array($agencia["departamento"], $agencia["provincia"], $agencia["distrito"], $agencia["nombre"]), function($valor){ return trim((string) $valor) !== ""; })); ?>
+                        <button class="formulario-publico-agencia-option" type="button" data-id="<?php echo (int) $agencia["id"]; ?>" data-ubicacion="<?php echo htmlspecialchars($ubicacionMarvisur, ENT_QUOTES, "UTF-8"); ?>" data-direccion="<?php echo htmlspecialchars(trim((string) ($agencia["direccion"] ?? "")), ENT_QUOTES, "UTF-8"); ?>">
+                            <span class="formulario-publico-agencia-title"><?php echo htmlspecialchars($ubicacionMarvisur, ENT_QUOTES, "UTF-8"); ?></span>
+                            <span class="formulario-publico-agencia-address"><?php echo htmlspecialchars(trim((string) ($agencia["direccion"] ?? "")), ENT_QUOTES, "UTF-8"); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="formulario-publico-field">
+                <label for="dniMarvisurPublico">DNI/CE para Recoger *</label>
+                <input class="formulario-publico-input" id="dniMarvisurPublico" type="text" placeholder="Número de DNI / CE">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombreMarvisurPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreMarvisurPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaMarvisurPublica">Fecha de Envío</label>
+                <select class="formulario-publico-select" id="fechaMarvisurPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div id="camposDinsides" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="agenciaDinsidesPublica">Busca tu Agencia *</label>
+                <input class="formulario-publico-input" id="agenciaDinsidesPublica" type="text" placeholder="Buscar sede Dinsides..." autocomplete="off">
+                <input id="agenciaDinsidesId" type="hidden">
+                <div class="formulario-publico-agencia-results" id="resultadosAgenciasDinsides">
+                    <?php foreach($agenciasDinsides as $agencia): ?>
+                        <?php $nombreDinsides = trim((string) ($agencia["nombre"] ?? "")); $observacionDinsides = trim((string) ($agencia["observacion"] ?? "")); ?>
+                        <button class="formulario-publico-agencia-option" type="button" data-id="<?php echo (int) $agencia["id"]; ?>" data-ubicacion="<?php echo htmlspecialchars($nombreDinsides, ENT_QUOTES, "UTF-8"); ?>" data-direccion="<?php echo htmlspecialchars($observacionDinsides, ENT_QUOTES, "UTF-8"); ?>">
+                            <span class="formulario-publico-agencia-title"><?php echo htmlspecialchars($nombreDinsides, ENT_QUOTES, "UTF-8"); ?></span>
+                            <span class="formulario-publico-agencia-address"><?php echo htmlspecialchars($observacionDinsides, ENT_QUOTES, "UTF-8"); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="formulario-publico-field">
+                <label for="dniDinsidesPublico">DNI/CE para Recoger *</label>
+                <input class="formulario-publico-input" id="dniDinsidesPublico" type="text" placeholder="Número de DNI / CE">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombreDinsidesPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreDinsidesPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaDinsidesPublica">Fecha de Envío</label>
+                <select class="formulario-publico-select" id="fechaDinsidesPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
         <button class="formulario-publico-submit" type="button" id="agendarPublico">Agendar y ver resumen <i class="fa fa-calendar-o"></i></button>
         <footer class="formulario-publico-footer">GRACIAS POR ELEGIRNOS</footer>
     </section>
@@ -356,6 +459,66 @@ opcionesAgenciasOlva.on('click', function(){
     resultadosAgenciasOlva.removeClass('visible');
 });
 
+var resultadosAgenciasMarvisur = $('#resultadosAgenciasMarvisur');
+var opcionesAgenciasMarvisur = resultadosAgenciasMarvisur.find('.formulario-publico-agencia-option');
+
+function filtrarAgenciasMarvisur(){
+    var busqueda = normalizarTextoAgencia($('#agenciaMarvisurPublica').val());
+    var visibles = 0;
+    opcionesAgenciasMarvisur.each(function(){
+        var opcion = $(this);
+        var coincide = !busqueda || normalizarTextoAgencia(opcion.text()).indexOf(busqueda) !== -1;
+        var mostrar = coincide && visibles < 8;
+        opcion.toggle(mostrar);
+        if(mostrar) visibles++;
+    });
+    resultadosAgenciasMarvisur.toggleClass('visible', visibles > 0 && $('#camposMarvisur').hasClass('visible'));
+}
+
+$('#agenciaMarvisurPublica').on('input focus', function(){
+    $('#agenciaMarvisurId').val('');
+    filtrarAgenciasMarvisur();
+});
+
+opcionesAgenciasMarvisur.on('click', function(){
+    var opcion = $(this);
+    var ubicacion = opcion.data('ubicacion');
+    var direccion = opcion.data('direccion');
+    $('#agenciaMarvisurPublica').val(presentarTextoAgencia(ubicacion) + (direccion ? ' | ' + presentarTextoAgencia(direccion) : ''));
+    $('#agenciaMarvisurId').val(opcion.data('id'));
+    resultadosAgenciasMarvisur.removeClass('visible');
+});
+
+var resultadosAgenciasDinsides = $('#resultadosAgenciasDinsides');
+var opcionesAgenciasDinsides = resultadosAgenciasDinsides.find('.formulario-publico-agencia-option');
+
+function filtrarAgenciasDinsides(){
+    var busqueda = normalizarTextoAgencia($('#agenciaDinsidesPublica').val());
+    var visibles = 0;
+    opcionesAgenciasDinsides.each(function(){
+        var opcion = $(this);
+        var coincide = !busqueda || normalizarTextoAgencia(opcion.text()).indexOf(busqueda) !== -1;
+        var mostrar = coincide && visibles < 8;
+        opcion.toggle(mostrar);
+        if(mostrar) visibles++;
+    });
+    resultadosAgenciasDinsides.toggleClass('visible', visibles > 0 && $('#camposDinsides').hasClass('visible'));
+}
+
+$('#agenciaDinsidesPublica').on('input focus', function(){
+    $('#agenciaDinsidesId').val('');
+    filtrarAgenciasDinsides();
+});
+
+opcionesAgenciasDinsides.on('click', function(){
+    var opcion = $(this);
+    var ubicacion = opcion.data('ubicacion');
+    var direccion = opcion.data('direccion');
+    $('#agenciaDinsidesPublica').val(presentarTextoAgencia(ubicacion) + (direccion ? ' | ' + presentarTextoAgencia(direccion) : ''));
+    $('#agenciaDinsidesId').val(opcion.data('id'));
+    resultadosAgenciasDinsides.removeClass('visible');
+});
+
 $('#agendarPublico').on('click', function(){
     if(!$('#whatsappPublico').val().trim()) { $('#whatsappPublico').focus(); return; }
     if(!$('#metodoPublico').val()) { $('#metodoPublico').focus(); return; }
@@ -389,6 +552,26 @@ $('#agendarPublico').on('click', function(){
             return;
         }
     }
+    if($('#metodoPublico').val() == 'marvisur') {
+        var camposMarvisur = ['#agenciaMarvisurPublica', '#dniMarvisurPublico', '#nombreMarvisurPublico'];
+        for(var m = 0; m < camposMarvisur.length; m++) {
+            if(!$(camposMarvisur[m]).val().trim()) { $(camposMarvisur[m]).focus(); return; }
+        }
+        if(!$('#agenciaMarvisurId').val()) {
+            $('#agenciaMarvisurPublica').focus();
+            return;
+        }
+    }
+    if($('#metodoPublico').val() == 'dinsides') {
+        var camposDinsides = ['#agenciaDinsidesPublica', '#dniDinsidesPublico', '#nombreDinsidesPublico'];
+        for(var d = 0; d < camposDinsides.length; d++) {
+            if(!$(camposDinsides[d]).val().trim()) { $(camposDinsides[d]).focus(); return; }
+        }
+        if(!$('#agenciaDinsidesId').val()) {
+            $('#agenciaDinsidesPublica').focus();
+            return;
+        }
+    }
     if($('#metodoPublico').val() == 'encomienda') {
         var camposEncomienda = ['#agenciaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
         for(var j = 0; j < camposEncomienda.length; j++) {
@@ -403,6 +586,8 @@ $('#metodoPublico').on('change', function(){
     var esRetiroTienda = $(this).val() == 'retiro_tienda';
     var esShalom = $(this).val() == 'shalom';
     var esOlva = $(this).val() == 'olva';
+    var esMarvisur = $(this).val() == 'marvisur';
+    var esDinsides = $(this).val() == 'dinsides';
     var esEncomienda = $(this).val() == 'encomienda';
     $('#camposDelivery').toggleClass('visible', esDelivery);
     $('#camposDelivery input').prop('required', esDelivery);
@@ -414,6 +599,12 @@ $('#metodoPublico').on('change', function(){
     $('#camposOlva').toggleClass('visible', esOlva);
     $('#camposOlva input').prop('required', esOlva);
     if(!esOlva) resultadosAgenciasOlva.removeClass('visible');
+    $('#camposMarvisur').toggleClass('visible', esMarvisur);
+    $('#camposMarvisur input').prop('required', esMarvisur);
+    if(!esMarvisur) resultadosAgenciasMarvisur.removeClass('visible');
+    $('#camposDinsides').toggleClass('visible', esDinsides);
+    $('#camposDinsides input').prop('required', esDinsides);
+    if(!esDinsides) resultadosAgenciasDinsides.removeClass('visible');
     $('#camposEncomienda').toggleClass('visible', esEncomienda);
     $('#camposEncomienda input').prop('required', esEncomienda);
 });
