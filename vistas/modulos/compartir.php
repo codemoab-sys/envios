@@ -12,6 +12,7 @@ if($esFormularioPublico):
     $agenciasOlva = array();
     $agenciasMarvisur = array();
     $agenciasDinsides = array();
+    $ubicacionesEncomienda = array();
     if(in_array("shalom", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
@@ -48,8 +49,18 @@ if($esFormularioPublico):
             $agenciasDinsides = array();
         }
     }
+    if(in_array("encomienda", $metodosConfigurados, true)){
+        try{
+            $conexionUbicaciones = Conexion::conectar();
+            $consultaUbicaciones = $conexionUbicaciones->query("SELECT id, departamento, provincia, distrito FROM ubicaciones_encomienda WHERE activo = 1 ORDER BY departamento ASC, provincia ASC, distrito ASC");
+            $ubicacionesEncomienda = $consultaUbicaciones->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            $ubicacionesEncomienda = array();
+        }
+    }
     $diasConfigurados = json_decode($configuracionPublica["dias_despacho"] ?? "[]", true) ?: array();
     $anticipacionPublica = (int) ($configuracionPublica["anticipacion"] ?? 0);
+    $whatsappEmprendimiento = preg_replace('/\D/', '', (string) ($configuracionPublica["whatsapp"] ?? ""));
     $horaCortePublica = htmlspecialchars(substr($configuracionPublica["hora_corte"] ?? "18:00", 0, 5), ENT_QUOTES, "UTF-8");
     $nombresMetodos = array(
         "shalom" => "Retiro en agencia Shalom",
@@ -61,6 +72,19 @@ if($esFormularioPublico):
         "retiro_tienda" => "Retiro en tienda",
         "encomienda" => "Encomienda"
     );
+    $distritosLima = array();
+    $distritosTrujillo = array();
+    try{
+        $conexionDistritos = Conexion::conectar();
+        $consultaDistritos = $conexionDistritos->query("SELECT zona, distrito FROM distritos_delivery WHERE activo = 1 ORDER BY zona ASC, distrito ASC");
+        foreach($consultaDistritos->fetchAll(PDO::FETCH_ASSOC) as $registroDistrito){
+            if($registroDistrito["zona"] === "lima") $distritosLima[] = $registroDistrito["distrito"];
+            if($registroDistrito["zona"] === "trujillo") $distritosTrujillo[] = $registroDistrito["distrito"];
+        }
+    }catch(PDOException $e){
+        $distritosLima = array();
+        $distritosTrujillo = array();
+    }
     $diasSemana = array("lun" => 1, "mar" => 2, "mie" => 3, "jue" => 4, "vie" => 5, "sab" => 6, "dom" => 7);
     $nombresDias = array(1 => "Lunes", 2 => "Martes", 3 => "Miércoles", 4 => "Jueves", 5 => "Viernes", 6 => "Sábado", 7 => "Domingo");
     $fechasRecojo = array();
@@ -98,6 +122,10 @@ if($esFormularioPublico):
     .formulario-publico-input { width: 100%; height: 52px; padding: 0 18px; border: 1px solid #e4e7eb; border-radius: 10px; outline: none; background: #fbfcfe; color: #5c6678; font-size: 16px; box-shadow: 0 1px 3px rgba(24, 32, 45, .05); transition: border-color 0.2s, box-shadow 0.2s; }
     .formulario-publico-input:focus { border-color: #3984ee; box-shadow: 0 0 0 3px rgba(57, 132, 238, .1); }
     .formulario-publico-input::placeholder { color: #9ca5b5; }
+    .formulario-publico-phone { display: flex; align-items: center; width: 100%; height: 52px; padding: 0 18px; border: 1px solid #e4e7eb; border-radius: 10px; background: #fbfcfe; color: #263143; box-shadow: 0 1px 3px rgba(24, 32, 45, .05); }
+    .formulario-publico-phone-prefix { flex: 0 0 auto; padding-right: 10px; color: #7b8799; font-size: 16px; }
+    .formulario-publico-phone .formulario-publico-input { height: 48px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+    .formulario-publico-phone:focus-within { border-color: #3984ee; box-shadow: 0 0 0 3px rgba(57, 132, 238, .1); }
     .formulario-publico-agencia-results { display: none; overflow: hidden; margin-top: -1px; border: 1px solid #e4e7eb; border-radius: 0 0 10px 10px; background: #fff; box-shadow: 0 5px 12px rgba(24, 32, 45, .1); }
     .formulario-publico-agencia-results.visible { display: block; }
     .formulario-publico-agencia-option { width: 100%; padding: 10px 14px; border: 0; border-bottom: 1px solid #edf0f3; background: #fff; color: #192437; cursor: pointer; text-align: left; }
@@ -123,6 +151,8 @@ if($esFormularioPublico):
     .formulario-publico-page.modo-oscuro .formulario-publico-input,
     .formulario-publico-page.modo-oscuro .formulario-publico-select { border-color: #37465d; background-color: #1b2638; color: #f3f4f6; box-shadow: none; }
     .formulario-publico-page.modo-oscuro .formulario-publico-input::placeholder { color: #93a0b5; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-phone { border-color: #37465d; background: #1b2638; color: #f3f4f6; box-shadow: none; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-phone-prefix { color: #9ca8ba; }
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-results { border-color: #37465d; background: #1b2638; box-shadow: 0 5px 12px rgba(0, 0, 0, .3); }
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option { border-color: #2f3d52; background: #1b2638; color: #f3f4f6; }
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option:hover,
@@ -163,7 +193,10 @@ if($esFormularioPublico):
         </div>
         <div class="formulario-publico-field">
             <label for="whatsappPublico">Tu WhatsApp *</label>
-            <input class="formulario-publico-input" id="whatsappPublico" type="tel" placeholder="+51  9XXXXXXXX" required>
+            <div class="formulario-publico-phone">
+                <span class="formulario-publico-phone-prefix">+51</span>
+                <input class="formulario-publico-input" id="whatsappPublico" type="tel" inputmode="numeric" pattern="9[0-9]{8}" minlength="9" maxlength="9" placeholder="9XXXXXXXX" required>
+            </div>
         </div>
         <div class="formulario-publico-field">
             <label for="metodoPublico">¿Cómo quieres recibir tu pedido? *</label>
@@ -179,7 +212,17 @@ if($esFormularioPublico):
         <div id="camposDelivery" class="formulario-publico-delivery-fields">
             <div class="formulario-publico-field">
                 <label for="distritoPublico">Distrito *</label>
-                <input class="formulario-publico-input" id="distritoPublico" type="text" placeholder="Buscar Distrito...">
+                <input class="formulario-publico-input" id="distritoPublico" list="distritosLimaPublicos" type="text" placeholder="Buscar Distrito..." autocomplete="off">
+                <datalist id="distritosLimaPublicos">
+                    <?php foreach($distritosLima as $distritoLima): ?>
+                        <option value="<?php echo htmlspecialchars($distritoLima, ENT_QUOTES, "UTF-8"); ?>"></option>
+                    <?php endforeach; ?>
+                </datalist>
+                <datalist id="distritosTrujilloPublicos">
+                    <?php foreach($distritosTrujillo as $distritoTrujillo): ?>
+                        <option value="<?php echo htmlspecialchars($distritoTrujillo, ENT_QUOTES, "UTF-8"); ?>"></option>
+                    <?php endforeach; ?>
+                </datalist>
             </div>
             <div class="formulario-publico-field">
                 <label for="direccionPublica">Dirección Exacta *</label>
@@ -258,8 +301,17 @@ if($esFormularioPublico):
         </div>
         <div id="camposEncomienda" class="formulario-publico-delivery-fields">
             <div class="formulario-publico-field">
-                <label for="agenciaPublica">Busca tu Agencia *</label>
-                <input class="formulario-publico-input" id="agenciaPublica" type="text" placeholder="Buscar sede Encomienda...">
+                <label for="ubicacionEncomiendaPublica">Busca tu Ubicación *</label>
+                <input class="formulario-publico-input" id="ubicacionEncomiendaPublica" type="text" placeholder="Buscar departamento, provincia o distrito..." autocomplete="off">
+                <input id="ubicacionEncomiendaId" type="hidden">
+                <div class="formulario-publico-agencia-results" id="resultadosUbicacionesEncomienda">
+                    <?php foreach($ubicacionesEncomienda as $ubicacion): ?>
+                        <?php $textoUbicacion = implode(" / ", array_filter(array($ubicacion["departamento"], $ubicacion["provincia"], $ubicacion["distrito"]), function($valor){ return trim((string) $valor) !== ""; })); ?>
+                        <button class="formulario-publico-agencia-option" type="button" data-id="<?php echo (int) $ubicacion["id"]; ?>" data-ubicacion="<?php echo htmlspecialchars($textoUbicacion, ENT_QUOTES, "UTF-8"); ?>">
+                            <span class="formulario-publico-agencia-title"><?php echo htmlspecialchars($textoUbicacion, ENT_QUOTES, "UTF-8"); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <div class="formulario-publico-field">
                 <label for="dniPublico">DNI/CE para Recoger *</label>
@@ -390,6 +442,10 @@ function normalizarTextoAgencia(texto){
     return (texto || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
+var distritosLimaPublicos = <?php echo json_encode($distritosLima, JSON_UNESCAPED_UNICODE); ?>;
+var distritosTrujilloPublicos = <?php echo json_encode($distritosTrujillo, JSON_UNESCAPED_UNICODE); ?>;
+var whatsappEmprendimiento = <?php echo json_encode($whatsappEmprendimiento); ?>;
+
 function presentarTextoAgencia(texto){
     return (texto || '').toString().toLowerCase().replace(/(^|[\s\/|,-])([a-záéíóúñ])/g, function(match, separador, letra){
         return separador + letra.toUpperCase();
@@ -519,13 +575,62 @@ opcionesAgenciasDinsides.on('click', function(){
     resultadosAgenciasDinsides.removeClass('visible');
 });
 
+var resultadosUbicacionesEncomienda = $('#resultadosUbicacionesEncomienda');
+var opcionesUbicacionesEncomienda = resultadosUbicacionesEncomienda.find('.formulario-publico-agencia-option');
+
+function filtrarUbicacionesEncomienda(){
+    var busqueda = normalizarTextoAgencia($('#ubicacionEncomiendaPublica').val());
+    var visibles = 0;
+    opcionesUbicacionesEncomienda.each(function(){
+        var opcion = $(this);
+        var coincide = !busqueda || normalizarTextoAgencia(opcion.text()).indexOf(busqueda) !== -1;
+        var mostrar = coincide && visibles < 8;
+        opcion.toggle(mostrar);
+        if(mostrar) visibles++;
+    });
+    resultadosUbicacionesEncomienda.toggleClass('visible', visibles > 0 && $('#camposEncomienda').hasClass('visible'));
+}
+
+$('#ubicacionEncomiendaPublica').on('input focus', function(){
+    $('#ubicacionEncomiendaId').val('');
+    filtrarUbicacionesEncomienda();
+});
+
+opcionesUbicacionesEncomienda.on('click', function(){
+    var opcion = $(this);
+    $('#ubicacionEncomiendaPublica').val(presentarTextoAgencia(opcion.data('ubicacion')));
+    $('#ubicacionEncomiendaId').val(opcion.data('id'));
+    resultadosUbicacionesEncomienda.removeClass('visible');
+});
+
+$('#whatsappPublico').on('input', function(){
+    this.value = this.value.replace(/\D/g, '').slice(0, 9);
+});
+
 $('#agendarPublico').on('click', function(){
-    if(!$('#whatsappPublico').val().trim()) { $('#whatsappPublico').focus(); return; }
+    var whatsappPublico = $('#whatsappPublico').val().trim();
+    if(!/^9[0-9]{8}$/.test(whatsappPublico)) { $('#whatsappPublico').focus(); return; }
     if(!$('#metodoPublico').val()) { $('#metodoPublico').focus(); return; }
     if(['delivery_lima', 'delivery_trujillo'].indexOf($('#metodoPublico').val()) !== -1) {
         var camposDelivery = ['#distritoPublico', '#direccionPublica', '#referenciaPublica', '#nombrePublico'];
         for(var i = 0; i < camposDelivery.length; i++) {
             if(!$(camposDelivery[i]).val().trim()) { $(camposDelivery[i]).focus(); return; }
+        }
+        if($('#metodoPublico').val() == 'delivery_lima') {
+            var distritoElegido = normalizarTextoAgencia($('#distritoPublico').val());
+            var distritoValido = distritosLimaPublicos.some(function(distrito){ return normalizarTextoAgencia(distrito) == distritoElegido; });
+            if(!distritoValido) {
+                $('#distritoPublico').focus();
+                return;
+            }
+        }
+        if($('#metodoPublico').val() == 'delivery_trujillo') {
+            var distritoTrujilloElegido = normalizarTextoAgencia($('#distritoPublico').val());
+            var distritoTrujilloValido = distritosTrujilloPublicos.some(function(distrito){ return normalizarTextoAgencia(distrito) == distritoTrujilloElegido; });
+            if(!distritoTrujilloValido) {
+                $('#distritoPublico').focus();
+                return;
+            }
         }
     }
     if($('#metodoPublico').val() == 'retiro_tienda' && !$('#nombreRetiroPublico').val().trim()) {
@@ -573,12 +678,96 @@ $('#agendarPublico').on('click', function(){
         }
     }
     if($('#metodoPublico').val() == 'encomienda') {
-        var camposEncomienda = ['#agenciaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
+        var camposEncomienda = ['#ubicacionEncomiendaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
         for(var j = 0; j < camposEncomienda.length; j++) {
             if(!$(camposEncomienda[j]).val().trim()) { $(camposEncomienda[j]).focus(); return; }
         }
+        if(!$('#ubicacionEncomiendaId').val()) {
+            $('#ubicacionEncomiendaPublica').focus();
+            return;
+        }
     }
-    Swal.fire({title:'Datos registrados',text:'Tu envío ha sido agendado correctamente.',icon:'success',confirmButtonText:'Continuar'});
+    function escaparResumen(valor){
+        return $('<div>').text(valor || '').html();
+    }
+
+    var metodoSeleccionado = $('#metodoPublico').val();
+    var metodoTexto = $('#metodoPublico option:selected').text();
+    var nombreResumen = '';
+    var dniResumen = '';
+    var ubicacionResumen = '';
+    var direccionResumen = '';
+    var fechaResumen = '';
+
+    if(['delivery_lima', 'delivery_trujillo'].indexOf(metodoSeleccionado) !== -1){
+        nombreResumen = $('#nombrePublico').val().trim();
+        ubicacionResumen = $('#distritoPublico').val().trim();
+        direccionResumen = $('#direccionPublica').val().trim() + ' - ' + $('#referenciaPublica').val().trim();
+        fechaResumen = $('#fechaPublica option:selected').text();
+    }else if(metodoSeleccionado == 'retiro_tienda'){
+        nombreResumen = $('#nombreRetiroPublico').val().trim();
+        fechaResumen = $('#fechaRetiroPublica option:selected').text();
+    }else if(metodoSeleccionado == 'shalom'){
+        nombreResumen = $('#nombreShalomPublico').val().trim();
+        dniResumen = $('#dniShalomPublico').val().trim();
+        ubicacionResumen = $('#agenciaShalomPublica').val().trim();
+        fechaResumen = $('#fechaShalomPublica option:selected').text();
+    }else if(metodoSeleccionado == 'olva'){
+        nombreResumen = $('#nombreOlvaPublico').val().trim();
+        dniResumen = $('#dniOlvaPublico').val().trim();
+        ubicacionResumen = $('#agenciaOlvaPublica').val().trim();
+        fechaResumen = $('#fechaOlvaPublica option:selected').text();
+    }else if(metodoSeleccionado == 'marvisur'){
+        nombreResumen = $('#nombreMarvisurPublico').val().trim();
+        dniResumen = $('#dniMarvisurPublico').val().trim();
+        ubicacionResumen = $('#agenciaMarvisurPublica').val().trim();
+        fechaResumen = $('#fechaMarvisurPublica option:selected').text();
+    }else if(metodoSeleccionado == 'dinsides'){
+        nombreResumen = $('#nombreDinsidesPublico').val().trim();
+        dniResumen = $('#dniDinsidesPublico').val().trim();
+        ubicacionResumen = $('#agenciaDinsidesPublica').val().trim();
+        fechaResumen = $('#fechaDinsidesPublica option:selected').text();
+    }else if(metodoSeleccionado == 'encomienda'){
+        nombreResumen = $('#nombreEncomiendaPublico').val().trim();
+        dniResumen = $('#dniPublico').val().trim();
+        ubicacionResumen = $('#ubicacionEncomiendaPublica').val().trim();
+        fechaResumen = $('#fechaEncomiendaPublica option:selected').text();
+    }
+
+    var resumenWhatsApp = '*NUEVO ENVÍO (' + metodoTexto.toUpperCase() + ')*\n\n' +
+        'Nombre: ' + nombreResumen + '\n' +
+        'WhatsApp: +51 ' + whatsappPublico + '\n' +
+        (dniResumen ? 'DNI/CE: ' + dniResumen + '\n' : '') +
+        (ubicacionResumen ? 'Ubicación: ' + ubicacionResumen + '\n' : '') +
+        (direccionResumen ? 'Dirección: ' + direccionResumen + '\n' : '') +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? 'Fecha: ' + fechaResumen : '');
+
+    var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
+        '<div style="padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;color:#8b98aa;font-size:13px;font-weight:700;letter-spacing:1px">RESUMEN</div>' +
+        '<div style="line-height:1.65;font-size:15px">' +
+        '<div>📦 &nbsp;<b>NUEVO ENVÍO (' + escaparResumen(metodoTexto.toUpperCase()) + ')</b></div>' +
+        '<div>👤 &nbsp;' + escaparResumen(nombreResumen) + '</div>' +
+        '<div>📱 &nbsp;+51 ' + escaparResumen(whatsappPublico) + '</div>' +
+        (dniResumen ? '<div>🪪 &nbsp;DNI: ' + escaparResumen(dniResumen) + '</div>' : '') +
+        (ubicacionResumen ? '<div>🏢 &nbsp;' + escaparResumen(ubicacionResumen) + '</div>' : '') +
+        (direccionResumen ? '<div>📍 &nbsp;' + escaparResumen(direccionResumen) + '</div>' : '') +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>🗓️ &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
+        '</div></div>';
+
+    Swal.fire({
+        title: 'Verifica tus datos',
+        html: resumenHtml,
+        confirmButtonText: '<i class="fa fa-whatsapp"></i> Enviar por WhatsApp',
+        cancelButtonText: 'Editar',
+        showCancelButton: true,
+        reverseButtons: true,
+        confirmButtonColor: '#20c968',
+        width: 520
+    }).then(function(resultado){
+        if(resultado.isConfirmed){
+            window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+        }
+    });
 });
 
 $('#metodoPublico').on('change', function(){
@@ -589,6 +778,7 @@ $('#metodoPublico').on('change', function(){
     var esMarvisur = $(this).val() == 'marvisur';
     var esDinsides = $(this).val() == 'dinsides';
     var esEncomienda = $(this).val() == 'encomienda';
+    $('#distritoPublico').attr('list', $(this).val() == 'delivery_trujillo' ? 'distritosTrujilloPublicos' : 'distritosLimaPublicos');
     $('#camposDelivery').toggleClass('visible', esDelivery);
     $('#camposDelivery input').prop('required', esDelivery);
     $('#camposRetiroTienda').toggleClass('visible', esRetiroTienda);
@@ -607,6 +797,7 @@ $('#metodoPublico').on('change', function(){
     if(!esDinsides) resultadosAgenciasDinsides.removeClass('visible');
     $('#camposEncomienda').toggleClass('visible', esEncomienda);
     $('#camposEncomienda input').prop('required', esEncomienda);
+    if(!esEncomienda) resultadosUbicacionesEncomienda.removeClass('visible');
 });
 
 (function(){
@@ -629,9 +820,7 @@ $('#metodoPublico').on('change', function(){
     actualizarTema();
 })();
 </script>
-<?php else:
-$enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QUOTES, "UTF-8");
-?>
+<?php else: ?>
 <style>
     body:has(.compartir-page) { overflow: hidden; }
     body:has(.compartir-page) .main-footer { display: none !important; }
