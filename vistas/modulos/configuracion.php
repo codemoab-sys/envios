@@ -23,7 +23,8 @@ $metodos = array(
     "olva" => "Olva Courier",
     "marvisur" => "Marvisur",
     "dinsides" => "Dinsides",
-    "delivery" => "Delivery",
+    "delivery_lima" => "Delivery (Solo Lima)",
+    "delivery_trujillo" => "Delivery (Solo Trujillo)",
     "retiro_tienda" => "Retiro en tienda",
     "encomienda" => "Encomienda"
 );

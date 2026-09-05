@@ -6,6 +6,32 @@ $formularioCompartir = $esFormularioPublico
 
 if($esFormularioPublico):
     $tituloFormulario = htmlspecialchars($formularioCompartir["titulo"] ?? "Papu billas", ENT_QUOTES, "UTF-8");
+    $configuracionPublica = ControladorConfiguracion::ctrMostrarConfiguracion();
+    $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
+    $diasConfigurados = json_decode($configuracionPublica["dias_despacho"] ?? "[]", true) ?: array();
+    $anticipacionPublica = (int) ($configuracionPublica["anticipacion"] ?? 0);
+    $horaCortePublica = htmlspecialchars(substr($configuracionPublica["hora_corte"] ?? "18:00", 0, 5), ENT_QUOTES, "UTF-8");
+    $nombresMetodos = array(
+        "shalom" => "Retiro en agencia Shalom",
+        "olva" => "Retiro en agencia Olva Courier",
+        "marvisur" => "Retiro en agencia Marvisur",
+        "dinsides" => "Retiro en agencia Dinsides",
+        "delivery_lima" => "Delivery (Solo Lima)",
+        "delivery_trujillo" => "Delivery (Solo Trujillo)",
+        "retiro_tienda" => "Retiro en tienda",
+        "encomienda" => "Encomienda"
+    );
+    $diasSemana = array("lun" => 1, "mar" => 2, "mie" => 3, "jue" => 4, "vie" => 5, "sab" => 6, "dom" => 7);
+    $nombresDias = array(1 => "Lunes", 2 => "Martes", 3 => "Miércoles", 4 => "Jueves", 5 => "Viernes", 6 => "Sábado", 7 => "Domingo");
+    $fechasRecojo = array();
+    $fechaBusqueda = new DateTime("today");
+    $fechaBusqueda->modify("+" . $anticipacionPublica . " days");
+    for($i = 0; $i < 60 && count($fechasRecojo) < 4; $i++){
+        if(in_array($fechaBusqueda->format("N"), array_map(function($dia) use ($diasSemana){ return $diasSemana[$dia] ?? 0; }, $diasConfigurados))){
+            $fechasRecojo[] = array("valor" => $fechaBusqueda->format("Y-m-d"), "texto" => $nombresDias[(int) $fechaBusqueda->format("N")] . " " . $fechaBusqueda->format("j M"));
+        }
+        $fechaBusqueda->modify("+1 day");
+    }
 ?>
 <style>
     .formulario-publico-page { min-height: 100vh; margin: 0; padding: 0 0 60px; background: #fff; color: #263143; font-family: 'Source Sans Pro', sans-serif; font-size: 16px; }
@@ -27,6 +53,24 @@ if($esFormularioPublico):
     .formulario-publico-input::placeholder { color: #9ca5b5; }
     .formulario-publico-select { width: 100%; height: 52px; padding: 0 40px 0 18px; border: 1px solid #e4e7eb; border-radius: 10px; outline: none; background: #fbfcfe; color: #263143; font-size: 16px; box-shadow: 0 1px 3px rgba(24, 32, 45, .05); transition: border-color 0.2s, box-shadow 0.2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca5b5' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
     .formulario-publico-select:focus { border-color: #3984ee; box-shadow: 0 0 0 3px rgba(57, 132, 238, .1); }
+    .formulario-publico-delivery-fields { display: none; }
+    .formulario-publico-delivery-fields.visible { display: block; }
+    .formulario-publico-theme-toggle { margin-left: auto; width: 42px; height: 42px; border: 1px solid #dfe4eb; border-radius: 50%; background: #fff; color: #536176; font-size: 17px; cursor: pointer; }
+    .formulario-publico-theme-toggle:hover { border-color: #3984ee; color: #3984ee; }
+    .formulario-publico-page.modo-oscuro { background: #111827; color: #e5e7eb; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-header { border-color: #2b3648; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-header h1,
+    .formulario-publico-page.modo-oscuro .formulario-publico-field label { color: #f3f4f6; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-header p { color: #9ca8ba; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-cutoff { border-color: #6b4d2d; background: #30251b; color: #f3b36c; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-cutoff h2 { color: #ffc078; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-cutoff h2 i { color: #ff9d3d; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-cutoff p { color: #e8b98b; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-input,
+    .formulario-publico-page.modo-oscuro .formulario-publico-select { border-color: #37465d; background-color: #1b2638; color: #f3f4f6; box-shadow: none; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-input::placeholder { color: #93a0b5; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-footer { border-color: #2b3648; color: #8e9aae; }
+    .formulario-publico-page.modo-oscuro .formulario-publico-theme-toggle { border-color: #475569; background: #1b2638; color: #facc15; }
     .formulario-publico-submit { width: 100%; height: 52px; margin-top: 40px; border: 0; border-radius: 10px; background: #3984ee; color: #fff; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(39, 116, 223, .25); cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; }
     .formulario-publico-submit:hover { background: #2b6fde; box-shadow: 0 6px 16px rgba(39, 116, 223, .35); }
     .formulario-publico-submit:active { transform: scale(0.98); }
@@ -47,14 +91,15 @@ if($esFormularioPublico):
     }
 </style>
 <style>.main-sidebar, .main-header, .main-footer { display: none !important; } .content-wrapper { margin-left: 0 !important; min-height: 100vh !important; }</style>
-<main class="formulario-publico-page">
+<main class="formulario-publico-page" id="formularioPublico">
     <header class="formulario-publico-header">
         <div class="formulario-publico-logo"><i class="fa fa-cube"></i></div>
         <div><h1><?php echo $tituloFormulario; ?></h1><p>FORMULARIO DE ENVÍO</p></div>
+        <button class="formulario-publico-theme-toggle" type="button" id="cambiarTemaPublico" aria-label="Activar modo oscuro" title="Cambiar tema"><i class="fa fa-moon-o"></i></button>
     </header>
     <section class="formulario-publico-content">
         <div class="formulario-publico-cutoff">
-            <h2><i class="fa fa-clock-o"></i>Hora de corte: 18:00</h2>
+            <h2><i class="fa fa-clock-o"></i>Hora de corte: <?php echo $horaCortePublica; ?></h2>
             <p>Asegura tu envío registrando tus datos antes de la hora de corte.</p>
         </div>
         <div class="formulario-publico-field">
@@ -65,10 +110,72 @@ if($esFormularioPublico):
             <label for="metodoPublico">¿Cómo quieres recibir tu pedido? *</label>
             <select class="formulario-publico-select" id="metodoPublico" required>
                 <option value="">Elige una opción...</option>
-                <option value="shalom">Retiro en agencia Shalom</option>
-                <option value="delivery">Delivery (Solo Lima)</option>
-                <option value="marvisur">Retiro en agencia Marvisur</option>
+                <?php foreach($metodosConfigurados as $metodo): ?>
+                    <?php if(isset($nombresMetodos[$metodo])): ?>
+                        <option value="<?php echo htmlspecialchars($metodo, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($nombresMetodos[$metodo], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </select>
+        </div>
+        <div id="camposDelivery" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="distritoPublico">Distrito *</label>
+                <input class="formulario-publico-input" id="distritoPublico" type="text" placeholder="Buscar Distrito...">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="direccionPublica">Dirección Exacta *</label>
+                <input class="formulario-publico-input" id="direccionPublica" type="text" placeholder="Calle, Av, Número...">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="referenciaPublica">Referencia *</label>
+                <input class="formulario-publico-input" id="referenciaPublica" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombrePublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombrePublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaPublica">Fecha de Envío</label>
+                <input class="formulario-publico-input" id="fechaPublica" type="date">
+            </div>
+        </div>
+        <div id="camposRetiroTienda" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="nombreRetiroPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreRetiroPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaRetiroPublica">Fecha de Recojo</label>
+                <select class="formulario-publico-select" id="fechaRetiroPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div id="camposEncomienda" class="formulario-publico-delivery-fields">
+            <div class="formulario-publico-field">
+                <label for="agenciaPublica">Busca tu Agencia *</label>
+                <input class="formulario-publico-input" id="agenciaPublica" type="text" placeholder="Buscar sede Encomienda...">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="dniPublico">DNI/CE para Recoger *</label>
+                <input class="formulario-publico-input" id="dniPublico" type="text" placeholder="Número de DNI / CE">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="nombreEncomiendaPublico">Nombre y Apellidos *</label>
+                <input class="formulario-publico-input" id="nombreEncomiendaPublico" type="text">
+            </div>
+            <div class="formulario-publico-field">
+                <label for="fechaEncomiendaPublica">Fecha de Envío</label>
+                <select class="formulario-publico-select" id="fechaEncomiendaPublica">
+                    <option value="">Elige una fecha...</option>
+                    <?php foreach($fechasRecojo as $fecha): ?>
+                        <option value="<?php echo $fecha["valor"]; ?>"><?php echo htmlspecialchars($fecha["texto"], ENT_QUOTES, "UTF-8"); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <button class="formulario-publico-submit" type="button" id="agendarPublico">Agendar y ver resumen <i class="fa fa-calendar-o"></i></button>
         <footer class="formulario-publico-footer">FORMULARIO LOGÍSTICO • CREADO POR LATAM5S</footer>
@@ -78,8 +185,56 @@ if($esFormularioPublico):
 $('#agendarPublico').on('click', function(){
     if(!$('#whatsappPublico').val().trim()) { $('#whatsappPublico').focus(); return; }
     if(!$('#metodoPublico').val()) { $('#metodoPublico').focus(); return; }
+    if(['delivery_lima', 'delivery_trujillo'].indexOf($('#metodoPublico').val()) !== -1) {
+        var camposDelivery = ['#distritoPublico', '#direccionPublica', '#referenciaPublica', '#nombrePublico'];
+        for(var i = 0; i < camposDelivery.length; i++) {
+            if(!$(camposDelivery[i]).val().trim()) { $(camposDelivery[i]).focus(); return; }
+        }
+    }
+    if($('#metodoPublico').val() == 'retiro_tienda' && !$('#nombreRetiroPublico').val().trim()) {
+        $('#nombreRetiroPublico').focus();
+        return;
+    }
+    if($('#metodoPublico').val() == 'encomienda') {
+        var camposEncomienda = ['#agenciaPublica', '#dniPublico', '#nombreEncomiendaPublico'];
+        for(var j = 0; j < camposEncomienda.length; j++) {
+            if(!$(camposEncomienda[j]).val().trim()) { $(camposEncomienda[j]).focus(); return; }
+        }
+    }
     Swal.fire({title:'Datos registrados',text:'Tu envío ha sido agendado correctamente.',icon:'success',confirmButtonText:'Continuar'});
 });
+
+$('#metodoPublico').on('change', function(){
+    var esDelivery = ['delivery_lima', 'delivery_trujillo'].indexOf($(this).val()) !== -1;
+    var esRetiroTienda = $(this).val() == 'retiro_tienda';
+    var esEncomienda = $(this).val() == 'encomienda';
+    $('#camposDelivery').toggleClass('visible', esDelivery);
+    $('#camposDelivery input').prop('required', esDelivery);
+    $('#camposRetiroTienda').toggleClass('visible', esRetiroTienda);
+    $('#nombreRetiroPublico').prop('required', esRetiroTienda);
+    $('#camposEncomienda').toggleClass('visible', esEncomienda);
+    $('#camposEncomienda input').prop('required', esEncomienda);
+});
+
+(function(){
+    var formulario = $('#formularioPublico');
+    var botonTema = $('#cambiarTemaPublico');
+    var modoOscuro = localStorage.getItem('formularioPublicoTema') == 'oscuro';
+
+    function actualizarTema(){
+        formulario.toggleClass('modo-oscuro', modoOscuro);
+        botonTema.find('i').toggleClass('fa-moon-o', !modoOscuro).toggleClass('fa-sun-o', modoOscuro);
+        botonTema.attr('aria-label', modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro');
+    }
+
+    botonTema.on('click', function(){
+        modoOscuro = !modoOscuro;
+        localStorage.setItem('formularioPublicoTema', modoOscuro ? 'oscuro' : 'claro');
+        actualizarTema();
+    });
+
+    actualizarTema();
+})();
 </script>
 <?php else:
 $enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QUOTES, "UTF-8");
