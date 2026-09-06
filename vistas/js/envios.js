@@ -197,6 +197,14 @@ $(document).ready(function(){
     });
 
     $('#btnEtiquetas').on('click', function(){
+        imprimirSeleccionados(false);
+    });
+
+    $('#btnEtiquetasGrandes').on('click', function(){
+        imprimirSeleccionados(true);
+    });
+
+    function imprimirSeleccionados(grandes){
         var seleccionados = $('.seleccionar-fila:checked');
         if(seleccionados.length === 0){
             Swal.fire('Atencion', 'Selecciona al menos un envio para imprimir', 'info');
@@ -207,10 +215,10 @@ $(document).ready(function(){
             var envio = registrosPorId[$(this).val()];
             if(envio) envios.push(envio);
         });
-        imprimirEtiquetas(envios);
-    });
+        imprimirEtiquetas(envios, grandes);
+    }
 
-    function imprimirEtiquetas(envios){
+    function imprimirEtiquetas(envios, grandes){
         var etiquetas = envios.map(function(item){
             var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
             var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
@@ -232,12 +240,15 @@ $(document).ready(function(){
         }).join('');
         var ventana = window.open('', '_blank');
         if(!ventana) return;
-        ventana.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Etiquetas de envio</title><style>' + estilosEtiquetas() + '</style></head><body>' + etiquetas + '<script>window.onload=function(){window.print();};<\/script></body></html>');
+        ventana.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Etiquetas de envio</title><style>' + estilosEtiquetas(grandes) + '</style></head><body>' + etiquetas + '<script>window.onload=function(){window.print();};<\/script></body></html>');
         ventana.document.close();
     }
 
-    function estilosEtiquetas(){
-        return '@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111}.etiqueta-envio{width:100%;min-height:82mm;margin:0 0 5mm;padding:5mm 4mm 3mm;border:1px solid #222;border-radius:3mm;page-break-inside:avoid}.etiqueta-linea{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #777;padding-bottom:2mm}.etiqueta-remitente{font-size:12px;color:#555}.etiqueta-remitente strong{font-size:17px;color:#111}.etiqueta-seccion{margin-top:3mm;font-size:11px;font-weight:bold}.etiqueta-nombre{margin-top:1mm;font-size:20px;font-weight:bold;text-transform:uppercase}.etiqueta-datos{display:flex;gap:28mm;margin-top:1mm;font-size:17px}.etiqueta-direccion{margin-top:1mm;font-size:15px;line-height:1.25}.etiqueta-pie{display:flex;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:2mm;border-top:1px solid #777;font-size:16px}.etiqueta-pie strong:first-child{background:#eee;padding:1mm 2mm}@media print{.etiqueta-envio{break-inside:avoid}}';
+    function estilosEtiquetas(grandes){
+        var ancho = grandes ? '100%' : '48%';
+        var alto = grandes ? '82mm' : '82mm';
+        var margen = grandes ? '0 0 5mm' : '0 1% 5mm';
+        return '@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;display:flex;flex-wrap:wrap;align-content:flex-start}.etiqueta-envio{width:' + ancho + ';min-height:' + alto + ';margin:' + margen + ';padding:5mm 4mm 3mm;border:1px solid #222;border-radius:3mm;page-break-inside:avoid}.etiqueta-linea{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #777;padding-bottom:2mm}.etiqueta-remitente{font-size:12px;color:#555}.etiqueta-remitente strong{font-size:17px;color:#111}.etiqueta-seccion{margin-top:3mm;font-size:11px;font-weight:bold}.etiqueta-nombre{margin-top:1mm;font-size:20px;font-weight:bold;text-transform:uppercase}.etiqueta-datos{display:flex;gap:28mm;margin-top:1mm;font-size:17px}.etiqueta-direccion{margin-top:1mm;font-size:15px;line-height:1.25}.etiqueta-pie{display:flex;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:2mm;border-top:1px solid #777;font-size:16px}.etiqueta-pie strong:first-child{background:#eee;padding:1mm 2mm}@media print{.etiqueta-envio{break-inside:avoid}}';
     }
 
     function formatearFechaEtiqueta(fecha){
