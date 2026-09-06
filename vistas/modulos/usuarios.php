@@ -52,7 +52,13 @@
 
                         <tbody>
 
-                            <?php 
+                            <?php
+
+                            if(session_status() !== PHP_SESSION_ACTIVE) session_start();
+                            if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] !== "ok" || strtolower(trim((string)($_SESSION["perfil"] ?? ""))) !== "administrador"){
+                                http_response_code(403);
+                                exit("No autorizado");
+                            }
 
                             $item=null;
                             
@@ -241,9 +247,9 @@ MODAL AGREGAR USUARIO
 
                                         <option value="Administrador">Administrador</option>
 
-                                        <option value="Especial">Especial</option>
+                                        <option value="Usuario">Usuario</option>
 
-                                        <option value="Vendedor">Vendedor</option>
+                                        <option value="Usuario/prueba">Usuario/prueba</option>
 
                                     </select>
 
@@ -400,9 +406,9 @@ MODAL EDITAR USUARIO
 
                                         <option value="Administrador">Administrador</option>
 
-                                        <option value="Especial">Especial</option>
+                                        <option value="Usuario">Usuario</option>
 
-                                        <option value="Vendedor">Vendedor</option>
+                                        <option value="Usuario/prueba">Usuario/prueba</option>
 
                                     </select>
 

@@ -15,43 +15,30 @@
           <ul class="sidebar-menu" data-widget="tree">
               <li class="header">menu de navegacion</li>
               <li>
-                  <a href="inicio">
+                  <a href="inicio" title="Inicio">
                       <i class="fa fa-home"></i> <span>inicio</span>
-                      <span class="pull-right-container">
-                          <small class="label pull-right bg-green">Hot</small>
-                      </span>
                   </a>
               </li>
+              <?php if(isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador"): ?>
               <li>
-                  <a href="usuarios">
+                  <a href="usuarios" title="Usuarios">
                       <i class="fa fa-users"></i> <span>usuarios</span>
-                      <span class="pull-right-container">
-                          <small class="label pull-right bg-green">Hot</small>
-                      </span>
                   </a>
               </li>
+              <?php endif; ?>
               <li>
-                  <a href="configuracion">
+                  <a href="configuracion" title="Configuración">
                       <i class="fa fa-cog"></i> <span>configuracion</span>
-                      <span class="pull-right-container">
-                          <small class="label pull-right bg-green">Hot</small>
-                      </span>
                   </a>
               </li>
               <li>
-                  <a href="compartir">
+                  <a href="compartir" title="Compartir">
                       <i class="fa fa-share-alt"></i> <span>Compartir</span>
-                      <span class="pull-right-container">
-                          <small class="label pull-right bg-green">Hot</small>
-                      </span>
                   </a>
               </li>
               <li>
-                  <a href="envios">
+                  <a href="envios" title="Envíos">
                       <i class="fa fa-truck"></i> <span>Envios</span>
-                      <span class="pull-right-container">
-                          <small class="label pull-right bg-green">Hot</small>
-                      </span>
                   </a>
               </li>
             

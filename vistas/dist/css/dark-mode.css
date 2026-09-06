@@ -226,6 +226,19 @@ html[data-theme="light"] .main-footer {
     transition: all var(--transition-fast);
 }
 
+.sidebar-menu > li > a > i {
+    width: 22px;
+    margin-right: 8px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-mini.sidebar-collapse .sidebar-menu > li > a > i {
+    width: 100%;
+    margin: 0;
+    font-size: 17px;
+}
+
 .sidebar-menu > li > a:hover {
     background-color: var(--bg-hover);
     color: var(--text-primary);
@@ -567,6 +580,43 @@ html[data-theme="light"] .main-footer {
     border-top: 1px solid var(--border-color);
     background-color: var(--bg-hover);
 }
+
+#modalAgregarUsuario .modal-content,
+#modalEditarUsuario .modal-content {
+    overflow: hidden;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+#modalAgregarUsuario .modal-header,
+#modalEditarUsuario .modal-header {
+    background: var(--header-color) !important;
+    color: #fff !important;
+    border-bottom: 0;
+}
+
+#modalAgregarUsuario .modal-header .close,
+#modalEditarUsuario .modal-header .close { color: #fff; opacity: .8; }
+#modalAgregarUsuario .modal-body,
+#modalEditarUsuario .modal-body { background: var(--bg-card); color: var(--text-primary); }
+#modalAgregarUsuario .box-body,
+#modalEditarUsuario .box-body { background: transparent; }
+#modalAgregarUsuario .input-group-addon,
+#modalEditarUsuario .input-group-addon { min-width: 46px; border-color: var(--border-color); background: var(--bg-hover); color: var(--text-secondary); }
+#modalAgregarUsuario .form-control,
+#modalEditarUsuario .form-control { border-color: var(--border-color); background: var(--bg-input); color: var(--text-primary); }
+#modalAgregarUsuario .form-control::placeholder,
+#modalEditarUsuario .form-control::placeholder { color: var(--text-muted); }
+#modalAgregarUsuario select.form-control,
+#modalEditarUsuario select.form-control { color: var(--text-primary); }
+#modalAgregarUsuario .panel,
+#modalEditarUsuario .panel { border-color: var(--border-color); background: var(--bg-hover); color: var(--text-primary); }
+#modalAgregarUsuario .help-block,
+#modalEditarUsuario .help-block { color: var(--text-secondary); }
+#modalAgregarUsuario .modal-footer,
+#modalEditarUsuario .modal-footer { border-top-color: var(--border-color); background: var(--bg-hover); }
+#modalAgregarUsuario input[type="file"],
+#modalEditarUsuario input[type="file"] { color: var(--text-primary); }
 
 .close {
     color: var(--text-secondary);

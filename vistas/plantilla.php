@@ -24,7 +24,7 @@ session_start();
     <!-- Theme style -->
     <link rel="stylesheet" href="vistas/dist/css/AdminLTE.min.css">
     <!-- Dark Mode CSS -->
-    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260905-3">
+    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260905-4">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
@@ -79,6 +79,13 @@ if((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || 
         if(isset($_GET["ruta"])){
 
             $ruta = strtolower($_GET["ruta"]);
+
+            $esAdministrador = isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador";
+
+            if($ruta === "usuarios" && !$esAdministrador){
+                http_response_code(403);
+                $ruta = "inicio";
+            }
 
             if($ruta == "usuarios" ||
                 $ruta == "configuracion" ||

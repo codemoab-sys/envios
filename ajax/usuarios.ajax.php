@@ -1,5 +1,14 @@
 <?php 
 
+session_start();
+
+if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] !== "ok" || strtolower(trim((string)($_SESSION["perfil"] ?? ""))) !== "administrador"){
+    http_response_code(403);
+    header("Content-Type: application/json; charset=UTF-8");
+    echo json_encode(array("estado" => "error", "mensaje" => "No autorizado"));
+    exit;
+}
+
 require_once "../controladores/usuarios.controlador.php";
 require_once "../modelo/usuarios.modelo.php";
 
