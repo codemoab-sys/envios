@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    var registrosPorId = {};
     var fechasIniciales = obtenerFechasPorDefecto();
     $('#filtroFechaInicio').val(fechasIniciales.inicio);
     $('#filtroFechaFin').val(fechasIniciales.fin);
@@ -68,6 +69,7 @@ $(document).ready(function(){
         $('#vacioRespuestas').hide();
         $('#contadorRespuestasBoard').text(datos.length + ' registros');
         $.each(datos, function(i, item){
+            registrosPorId[item.id] = item;
             var fechaRegistro = item.fecha ? item.fecha.split(' ')[0].split('-').reverse().join('/') : '-';
             var horaRegistro = item.fecha ? item.fecha.split(' ')[1] : '';
             var fechaEnvioTexto = formatearFechaEnvio(item.fecha_envio, fechaRegistro, horaRegistro);
@@ -193,6 +195,63 @@ $(document).ready(function(){
     $('#btnActualizar').on('click', function(){
         cargarRespuestas();
     });
+
+    $('#btnEtiquetas').on('click', function(){
+        var seleccionados = $('.seleccionar-fila:checked');
+        if(seleccionados.length === 0){
+            Swal.fire('Atencion', 'Selecciona al menos un envio para imprimir', 'info');
+            return;
+        }
+        var envios = [];
+        seleccionados.each(function(){
+            var envio = registrosPorId[$(this).val()];
+            if(envio) envios.push(envio);
+        });
+        imprimirEtiquetas(envios);
+    });
+
+    function imprimirEtiquetas(envios){
+        var etiquetas = envios.map(function(item){
+            var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
+            var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+            var fecha = formatearFechaEtiqueta(item.fecha_envio || item.fecha);
+            var courier = escaparHtmlTexto(obtenerCourier(item.agencia));
+            var nombre = escaparHtmlTexto(item.nombre || '-');
+            var telefono = escaparHtmlTexto(item.telefono || '-');
+            var direccion = escaparHtmlTexto(item.direccion || '-');
+            var documento = escaparHtmlTexto(dni || '-');
+            return '<article class="etiqueta-envio">' +
+                '<div class="etiqueta-linea etiqueta-remitente"><span>REMITENTE</span><strong>MODA A&amp;B</strong></div>' +
+                '<div class="etiqueta-seccion">DESTINATARIO:</div>' +
+                '<div class="etiqueta-nombre">' + nombre + '</div>' +
+                '<div class="etiqueta-datos"><strong>N°DOC: ' + documento + '</strong><strong>Cel: ' + telefono + '</strong></div>' +
+                '<div class="etiqueta-seccion">DESTINO:</div>' +
+                '<div class="etiqueta-direccion">' + direccion + '</div>' +
+                '<div class="etiqueta-pie"><strong>' + courier.toUpperCase() + '</strong><strong>' + fecha + '</strong></div>' +
+                '</article>';
+        }).join('');
+        var ventana = window.open('', '_blank');
+        if(!ventana) return;
+        ventana.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Etiquetas de envio</title><style>' + estilosEtiquetas() + '</style></head><body>' + etiquetas + '<script>window.onload=function(){window.print();};<\/script></body></html>');
+        ventana.document.close();
+    }
+
+    function estilosEtiquetas(){
+        return '@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111}.etiqueta-envio{width:100%;min-height:82mm;margin:0 0 5mm;padding:5mm 4mm 3mm;border:1px solid #222;border-radius:3mm;page-break-inside:avoid}.etiqueta-linea{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #777;padding-bottom:2mm}.etiqueta-remitente{font-size:12px;color:#555}.etiqueta-remitente strong{font-size:17px;color:#111}.etiqueta-seccion{margin-top:3mm;font-size:11px;font-weight:bold}.etiqueta-nombre{margin-top:1mm;font-size:20px;font-weight:bold;text-transform:uppercase}.etiqueta-datos{display:flex;gap:28mm;margin-top:1mm;font-size:17px}.etiqueta-direccion{margin-top:1mm;font-size:15px;line-height:1.25}.etiqueta-pie{display:flex;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:2mm;border-top:1px solid #777;font-size:16px}.etiqueta-pie strong:first-child{background:#eee;padding:1mm 2mm}@media print{.etiqueta-envio{break-inside:avoid}}';
+    }
+
+    function formatearFechaEtiqueta(fecha){
+        var valor = (fecha || '').toString().trim().split(' ')[0];
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor || '-';
+        var partes = valor.split('-');
+        var fechaLocal = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+        var dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+        return dias[fechaLocal.getDay()] + ' ' + partes[2] + '/' + partes[1];
+    }
+
+    function escaparHtmlTexto(texto){
+        return $('<div>').text(texto || '').html();
+    }
 
     $('#btnTodo').on('click', function(){
         var filas = $('.seleccionar-fila');

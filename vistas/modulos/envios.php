@@ -298,6 +298,7 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
             <button class="envios-button" type="button" id="btnTodo"><i class="fa fa-check-square-o"></i><span>Todo</span></button>
             <button class="envios-button envios-button-icon" type="button" id="btnActualizar" title="Actualizar"><i class="fa fa-refresh"></i></button>
             <span class="envios-spacer" aria-hidden="true"></span>
+            <button class="envios-button" type="button" id="btnEtiquetas"><i class="fa fa-print"></i>Etiquetas</button>
             <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Completar</button>
             <button class="envios-button envios-button-danger envios-button-icon" type="button" id="btnEliminar" title="Eliminar"><i class="fa fa-trash-o"></i></button>
         </div>
