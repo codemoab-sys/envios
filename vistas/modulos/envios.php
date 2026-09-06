@@ -242,6 +242,9 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
     .envios-empty i { font-size: 48px; color: #26344b; margin-bottom: 16px; display: block; }
     .envios-empty p { color: #8490aa; font-size: 15px; margin: 0; }
     .envios-loading { text-align: center; color: #8490aa; padding: 30px; }
+    .envios-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; border-top: 1px solid #26344b; color: #9ab1d3; font-size: 13px; }
+    .envios-pagination button { min-width: 36px; height: 32px; border: 1px solid #33415a; border-radius: 8px; background: #202c42; color: #dce5f8; cursor: pointer; }
+    .envios-pagination button:disabled { opacity: .4; cursor: not-allowed; }
     @media (max-width: 767px) {
         .envios-page { padding: 12px; }
         .envios-toolbar-row { flex-wrap: wrap; }
@@ -298,8 +301,13 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
             <button class="envios-button" type="button" id="btnTodo"><i class="fa fa-check-square-o"></i><span>Todo</span></button>
             <button class="envios-button envios-button-icon" type="button" id="btnActualizar" title="Actualizar"><i class="fa fa-refresh"></i></button>
             <span class="envios-spacer" aria-hidden="true"></span>
-            <button class="envios-button" type="button" id="btnEtiquetas"><i class="fa fa-print"></i>Etiquetas</button>
-            <button class="envios-button" type="button" id="btnEtiquetasGrandes"><i class="fa fa-file-text-o"></i>Etiquetas grandes</button>
+            <select class="envios-control" id="selectorEtiquetas" aria-label="Formato de etiquetas">
+                <option value="">Etiquetas</option>
+                <option value="grandes">Etiquetas en 1 columna</option>
+                <option value="dos-columnas">Etiquetas en 2 columnas</option>
+                <option value="tres-columnas">Etiquetas en 3 columnas</option>
+            </select>
+            <button class="envios-button envios-button-green" type="button" id="btnExcel"><i class="fa fa-file-excel-o"></i>Excel</button>
             <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Completar</button>
             <button class="envios-button envios-button-danger envios-button-icon" type="button" id="btnEliminar" title="Eliminar"><i class="fa fa-trash-o"></i></button>
         </div>
@@ -312,6 +320,11 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
         </div>
         <div class="envios-cards-wrap" id="contenedorTabla">
             <div class="envios-cards" id="tablaRespuestas"></div>
+        </div>
+        <div class="envios-pagination" id="paginacionRespuestas" style="display:none">
+            <button type="button" id="btnPaginaAnterior" aria-label="Pagina anterior"><i class="fa fa-chevron-left"></i></button>
+            <span id="textoPaginacionRespuestas"></span>
+            <button type="button" id="btnPaginaSiguiente" aria-label="Pagina siguiente"><i class="fa fa-chevron-right"></i></button>
         </div>
         <div class="envios-empty" id="vacioRespuestas" style="display:none">
             <i class="fa fa-inbox"></i>

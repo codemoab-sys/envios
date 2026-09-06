@@ -70,9 +70,12 @@ class ModeloEnvios{
         }
     }
 
-    static public function mdlListarRespuestas($estado, $busqueda, $agencia = "todos", $fechaInicio = "", $fechaFin = ""){
+    static public function mdlListarRespuestas($estado, $busqueda, $agencia = "todos", $fechaInicio = "", $fechaFin = "", $pagina = 1, $limite = 10){
         try{
             $conexion = self::prepararTabla();
+            $pagina = max(1, (int) $pagina);
+            $limite = min(100, max(1, (int) $limite));
+            $offset = ($pagina - 1) * $limite;
             $where = "";
             $parametros = array();
 
@@ -106,10 +109,23 @@ class ModeloEnvios{
                 $parametros[":busqueda4"] = "%" . $busqueda . "%";
             }
 
-            $sql = "SELECT * FROM respuestas_formulario" . $where . " ORDER BY fecha DESC";
+            $totalStmt = $conexion->prepare("SELECT COUNT(*) FROM respuestas_formulario" . $where);
+            $totalStmt->execute($parametros);
+            $total = (int) $totalStmt->fetchColumn();
+            $totalPaginas = max(1, (int) ceil($total / $limite));
+            if($pagina > $totalPaginas){
+                $pagina = $totalPaginas;
+                $offset = ($pagina - 1) * $limite;
+            }
+
+            $sql = "SELECT * FROM respuestas_formulario" . $where . " ORDER BY fecha DESC LIMIT " . $limite . " OFFSET " . $offset;
             $stmt = $conexion->prepare($sql);
             $stmt->execute($parametros);
-            return array("estado" => "ok", "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC));
+            return array(
+                "estado" => "ok",
+                "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC),
+                "paginacion" => array("pagina" => $pagina, "limite" => $limite, "total" => $total, "total_paginas" => $totalPaginas)
+            );
         }catch(PDOException $e){
             return array("estado" => "error", "mensaje" => $e->getMessage());
         }

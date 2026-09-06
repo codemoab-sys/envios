@@ -20,7 +20,7 @@ if(isset($_POST["guardarRespuestaAjax"])){
 }
 
 if(isset($_POST["listarRespuestasAjax"])){
-    echo json_encode(ControladorEnvios::ctrListarRespuestas($_POST["estado"] ?? "todos", $_POST["busqueda"] ?? "", $_POST["agencia"] ?? "todos", $_POST["fecha_inicio"] ?? "", $_POST["fecha_fin"] ?? ""));
+    echo json_encode(ControladorEnvios::ctrListarRespuestas($_POST["estado"] ?? "todos", $_POST["busqueda"] ?? "", $_POST["agencia"] ?? "todos", $_POST["fecha_inicio"] ?? "", $_POST["fecha_fin"] ?? "", (int)($_POST["pagina"] ?? 1), (int)($_POST["limite"] ?? 10)));
     exit;
 }
 

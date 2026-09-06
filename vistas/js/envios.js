@@ -1,5 +1,8 @@
 $(document).ready(function(){
     var registrosPorId = {};
+    var ventanaEtiquetas = null;
+    var paginaActual = 1;
+    var limitePagina = 10;
     var fechasIniciales = obtenerFechasPorDefecto();
     $('#filtroFechaInicio').val(fechasIniciales.inicio);
     $('#filtroFechaFin').val(fechasIniciales.fin);
@@ -19,7 +22,7 @@ $(document).ready(function(){
         $.ajax({
             url: 'ajax/envios.ajax.php',
             method: 'POST',
-            data: { listarRespuestasAjax: 1, estado: estado, agencia: agencia, fecha_inicio: fechaInicio, fecha_fin: fechaFin, busqueda: busqueda },
+            data: { listarRespuestasAjax: 1, estado: estado, agencia: agencia, fecha_inicio: fechaInicio, fecha_fin: fechaFin, busqueda: busqueda, pagina: paginaActual, limite: limitePagina },
             dataType: 'json',
             beforeSend: function(){
                 $('#tablaRespuestas').html('<div class="envios-loading"><i class="fa fa-spinner fa-spin"></i> Cargando...</div>');
@@ -28,7 +31,7 @@ $(document).ready(function(){
             },
             success: function(respuesta){
                 if(respuesta.estado === 'ok'){
-                    renderizarTabla(respuesta.datos);
+                    renderizarTabla(respuesta.datos, respuesta.paginacion);
                 } else {
                     $('#tablaRespuestas').html('<div class="envios-loading" style="color:#e36b77">Error al cargar datos</div>');
                 }
@@ -56,18 +59,19 @@ $(document).ready(function(){
         return anio + '-' + mes + '-' + dia;
     }
 
-    function renderizarTabla(datos){
+    function renderizarTabla(datos, paginacion){
         var contenedor = $('#tablaRespuestas');
         contenedor.empty();
         if(datos.length === 0){
             $('#contenedorTabla').hide();
             $('#vacioRespuestas').show();
             $('#contadorRespuestasBoard').text('0 registros');
+            $('#paginacionRespuestas').hide();
             return;
         }
         $('#contenedorTabla').show();
         $('#vacioRespuestas').hide();
-        $('#contadorRespuestasBoard').text(datos.length + ' registros');
+        $('#contadorRespuestasBoard').text((paginacion ? paginacion.total : datos.length) + ' registros');
         $.each(datos, function(i, item){
             registrosPorId[item.id] = item;
             var fechaRegistro = item.fecha ? item.fecha.split(' ')[0].split('-').reverse().join('/') : '-';
@@ -105,7 +109,20 @@ $(document).ready(function(){
             '</article>';
             contenedor.append(fila);
         });
+        actualizarPaginacion(paginacion);
         actualizarBotonTodo();
+    }
+
+    function actualizarPaginacion(paginacion){
+        if(!paginacion || paginacion.total_paginas <= 1){
+            $('#paginacionRespuestas').hide();
+            return;
+        }
+        paginaActual = Number(paginacion.pagina);
+        $('#paginacionRespuestas').show();
+        $('#textoPaginacionRespuestas').text('Pagina ' + paginaActual + ' de ' + paginacion.total_paginas);
+        $('#btnPaginaAnterior').prop('disabled', paginaActual <= 1);
+        $('#btnPaginaSiguiente').prop('disabled', paginaActual >= paginacion.total_paginas);
     }
 
     function crearMensajeWhatsapp(item){
@@ -175,36 +192,104 @@ $(document).ready(function(){
     }
 
     $('#filtroEstado').on('change', function(){
+        paginaActual = 1;
         cargarRespuestas();
     });
 
     $('#filtroAgencia').on('change', function(){
+        paginaActual = 1;
         cargarRespuestas();
     });
 
     $('#filtroFechaInicio, #filtroFechaFin').on('change', function(){
+        paginaActual = 1;
         cargarRespuestas();
     });
 
     var temporizadorBusqueda;
     $('#buscadorRespuestas').on('input', function(){
         clearTimeout(temporizadorBusqueda);
-        temporizadorBusqueda = setTimeout(function(){ cargarRespuestas(); }, 400);
+        temporizadorBusqueda = setTimeout(function(){ paginaActual = 1; cargarRespuestas(); }, 400);
     });
 
     $('#btnActualizar').on('click', function(){
+        paginaActual = 1;
         cargarRespuestas();
     });
 
-    $('#btnEtiquetas').on('click', function(){
-        imprimirSeleccionados(false);
+    $('#btnPaginaAnterior').on('click', function(){
+        if(paginaActual > 1){
+            paginaActual--;
+            cargarRespuestas();
+        }
     });
 
-    $('#btnEtiquetasGrandes').on('click', function(){
-        imprimirSeleccionados(true);
+    $('#btnPaginaSiguiente').on('click', function(){
+        paginaActual++;
+        cargarRespuestas();
     });
 
-    function imprimirSeleccionados(grandes){
+    $('#selectorEtiquetas').on('change', function(){
+        var selector = this;
+        var formato = selector.value;
+        if(formato){
+            imprimirSeleccionados(formato);
+            setTimeout(function(){
+                selector.value = '';
+                selector.blur();
+            }, 0);
+        }
+    });
+
+    $('#btnExcel').on('click', function(){
+        var seleccionados = $('.seleccionar-fila:checked');
+        if(seleccionados.length === 0){
+            Swal.fire('Atencion', 'Selecciona al menos un envio para exportar', 'info');
+            return;
+        }
+        var envios = [];
+        seleccionados.each(function(){
+            var envio = registrosPorId[$(this).val()];
+            if(envio) envios.push(envio);
+        });
+        exportarExcel(envios);
+    });
+
+    function exportarExcel(envios){
+        var encabezados = ['Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
+        var filas = envios.map(function(item){
+            var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
+            var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+            return [
+                item.nombre || '',
+                item.telefono || '',
+                formatearFechaEtiqueta(item.fecha_envio || item.fecha),
+                obtenerCourier(item.agencia),
+                item.direccion || '',
+                dni,
+                item.estado === 'completado' ? 'Completado' : 'Pendiente'
+            ];
+        });
+        var contenido = [encabezados].concat(filas).map(function(fila){
+            return fila.map(function(valor){
+                return '"' + (valor || '').toString().replace(/"/g, '""').replace(/\r?\n/g, ' ') + '"';
+            }).join(';');
+        }).join('\r\n');
+        var archivo = new Blob(['\uFEFF' + contenido], {type: 'text/csv;charset=utf-8;'});
+        var enlace = document.createElement('a');
+        enlace.href = URL.createObjectURL(archivo);
+        enlace.download = 'reporte-envios-' + convertirFechaInput(new Date()) + '.csv';
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+        URL.revokeObjectURL(enlace.href);
+    }
+
+    $(window).on('focus pageshow', function(){
+        $('#selectorEtiquetas').val('').prop('disabled', false).blur();
+    });
+
+    function imprimirSeleccionados(formato){
         var seleccionados = $('.seleccionar-fila:checked');
         if(seleccionados.length === 0){
             Swal.fire('Atencion', 'Selecciona al menos un envio para imprimir', 'info');
@@ -215,10 +300,10 @@ $(document).ready(function(){
             var envio = registrosPorId[$(this).val()];
             if(envio) envios.push(envio);
         });
-        imprimirEtiquetas(envios, grandes);
+        imprimirEtiquetas(envios, formato);
     }
 
-    function imprimirEtiquetas(envios, grandes){
+    function imprimirEtiquetas(envios, formato){
         var etiquetas = envios.map(function(item){
             var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
             var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
@@ -238,17 +323,36 @@ $(document).ready(function(){
                 '<div class="etiqueta-pie"><strong>' + courier.toUpperCase() + '</strong><strong>' + fecha + '</strong></div>' +
                 '</article>';
         }).join('');
-        var ventana = window.open('', '_blank');
-        if(!ventana) return;
-        ventana.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Etiquetas de envio</title><style>' + estilosEtiquetas(grandes) + '</style></head><body>' + etiquetas + '<script>window.onload=function(){window.print();};<\/script></body></html>');
+        if(ventanaEtiquetas && !ventanaEtiquetas.closed){
+            ventanaEtiquetas.focus();
+        }else{
+            ventanaEtiquetas = window.open('', 'ventanaEtiquetasEnvios');
+        }
+        if(!ventanaEtiquetas){
+            Swal.fire('Atencion', 'El navegador bloqueo la ventana de impresion. Permite las ventanas emergentes para este sitio.', 'warning');
+            return;
+        }
+        var ventana = ventanaEtiquetas;
+        ventana.document.open();
+        ventana.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Etiquetas de envio</title><style>' + estilosEtiquetas(formato) + '</style></head><body>' + etiquetas + '<script>window.onload=function(){window.print();};<\/script></body></html>');
         ventana.document.close();
     }
 
-    function estilosEtiquetas(grandes){
-        var ancho = grandes ? '100%' : '48%';
-        var alto = grandes ? '82mm' : '82mm';
-        var margen = grandes ? '0 0 5mm' : '0 1% 5mm';
-        return '@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;display:flex;flex-wrap:wrap;align-content:flex-start}.etiqueta-envio{width:' + ancho + ';min-height:' + alto + ';margin:' + margen + ';padding:5mm 4mm 3mm;border:1px solid #222;border-radius:3mm;page-break-inside:avoid}.etiqueta-linea{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #777;padding-bottom:2mm}.etiqueta-remitente{font-size:12px;color:#555}.etiqueta-remitente strong{font-size:17px;color:#111}.etiqueta-seccion{margin-top:3mm;font-size:11px;font-weight:bold}.etiqueta-nombre{margin-top:1mm;font-size:20px;font-weight:bold;text-transform:uppercase}.etiqueta-datos{display:flex;gap:28mm;margin-top:1mm;font-size:17px}.etiqueta-direccion{margin-top:1mm;font-size:15px;line-height:1.25}.etiqueta-pie{display:flex;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:2mm;border-top:1px solid #777;font-size:16px}.etiqueta-pie strong:first-child{background:#eee;padding:1mm 2mm}@media print{.etiqueta-envio{break-inside:avoid}}';
+    function estilosEtiquetas(formato){
+        var tresColumnas = formato === 'tres-columnas';
+        var grandes = formato === 'grandes';
+        var ancho = grandes ? '100%' : (tresColumnas ? '31.8%' : '48%');
+        var alto = grandes ? '82mm' : (tresColumnas ? '62mm' : '82mm');
+        var margen = grandes ? '0 0 5mm' : (tresColumnas ? '0 .75% 4mm' : '0 1% 5mm');
+        var padding = tresColumnas ? '3mm 2.5mm 2mm' : '5mm 4mm 3mm';
+        var tamanoRemitente = tresColumnas ? '8px' : '12px';
+        var tamanoMarca = tresColumnas ? '11px' : '17px';
+        var tamanoSeccion = tresColumnas ? '7px' : '11px';
+        var tamanoNombre = tresColumnas ? '13px' : '20px';
+        var tamanoDatos = tresColumnas ? '10px' : '17px';
+        var tamanoDireccion = tresColumnas ? '9px' : '15px';
+        var tamanoPie = tresColumnas ? '10px' : '16px';
+        return '@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;display:flex;flex-wrap:wrap;align-content:flex-start}.etiqueta-envio{width:' + ancho + ';min-height:' + alto + ';margin:' + margen + ';padding:' + padding + ';border:1px solid #222;border-radius:3mm;page-break-inside:avoid}.etiqueta-linea{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #777;padding-bottom:2mm}.etiqueta-remitente{font-size:' + tamanoRemitente + ';color:#555}.etiqueta-remitente strong{font-size:' + tamanoMarca + ';color:#111}.etiqueta-seccion{margin-top:3mm;font-size:' + tamanoSeccion + ';font-weight:bold}.etiqueta-nombre{margin-top:1mm;font-size:' + tamanoNombre + ';font-weight:bold;text-transform:uppercase}.etiqueta-datos{display:flex;gap:' + (tresColumnas ? '4mm' : '28mm') + ';margin-top:1mm;font-size:' + tamanoDatos + '}.etiqueta-direccion{margin-top:1mm;font-size:' + tamanoDireccion + ';line-height:1.25}.etiqueta-pie{display:flex;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:2mm;border-top:1px solid #777;font-size:' + tamanoPie + '}.etiqueta-pie strong:first-child{background:#eee;padding:1mm 2mm}@media print{.etiqueta-envio{break-inside:avoid}}';
     }
 
     function formatearFechaEtiqueta(fecha){

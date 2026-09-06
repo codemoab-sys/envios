@@ -24,8 +24,8 @@ class ControladorEnvios{
         return ModeloEnvios::mdlGuardarRespuesta($datos);
     }
 
-    static public function ctrListarRespuestas($estado, $busqueda, $agencia = "todos", $fechaInicio = "", $fechaFin = ""){
-        return ModeloEnvios::mdlListarRespuestas($estado, $busqueda, $agencia, $fechaInicio, $fechaFin);
+    static public function ctrListarRespuestas($estado, $busqueda, $agencia = "todos", $fechaInicio = "", $fechaFin = "", $pagina = 1, $limite = 10){
+        return ModeloEnvios::mdlListarRespuestas($estado, $busqueda, $agencia, $fechaInicio, $fechaFin, $pagina, $limite);
     }
 
     static public function ctrCambiarEstado($id, $nuevoEstado){
