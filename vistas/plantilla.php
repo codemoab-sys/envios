@@ -34,7 +34,7 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
     <!-- Theme style -->
     <link rel="stylesheet" href="vistas/dist/css/AdminLTE.min.css">
     <!-- Dark Mode CSS -->
-    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260906-23">
+    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260906-25">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
@@ -95,6 +95,7 @@ if($esRegistro){
 
         }
 
+        include "modulos/footer.php";
 
         echo '</div>';
 

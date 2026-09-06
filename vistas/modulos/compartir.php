@@ -864,7 +864,7 @@ $enlaceCompartirRaw = trim((string) ($formularioCompartir["enlace"] ?? ""));
 $enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
 ?>
 <style>
-    .compartir-page { position: relative; left: 0; width: calc(100vw - 230px); min-height: 0 !important; margin-top: 50px; margin-left: 230px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 24px 20px 32px; background: #030817; color: #f5f7ff; font-family: 'Source Sans Pro', sans-serif; }
+    .compartir-page { position: relative; left: 0; width: calc(100vw - 230px); min-height: calc(100vh - 50px - 54px) !important; margin-top: 50px; margin-left: 230px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 24px 20px 32px; background: #030817; color: #f5f7ff; font-family: 'Source Sans Pro', sans-serif; }
     body.sidebar-collapse .compartir-page { width: calc(100vw - 50px); margin-left: 50px; }
     .compartir-shell { width: 100%; max-width: 560px; text-align: center; }
     .compartir-card { padding: 24px 28px 22px; border: 1px solid #344052; border-radius: 22px; background: linear-gradient(145deg, #1e2a3d, #111a2d); box-shadow: 0 24px 50px rgba(0, 0, 0, .35); }
@@ -886,7 +886,7 @@ $enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
     [data-theme="light"] .compartir-action-open { border-color: #cbd5e1; background: #fff; color: #334155; }
     [data-theme="dark"] .compartir-page { background: #030817; color: #f5f7ff; }
     [data-theme="dark"] .compartir-card { border-color: #344052; background: linear-gradient(145deg, #1e2a3d, #111a2d); }
-    @media (max-width: 767px) { .compartir-page { width: 100%; margin-left: 0; margin-top: 50px; } }
+    @media (max-width: 767px) { .compartir-page { width: 100%; min-height: calc(100vh - 50px - 64px) !important; margin-left: 0; margin-top: 50px; } }
     @media (max-width: 600px) { .compartir-page { padding: 18px 12px 24px; } .compartir-card { padding: 20px 16px 18px; border-radius: 20px; } .compartir-card h1 { font-size: 23px; } .compartir-copy { font-size: 14px; } .compartir-link { padding: 12px 14px; font-size: 11px; } .compartir-action { min-height: 42px; font-size: 14px; } }
     @media (max-height: 620px) { .compartir-page { padding-top: 12px; padding-bottom: 12px; } .compartir-card { padding-top: 14px; padding-bottom: 12px; } .compartir-icon { width: 48px; height: 48px; margin-bottom: 8px; font-size: 22px; } .compartir-card h1 { margin-bottom: 6px; font-size: 21px; } .compartir-copy { margin-bottom: 10px; } .compartir-link { margin-bottom: 10px; padding: 9px 12px; } .compartir-action { min-height: 36px; margin-bottom: 5px; } }
 </style>
