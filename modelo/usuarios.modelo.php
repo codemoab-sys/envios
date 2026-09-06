@@ -4,6 +4,42 @@ require_once "conexion.php";
 
 class ModeloUsuarios{
 
+    static public function mdlRegistrarCuenta($nombre, $whatsapp, $password){
+        try{
+            $conexion = Conexion::conectar();
+            $consulta = $conexion->prepare("SELECT id FROM usuarios WHERE usuario = :usuario LIMIT 1");
+            $consulta->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);
+            $consulta->execute();
+            if($consulta->fetch()) return "existe";
+
+            $encriptada = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+            $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, usuario, password, perfil, foto, estado) VALUES (:nombre, :usuario, :password, 'Administrador', '', 1)");
+            $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
+            $stmt->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);
+            $stmt->bindParam(":password", $encriptada, PDO::PARAM_STR);
+            if(!$stmt->execute()) return "error";
+
+            $configuracion = $conexion->prepare("SELECT id FROM configuracion ORDER BY id ASC LIMIT 1");
+            $configuracion->execute();
+            $fila = $configuracion->fetch(PDO::FETCH_ASSOC);
+            if($fila){
+                $actualizar = $conexion->prepare("UPDATE configuracion SET nombre_emprendimiento = :nombre, whatsapp = :whatsapp WHERE id = :id");
+                $actualizar->bindParam(":nombre", $nombre, PDO::PARAM_STR);
+                $actualizar->bindParam(":whatsapp", $whatsapp, PDO::PARAM_STR);
+                $actualizar->bindParam(":id", $fila["id"], PDO::PARAM_INT);
+                $actualizar->execute();
+            }else{
+                $crear = $conexion->prepare("INSERT INTO configuracion (nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho) VALUES (:nombre, :whatsapp, '[]', '[]')");
+                $crear->bindParam(":nombre", $nombre, PDO::PARAM_STR);
+                $crear->bindParam(":whatsapp", $whatsapp, PDO::PARAM_STR);
+                $crear->execute();
+            }
+            return "ok";
+        }catch(PDOException $e){
+            return "error";
+        }
+    }
+
     static public function mdlMostrarUsuarios($tabla,$item,$valor){
 
         if($item !=null){

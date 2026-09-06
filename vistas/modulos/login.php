@@ -22,6 +22,7 @@ $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecer
     .login-field-custom .form-control:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(59,130,246,.14); }
     .login-submit-custom { width: 100%; height: 48px; margin-top: 6px; border: 0; border-radius: 9px; background: var(--button-primary-color); color: var(--button-primary-text); font-size: 15px; font-weight: 700; cursor: pointer; }
     .login-submit-custom:hover { filter: brightness(1.08); }
+    .login-register-custom { display:block; margin-top:18px; color:var(--accent-primary); text-align:center; }
     [data-theme="dark"] body:has(.login-page-custom) { background: #0f172a; }
     @media (max-width: 480px) { .login-page-custom { padding: 16px; } .login-panel-custom { padding: 26px 20px; } }
 </style>
@@ -45,5 +46,6 @@ $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecer
             <button type="submit" class="login-submit-custom">Ingresar <i class="fa fa-arrow-right"></i></button>
             <?php ControladorUsuarios::ctrIngresoUsuario(); ?>
         </form>
+        <a class="login-register-custom" href="?ruta=registro">Crear una cuenta</a>
     </section>
 </main>

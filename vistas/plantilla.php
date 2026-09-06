@@ -65,8 +65,11 @@ session_start();
     <?php
     
 $esFormularioPublico = isset($_GET["ruta"]) && strtolower($_GET["ruta"]) == "compartir" && isset($_GET["merchant"]);
+$esRegistro = isset($_GET["ruta"]) && strtolower($_GET["ruta"]) === "registro";
 
-if((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || $esFormularioPublico){
+if($esRegistro){
+    include "modulos/registro.php";
+}elseif((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || $esFormularioPublico){
 
     echo'<div class="wrapper">';
 
@@ -100,7 +103,8 @@ if((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || 
                 $ruta == "editar-venta"||
                 $ruta == "clientes"||
                 $ruta == "compartir"||
-                $ruta == "envios"){
+                $ruta == "envios" ||
+                $ruta == "registro"){
 
                 include "modulos/".$ruta.".php";
 

@@ -67,6 +67,26 @@ class ControladorUsuarios{
 
     }
 
+    static public function ctrRegistrarCuenta(){
+        if(!isset($_POST["registrarCuenta"])) return;
+
+        $nombre = trim((string)($_POST["nombreEmprendimiento"] ?? ""));
+        $whatsapp = preg_replace('/\D/', '', (string)($_POST["whatsapp"] ?? ""));
+        $password = (string)($_POST["passwordRegistro"] ?? "");
+
+        if($nombre === "" || !preg_match('/^9[0-9]{8}$/', $whatsapp) || strlen($password) < 6){
+            echo '<div class="login-alert">Completa el nombre, un WhatsApp válido y una contraseña de al menos 6 caracteres.</div>';
+            return;
+        }
+
+        $respuesta = ModeloUsuarios::mdlRegistrarCuenta($nombre, $whatsapp, $password);
+        if($respuesta === "ok"){
+            echo '<script>window.location="?ruta=login&registro=ok";</script>';
+        }else{
+            echo '<div class="login-alert">Ese WhatsApp ya está registrado o no se pudo crear la cuenta.</div>';
+        }
+    }
+
 
     
 
