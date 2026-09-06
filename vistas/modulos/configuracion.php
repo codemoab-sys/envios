@@ -42,7 +42,7 @@ $dias = array(
 ?>
 
 <style>
-    .configuracion-page { background: #060b1e; min-height: calc(100vh - 50px); padding: 28px 35px 12px; color: #98a7bf; }
+    .configuracion-page { background: #060b1e; min-height: calc(100vh - 50px); padding: 42px 35px 20px; color: #98a7bf; }
     .configuracion-page .configuracion-title { color: #f4f7fb; font-size: 30px; font-weight: 700; margin: 0 0 36px; }
     .configuracion-page .configuracion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1480px; margin: 0 auto; }
     .configuracion-page .config-card { background: #182337; border: 1px solid #2b3a52; border-radius: 28px; padding: 30px; box-shadow: 0 12px 30px rgba(0,0,0,.12); }
@@ -74,7 +74,7 @@ $dias = array(
     .configuracion-page .input-icon i { position: absolute; left: 17px; top: 19px; color: #3987fa; z-index: 2; }
     .configuracion-page .input-icon .form-control { padding-left: 43px; }
     .configuracion-page .input-icon.anticipacion i { color: #11c99a; }
-    @media (max-width: 900px) { .configuracion-page { padding: 20px 15px; } .configuracion-page .configuracion-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .configuracion-page { padding: 34px 15px 20px; } .configuracion-page .configuracion-grid { grid-template-columns: 1fr; } }
     @media (max-width: 520px) { .configuracion-page .config-topbar { align-items: flex-start; gap: 15px; } .configuracion-page .configuracion-title { font-size: 25px; } .configuracion-page .config-card { padding: 20px; border-radius: 20px; } .configuracion-page .password-row, .configuracion-page .fields-inline { display: block; } .configuracion-page .btn-update { margin-top: 15px; width: 100%; } }
 </style>
 

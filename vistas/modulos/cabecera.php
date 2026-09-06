@@ -1,10 +1,18 @@
-  <header class="main-header">
+    <?php
+    $configuracionCabecera = ControladorConfiguracion::ctrMostrarConfiguracion();
+    $nombreEmprendimiento = trim((string)($configuracionCabecera["nombre_emprendimiento"] ?? ""));
+    if($nombreEmprendimiento === "") $nombreEmprendimiento = "Mi emprendimiento";
+    $nombreEmprendimientoSeguro = htmlspecialchars($nombreEmprendimiento, ENT_QUOTES, "UTF-8");
+    $inicialesEmprendimiento = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nombreEmprendimiento), 0, 2));
+    if($inicialesEmprendimiento === "") $inicialesEmprendimiento = "ME";
+    ?>
+    <header class="main-header">
       <!-- Logo -->
       <a href="inicio" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
-          <span class="logo-mini"><b>A</b>LT</span>
+          <span class="logo-mini"><b><?php echo htmlspecialchars($inicialesEmprendimiento, ENT_QUOTES, "UTF-8"); ?></b></span>
           <!-- logo for regular state and mobile devices -->
-          <span class="logo-lg"><b>Admin</b>LTE</span>
+          <span class="logo-lg" title="<?php echo $nombreEmprendimientoSeguro; ?>"><?php echo $nombreEmprendimientoSeguro; ?></span>
       </a>
       <!-- Header Navbar: style can be found in header.less -->
       <nav class="navbar navbar-static-top">
