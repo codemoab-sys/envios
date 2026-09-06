@@ -8,12 +8,17 @@ $landingTitle = "MOABCODE · Gestión de envíos";
     .landing-nav { display: flex; align-items: center; justify-content: space-between; max-width: 1180px; margin: 0 auto; padding: 22px 28px; }
     .landing-brand img { display: block; width: 164px; height: auto; }
     .landing-nav-actions { display: flex; align-items: center; gap: 12px; }
+    .landing-menu-toggle { display: none; width: 42px; height: 42px; align-items: center; justify-content: center; border: 1px solid #d8e0ec; border-radius: 9px; background: #fff; color: var(--brand-navy); cursor: pointer; font-size: 18px; }
+    .landing-menu-toggle:hover { border-color: var(--brand-gold); color: var(--brand-gold-dark); }
     .landing-link { color: #536176; font-size: 14px; font-weight: 700; text-decoration: none; }
     .landing-link:hover { color: var(--brand-gold-dark); }
     .landing-button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 18px; border-radius: 9px; font-size: 14px; font-weight: 700; text-decoration: none !important; }
     .landing-button-primary { background: var(--brand-navy); color: #fff; box-shadow: 0 10px 22px rgba(9,39,90,.2); }
     .landing-button-primary:hover { background: var(--brand-navy-deep); color: #fff; }
     .landing-button-quiet { border: 1px solid #d8e0ec; background: #fff; color: #334155; }
+    .landing-theme-toggle { display: inline-flex; width: 42px; height: 42px; align-items: center; justify-content: center; border: 1px solid #d8e0ec; border-radius: 9px; background: #fff; color: var(--brand-navy); cursor: pointer; font-size: 16px; }
+    .landing-theme-toggle:hover { border-color: var(--brand-gold); color: var(--brand-gold-dark); }
+    .landing-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .landing-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: center; gap: 70px; max-width: 1180px; margin: 0 auto; padding: 72px 28px 96px; }
     .landing-kicker { margin: 0 0 16px; color: var(--brand-gold-dark); font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; }
     .landing-title { max-width: 650px; margin: 0; color: var(--brand-navy-deep); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(42px, 5vw, 70px); font-weight: 700; line-height: 1.03; }
@@ -73,15 +78,38 @@ $landingTitle = "MOABCODE · Gestión de envíos";
     .landing-cta p { max-width: 570px; margin: 14px auto 24px; color: #b9c5d8; line-height: 1.6; }
     .landing-footer { display: flex; justify-content: space-between; max-width: 1180px; margin: 0 auto; padding: 24px 28px 30px; border-top: 1px solid #dfe6ef; color: #7b8799; font-size: 12px; }
     .landing-footer strong { color: #334155; }
+    body:has(.landing-page[data-theme="dark"]) { background: #081426; }
+    .landing-page[data-theme="dark"] { --brand-navy: #1f4f91; --brand-navy-deep: #061b3d; --brand-gold: #e0b24d; --brand-gold-dark: #f0c86b; --brand-gold-soft: #3b301d; color: #e5edf8; background: #081426; }
+    .landing-page[data-theme="dark"] .landing-link { color: #b8c8de; }
+    .landing-page[data-theme="dark"] .landing-link:hover { color: var(--brand-gold); }
+    .landing-page[data-theme="dark"] .landing-button-quiet,
+    .landing-page[data-theme="dark"] .landing-theme-toggle { border-color: #2b4263; background: #10233e; color: #e5edf8; }
+    .landing-page[data-theme="dark"] .landing-section { background: #0d1c31; }
+    .landing-page[data-theme="dark"] .landing-title,
+    .landing-page[data-theme="dark"] .landing-section-heading h2,
+    .landing-page[data-theme="dark"] .landing-plan h3,
+    .landing-page[data-theme="dark"] .landing-plan-price { color: #f4f7fb; }
+    .landing-page[data-theme="dark"] .landing-copy,
+    .landing-page[data-theme="dark"] .landing-section-heading p,
+    .landing-page[data-theme="dark"] .landing-feature p,
+    .landing-page[data-theme="dark"] .landing-step p,
+    .landing-page[data-theme="dark"] .landing-plan-description,
+    .landing-page[data-theme="dark"] .landing-plan-list { color: #b5c3d6; }
+    .landing-page[data-theme="dark"] .landing-feature,
+    .landing-page[data-theme="dark"] .landing-plan { border-color: #263d5d; background: #10233e; }
+    .landing-page[data-theme="dark"] .landing-menu-toggle { border-color: #2b4263; background: #10233e; color: #e5edf8; }
+    .landing-page[data-theme="dark"] .landing-brand { padding: 6px 10px; border-radius: 8px; background: #fff; }
+    .landing-page[data-theme="dark"] .landing-footer { border-color: #263d5d; color: #9fb1c8; }
+    .landing-page[data-theme="dark"] .landing-footer strong { color: #dbe7f5; }
     @media (max-width: 1100px) { .landing-features, .landing-pricing { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 900px) { .landing-hero { grid-template-columns: 1fr; gap: 40px; padding-top: 48px; } .landing-visual { max-width: 620px; } .landing-steps, .landing-pricing { grid-template-columns: 1fr; } .landing-plan-featured { transform: none; } }
     @media (max-width: 560px) { .landing-features { grid-template-columns: 1fr; } }
-    @media (max-width: 560px) { .landing-nav { padding: 18px 16px; } .landing-brand img { width: 135px; } .landing-nav-actions .landing-link { display: none; } .landing-hero { padding: 36px 16px 64px; } .landing-title { font-size: 43px; } .landing-copy { font-size: 16px; } .landing-section { padding: 60px 16px; } .landing-section-heading h2, .landing-cta h2 { font-size: 31px; } .landing-cta { padding: 60px 16px 70px; } .landing-cta-inner { padding: 38px 20px; } .landing-footer { flex-direction: column; gap: 8px; padding: 20px 16px 26px; } }
+    @media (max-width: 560px) { .landing-nav { position: relative; padding: 18px 16px; } .landing-brand img { width: 135px; } .landing-menu-toggle { display: inline-flex; } .landing-nav-actions { display: none; position: absolute; top: 76px; right: 16px; left: 16px; z-index: 20; flex-direction: column; align-items: stretch; gap: 8px; padding: 14px; border: 1px solid #d8e0ec; border-radius: 12px; background: #fff; box-shadow: 0 18px 36px rgba(15,23,42,.16); } .landing-nav-actions.is-open { display: flex; } .landing-nav-actions .landing-link { display: block; padding: 10px 6px; } .landing-nav-actions .landing-theme-toggle { align-self: flex-start; } .landing-page[data-theme="dark"] .landing-nav-actions { border-color: #2b4263; background: #10233e; } .landing-hero { padding: 36px 16px 64px; } .landing-title { font-size: 43px; } .landing-copy { font-size: 16px; } .landing-section { padding: 60px 16px; } .landing-section-heading h2, .landing-cta h2 { font-size: 31px; } .landing-cta { padding: 60px 16px 70px; } .landing-cta-inner { padding: 38px 20px; } .landing-footer { flex-direction: column; gap: 8px; padding: 20px 16px 26px; } }
 </style>
 <main class="landing-page">
     <nav class="landing-nav" aria-label="Navegación principal">
         <a class="landing-brand" href="?ruta=web" aria-label="MOABCODE inicio"><img src="LOGO.png" alt="MOABCODE"></a>
-        <div class="landing-nav-actions"><a class="landing-link" href="#funciones">Funciones</a><a class="landing-link" href="#planes">Planes</a><a class="landing-button landing-button-quiet" href="?ruta=login">Ingresar</a><a class="landing-button landing-button-primary" href="?ruta=registro">Crear cuenta</a></div>
+        <button class="landing-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="landingMenu"><i class="fa fa-bars" aria-hidden="true"></i><span class="landing-visually-hidden">Abrir menú</span></button><div class="landing-nav-actions" id="landingMenu"><a class="landing-link" href="#funciones">Funciones</a><a class="landing-link" href="#planes">Planes</a><a class="landing-button landing-button-quiet" href="?ruta=login">Ingresar</a><a class="landing-button landing-button-primary" href="?ruta=registro">Crear cuenta</a><button class="landing-theme-toggle" type="button" aria-label="Activar modo oscuro" title="Activar modo oscuro"><i class="fa fa-moon-o" aria-hidden="true"></i><span class="landing-visually-hidden">Cambiar tema</span></button></div>
     </nav>
     <section class="landing-hero" aria-labelledby="landingTitle">
         <div>
@@ -102,3 +130,65 @@ $landingTitle = "MOABCODE · Gestión de envíos";
     <section class="landing-cta"><div class="landing-cta-inner"><h2>Tu próximo envío puede estar mejor organizado.</h2><p>Empieza con una cuenta y convierte la información dispersa en una operación que puedes controlar.</p><a class="landing-button landing-button-primary" href="?ruta=registro">Crear mi cuenta <i class="fa fa-arrow-right" style="margin-left:8px"></i></a></div></section>
     <footer class="landing-footer"><strong>MOABCODE · Gestión de envíos</strong><span>Operaciones más claras para negocios que quieren crecer.</span></footer>
 </main>
+<script>
+    (function () {
+        const page = document.querySelector('.landing-page');
+        const toggle = document.querySelector('.landing-theme-toggle');
+        const icon = toggle.querySelector('i');
+        const menuToggle = document.querySelector('.landing-menu-toggle');
+        const menu = document.querySelector('#landingMenu');
+        const storageKey = 'moabcode-landing-theme';
+
+        function closeMenu() {
+            menu.classList.remove('is-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Abrir menú');
+            menuToggle.querySelector('i').className = 'fa fa-bars';
+        }
+
+        menuToggle.addEventListener('click', function () {
+            const isOpen = menu.classList.toggle('is-open');
+            menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            menuToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+            menuToggle.querySelector('i').className = isOpen ? 'fa fa-times' : 'fa fa-bars';
+        });
+
+        menu.querySelectorAll('.landing-link').forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        function applyTheme(theme) {
+            const darkMode = theme === 'dark';
+            page.dataset.theme = darkMode ? 'dark' : 'light';
+            icon.className = darkMode ? 'fa fa-sun-o' : 'fa fa-moon-o';
+            toggle.setAttribute('aria-pressed', darkMode ? 'true' : 'false');
+            toggle.setAttribute('aria-label', darkMode ? 'Activar modo claro' : 'Activar modo oscuro');
+            toggle.setAttribute('title', darkMode ? 'Activar modo claro' : 'Activar modo oscuro');
+        }
+
+        let savedTheme = null;
+        try {
+            savedTheme = window.localStorage.getItem(storageKey);
+        } catch (error) {
+            savedTheme = null;
+        }
+
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyTheme(savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : systemTheme);
+
+        toggle.addEventListener('click', function () {
+            const nextTheme = page.dataset.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            try {
+                window.localStorage.setItem(storageKey, nextTheme);
+            } catch (error) {
+            }
+        });
+    }());
+</script>
