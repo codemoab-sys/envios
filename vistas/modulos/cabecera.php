@@ -1,23 +1,25 @@
     <?php
     $configuracionCabecera = ControladorConfiguracion::ctrMostrarConfiguracion();
-    $nombreEmprendimiento = "Gestión de envíos";
+    $nombreEmprendimiento = "MOABCODE · Gestión de envíos";
     $nombreEmprendimientoSeguro = htmlspecialchars($nombreEmprendimiento, ENT_QUOTES, "UTF-8");
     $temaGuardado = ($configuracionCabecera["tema"] ?? "light") === "dark" ? "dark" : "light";
-    $colorCabeceraGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_cabecera"] ?? "") ? $configuracionCabecera["color_cabecera"] : "#dd4b39";
-    $colorBotonPrimarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_primario"] ?? "") ? $configuracionCabecera["color_boton_primario"] : "#3b82f6";
-    $colorBotonSecundarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_secundario"] ?? "") ? $configuracionCabecera["color_boton_secundario"] : "#202c42";
+    $colorCabeceraGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_cabecera"] ?? "") ? $configuracionCabecera["color_cabecera"] : "#111827";
+    $colorBotonPrimarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_primario"] ?? "") ? $configuracionCabecera["color_boton_primario"] : "#2563eb";
+    $colorBotonSecundarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_secundario"] ?? "") ? $configuracionCabecera["color_boton_secundario"] : "#334155";
+    $usuarioActualId = isset($_SESSION["id"]) ? (int) $_SESSION["id"] : 0;
+    $tenantActualId = isset($_SESSION["tenant_id"]) ? (int) $_SESSION["tenant_id"] : 0;
     $inicialesEmprendimiento = "MC";
     ?>
         <style>
             .user-icon-header { display: block; width: 90px; height: 90px; margin: 0 auto; padding-top: 25px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 38px; text-align: center; }
+            .brand-logo-lg { display: block; width: 170px; max-width: 100%; height: auto; object-fit: contain; margin: 0 auto; }
+            .brand-logo-mini { display: none !important; }
+            .main-header .logo { display: flex; align-items: center; justify-content: center; padding: 0 8px; }
         </style>
     <header class="main-header">
       <!-- Logo -->
-      <a href="inicio" class="logo">
-          <!-- mini logo for sidebar mini 50x50 pixels -->
-          <span class="logo-mini"><b><?php echo htmlspecialchars($inicialesEmprendimiento, ENT_QUOTES, "UTF-8"); ?></b></span>
-          <!-- logo for regular state and mobile devices -->
-          <span class="logo-lg" title="<?php echo $nombreEmprendimientoSeguro; ?>"><?php echo $nombreEmprendimientoSeguro; ?></span>
+      <a href="inicio" class="logo" aria-label="MOABCODE">
+          <img class="brand-logo-lg" src="LOGO.png" alt="MOABCODE" title="<?php echo $nombreEmprendimientoSeguro; ?>">
       </a>
       <!-- Header Navbar: style can be found in header.less -->
       <nav class="navbar navbar-static-top">
@@ -66,7 +68,7 @@
       </nav>
   </header>
 
-    <div class="modal fade" id="modalApariencia" data-theme-current="<?php echo $temaGuardado; ?>" data-color-current="<?php echo htmlspecialchars($colorCabeceraGuardado, ENT_QUOTES, "UTF-8"); ?>" data-primary-current="<?php echo htmlspecialchars($colorBotonPrimarioGuardado, ENT_QUOTES, "UTF-8"); ?>" data-secondary-current="<?php echo htmlspecialchars($colorBotonSecundarioGuardado, ENT_QUOTES, "UTF-8"); ?>" tabindex="-1" role="dialog" aria-labelledby="tituloModalApariencia">
+    <div class="modal fade" id="modalApariencia" data-theme-current="<?php echo $temaGuardado; ?>" data-color-current="<?php echo htmlspecialchars($colorCabeceraGuardado, ENT_QUOTES, "UTF-8"); ?>" data-primary-current="<?php echo htmlspecialchars($colorBotonPrimarioGuardado, ENT_QUOTES, "UTF-8"); ?>" data-secondary-current="<?php echo htmlspecialchars($colorBotonSecundarioGuardado, ENT_QUOTES, "UTF-8"); ?>" data-user-id="<?php echo $usuarioActualId; ?>" data-tenant-id="<?php echo $tenantActualId; ?>" tabindex="-1" role="dialog" aria-labelledby="tituloModalApariencia">
       <div class="modal-dialog" role="document">
           <div class="modal-content apariencia-modal">
               <div class="modal-header">

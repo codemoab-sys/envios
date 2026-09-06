@@ -56,6 +56,17 @@
 
 
           </ul>
+          <?php if(isset($_SESSION["solo_lectura"]) && $_SESSION["solo_lectura"] === true): ?>
+              <div class="alert alert-warning subscription-alert" role="status" aria-live="polite"><i class="fa fa-lock" aria-hidden="true"></i><span>Tu período terminó. Estás en modo solo lectura; no puedes crear ni modificar información.</span></div>
+          <?php elseif(isset($_SESSION["plan"]) && $_SESSION["plan"] !== "general" && isset($_SESSION["dias_restantes"]) && $_SESSION["dias_restantes"] !== null): ?>
+              <?php
+              $tipoSuscripcion = $_SESSION["plan"] === "prueba" ? "prueba" : "suscripción mensual";
+              $diasRestantes = (int) $_SESSION["dias_restantes"];
+              $claseAlerta = $diasRestantes <= 3 ? "alert-warning" : "alert-info";
+              $mensajeRenovacion = $diasRestantes <= 3 ? " Renueva pronto para no quedar en modo solo lectura." : "";
+              ?>
+              <div class="alert <?php echo $claseAlerta; ?> subscription-alert" role="status" aria-live="polite"><i class="fa fa-clock-o" aria-hidden="true"></i><span>Te quedan <?php echo $diasRestantes; ?> día(s) de tu <?php echo $tipoSuscripcion; ?>.<?php echo $mensajeRenovacion; ?></span></div>
+          <?php endif; ?>
       </section>
       <!-- /.sidebar -->
   </aside>

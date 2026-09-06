@@ -8,24 +8,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const html = document.documentElement;
     const icon = themeToggle ? themeToggle.querySelector('i') : null;
     
-    // Cargar tema guardado
     const modalApariencia = document.getElementById('modalApariencia');
     const superficieTema = modalApariencia || document.querySelector('[data-theme-current]');
     const temaBaseDatos = superficieTema ? superficieTema.getAttribute('data-theme-current') : '';
     const colorBaseDatos = superficieTema ? superficieTema.getAttribute('data-color-current') : '';
     const primarioBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-primary-current') : '';
     const secundarioBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-secondary-current') : '';
-    const savedTheme = temaBaseDatos || localStorage.getItem('theme') || 'light';
+    const usuarioId = modalApariencia ? Number(modalApariencia.getAttribute('data-user-id') || 0) : 0;
+    const tenantId = modalApariencia ? Number(modalApariencia.getAttribute('data-tenant-id') || 0) : 0;
+    const storagePrefix = `moabcode_ux_${tenantId}_${usuarioId}`;
+    const storageKeys = {
+        theme: `${storagePrefix}_theme`,
+        headerColor: `${storagePrefix}_headerColor`,
+        primaryButtonColor: `${storagePrefix}_primaryButtonColor`,
+        secondaryButtonColor: `${storagePrefix}_secondaryButtonColor`
+    };
+    const cachedTheme = localStorage.getItem(storageKeys.theme) || localStorage.getItem('theme') || 'light';
+    const cachedHeaderColor = localStorage.getItem(storageKeys.headerColor) || localStorage.getItem('headerColor') || '#111827';
+    const cachedPrimaryColor = localStorage.getItem(storageKeys.primaryButtonColor) || localStorage.getItem('primaryButtonColor') || '#2563eb';
+    const cachedSecondaryColor = localStorage.getItem(storageKeys.secondaryButtonColor) || localStorage.getItem('secondaryButtonColor') || '#334155';
+    const headerColorResolved = (colorBaseDatos || cachedHeaderColor).toLowerCase() === '#dd4b39' ? '#111827' : (colorBaseDatos || cachedHeaderColor);
+    const savedTheme = temaBaseDatos || cachedTheme;
     html.setAttribute('data-theme', savedTheme);
     updateIcon(savedTheme);
-    aplicarColorCabecera(colorBaseDatos || localStorage.getItem('headerColor') || '#dd4b39');
-    aplicarColorBotones(primarioBaseDatos || localStorage.getItem('primaryButtonColor') || '#3b82f6', secundarioBaseDatos || localStorage.getItem('secondaryButtonColor') || '#202c42');
+    aplicarColorCabecera(headerColorResolved);
+    aplicarColorBotones(primarioBaseDatos || cachedPrimaryColor, secundarioBaseDatos || cachedSecondaryColor);
 
     document.querySelectorAll('[data-theme-choice]').forEach(function(button) {
         button.addEventListener('click', function() {
             const newTheme = button.getAttribute('data-theme-choice');
             html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            localStorage.setItem(storageKeys.theme, newTheme);
             updateIcon(newTheme);
             actualizarTemaActivo(newTheme);
         });
@@ -34,11 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const colorCabecera = document.getElementById('colorCabecera');
     const codigoColorCabecera = document.getElementById('codigoColorCabecera');
     if(colorCabecera){
-        colorCabecera.value = colorBaseDatos || colorCabecera.value || localStorage.getItem('headerColor') || '#dd4b39';
+        colorCabecera.value = headerColorResolved || colorCabecera.value || localStorage.getItem('headerColor') || '#111827';
         actualizarCodigoColor(colorCabecera.value);
         colorCabecera.addEventListener('input', function(){
             aplicarColorCabecera(colorCabecera.value);
-            localStorage.setItem('headerColor', colorCabecera.value);
+            localStorage.setItem(storageKeys.headerColor, colorCabecera.value);
             actualizarCodigoColor(colorCabecera.value);
         });
     }
@@ -66,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         codigoColorCabecera.addEventListener('blur', function(){
-            var valor = normalizarColor(codigoColorCabecera.value) || '#dd4b39';
+            var valor = normalizarColor(codigoColorCabecera.value) || '#111827';
             codigoColorCabecera.value = valor.toUpperCase();
             colorCabecera.value = valor;
             aplicarColorCabecera(valor);
@@ -85,14 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {
                     guardarAparienciaAjax: 1,
                     tema: html.getAttribute('data-theme'),
-                    color_cabecera: colorCabecera ? colorCabecera.value : '#dd4b39'
-                    ,color_boton_primario: obtenerColor('colorBotonPrimario', primarioBaseDatos || '#3b82f6')
-                    ,color_boton_secundario: obtenerColor('colorBotonSecundario', secundarioBaseDatos || '#202c42')
+                    color_cabecera: colorCabecera ? colorCabecera.value : '#111827'
+                    ,color_boton_primario: obtenerColor('colorBotonPrimario', primarioBaseDatos || '#2563eb')
+                    ,color_boton_secundario: obtenerColor('colorBotonSecundario', secundarioBaseDatos || '#334155')
                 },
                 success: function(respuesta){
                     if(respuesta.estado === 'ok'){
-                        localStorage.setItem('theme', html.getAttribute('data-theme'));
-                        localStorage.setItem('headerColor', colorCabecera ? colorCabecera.value : '#dd4b39');
+                        localStorage.setItem(storageKeys.theme, html.getAttribute('data-theme'));
+                        localStorage.setItem(storageKeys.headerColor, colorCabecera ? colorCabecera.value : '#111827');
+                        localStorage.setItem(storageKeys.primaryButtonColor, obtenerColor('colorBotonPrimario', primarioBaseDatos || '#2563eb'));
+                        localStorage.setItem(storageKeys.secondaryButtonColor, obtenerColor('colorBotonSecundario', secundarioBaseDatos || '#334155'));
                         $('#modalApariencia').modal('hide');
                         Swal.fire({icon: 'success', title: 'Apariencia guardada', timer: 1400, showConfirmButton: false});
                     }else{
@@ -137,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function aplicarColorBotones(primario, secundario){
         document.documentElement.style.setProperty('--button-primary-color', primario);
+        document.documentElement.style.setProperty('--accent-primary', primario);
         document.documentElement.style.setProperty('--button-secondary-color', secundario);
         document.documentElement.style.setProperty('--button-primary-text', colorContraste(primario));
         document.documentElement.style.setProperty('--button-secondary-text', colorContraste(secundario));
@@ -150,16 +166,19 @@ document.addEventListener('DOMContentLoaded', function() {
         selector.addEventListener('input', function(){
             codigo.value = selector.value.toUpperCase();
             document.documentElement.style.setProperty(variable, selector.value);
-            localStorage.setItem(storageKey, selector.value);
+            localStorage.setItem(storageKeys[storageKey], selector.value);
         });
         codigo.addEventListener('input', function(){
             var valor = normalizarColor(codigo.value);
             if(valor){
                 selector.value = valor;
                 document.documentElement.style.setProperty(variable, valor);
-                if(variable === '--button-primary-color') document.documentElement.style.setProperty('--button-primary-text', colorContraste(valor));
+                if(variable === '--button-primary-color') {
+                    document.documentElement.style.setProperty('--accent-primary', valor);
+                    document.documentElement.style.setProperty('--button-primary-text', colorContraste(valor));
+                }
                 if(variable === '--button-secondary-color') document.documentElement.style.setProperty('--button-secondary-text', colorContraste(valor));
-                localStorage.setItem(storageKey, valor);
+                localStorage.setItem(storageKeys[storageKey], valor);
             }
         });
         codigo.addEventListener('blur', function(){
@@ -208,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         html.setAttribute('data-theme', nuevoTema);
         actualizarTemaActivo(nuevoTema);
         updateIcon(nuevoTema);
-        localStorage.setItem('theme', nuevoTema);
+        localStorage.setItem(storageKeys.theme, nuevoTema);
     };
 
     document.addEventListener('click', function(event){

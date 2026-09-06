@@ -1,6 +1,6 @@
 <?php
 $configuracionLogin = ControladorConfiguracion::ctrMostrarConfiguracion();
-$nombreLogin = "Gestión de envíos";
+$nombreLogin = "MOABCODE · Gestión de envíos";
 $nombreLogin = htmlspecialchars($nombreLogin, ENT_QUOTES, "UTF-8");
 $temaLogin = ($configuracionLogin["tema"] ?? "light") === "dark" ? "dark" : "light";
 $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecera"] ?? "") ? $configuracionLogin["color_cabecera"] : "#dd4b39";
@@ -10,8 +10,9 @@ $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecer
     .login-page-custom { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(circle at top right, rgba(59,130,246,.12), transparent 38%), var(--bg-body); color: var(--text-primary); }
     .login-panel-custom { width: 100%; max-width: 420px; padding: 34px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); box-shadow: 0 20px 50px rgba(15,23,42,.14); }
     .login-brand-custom { margin-bottom: 28px; text-align: center; }
-    .login-brand-custom .login-mark { width: 58px; height: 58px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--header-color); color: #fff; font-size: 25px; font-weight: 700; }
-    .login-brand-custom h1 { margin: 0 0 7px; color: var(--text-primary); font-size: 25px; font-weight: 700; }
+    .login-brand-custom .login-mark { width: 100%; max-width: 280px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; }
+    .login-brand-custom .login-mark img { width: 100%; max-width: 220px; height: auto; object-fit: contain; }
+    .login-brand-custom h1 { display: none; }
     .login-brand-custom p { margin: 0; color: var(--text-secondary); font-size: 14px; }
     .login-theme-custom { position: fixed; top: 18px; right: 18px; width: 42px; height: 42px; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-card); color: var(--accent-warning); cursor: pointer; }
     .login-theme-custom:hover { border-color: var(--accent-primary); }
@@ -29,8 +30,7 @@ $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecer
     <button type="button" id="themeToggle" class="login-theme-custom" title="Cambiar tema" aria-label="Cambiar tema"><i class="fa fa-moon-o"></i></button>
     <section class="login-panel-custom" aria-labelledby="tituloLogin">
         <div class="login-brand-custom">
-            <div class="login-mark">MC</div>
-            <h1 id="tituloLogin"><?php echo $nombreLogin; ?></h1>
+            <div class="login-mark"><img src="LOGO.png" alt="MOABCODE" /></div>
             <p>Ingresa para administrar tus envíos</p>
         </div>
         <form method="post" autocomplete="on">

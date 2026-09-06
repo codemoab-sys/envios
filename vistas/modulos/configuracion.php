@@ -42,7 +42,8 @@ $dias = array(
 ?>
 
 <style>
-    .configuracion-page { background: #060b1e; min-height: calc(100vh - 50px); padding: 78px 35px 20px !important; color: #98a7bf; }
+    .wrapper:has(.configuracion-page) { background: #060b1e; }
+    .configuracion-page { background: #060b1e; min-height: 0 !important; padding: 78px 35px 0 !important; color: #98a7bf; }
     .configuracion-page .configuracion-title { color: #f4f7fb; font-size: 30px; font-weight: 700; margin: 0 0 36px; }
     .configuracion-page .configuracion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1480px; margin: 0 auto; }
     .configuracion-page .config-card { background: #182337; border: 1px solid #2b3a52; border-radius: 28px; padding: 30px; box-shadow: 0 12px 30px rgba(0,0,0,.12); }

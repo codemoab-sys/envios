@@ -106,7 +106,6 @@ if($esFormularioPublico):
 ?>
 <style>
     .formulario-publico-page { min-height: 100vh; margin: 0; padding: 0 0 60px; background: #fff; color: #263143; font-family: 'Source Sans Pro', sans-serif; font-size: 16px; }
-    .formulario-publico-page ~ * { display: none !important; }
     .formulario-publico-page, .formulario-publico-page * { box-sizing: border-box; }
     .formulario-publico-header { min-height: 90px; padding: 20px 8%; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e9ebee; }
     .formulario-publico-logo { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #f0f8ff; color: #111923; font-size: 26px; }
@@ -158,13 +157,11 @@ if($esFormularioPublico):
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option:hover,
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-option:focus { background: #26364e; }
     .formulario-publico-page.modo-oscuro .formulario-publico-agencia-address { color: #9ca8ba; }
-    .formulario-publico-page.modo-oscuro .formulario-publico-footer { border-color: #2b3648; color: #8e9aae; }
     .formulario-publico-page.modo-oscuro .formulario-publico-theme-toggle { border-color: #475569; background: #1b2638; color: #facc15; }
     .formulario-publico-submit { width: 100%; height: 52px; margin-top: 40px; border: 0; border-radius: 10px; background: #3984ee; color: #fff; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(39, 116, 223, .25); cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; }
     .formulario-publico-submit:hover { background: #2b6fde; box-shadow: 0 6px 16px rgba(39, 116, 223, .35); }
     .formulario-publico-submit:active { transform: scale(0.98); }
     .formulario-publico-submit i { margin-left: 8px; font-size: 16px; }
-    .formulario-publico-footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #edf0f3; color: #a0a6af; font-size: 11px; letter-spacing: 3px; text-align: center; }
     @media (max-width: 500px) {
         .formulario-publico-header { padding: 18px 6%; gap: 12px; }
         .formulario-publico-logo { width: 46px; height: 46px; font-size: 22px; border-radius: 12px; }
@@ -179,7 +176,7 @@ if($esFormularioPublico):
         .formulario-publico-submit { height: 48px; font-size: 15px; margin-top: 30px; }
     }
 </style>
-<style>.main-sidebar, .main-header, .main-footer { display: none !important; } .content-wrapper { margin-left: 0 !important; min-height: 100vh !important; }</style>
+<style>.main-sidebar, .main-header { display: none !important; } .content-wrapper { margin-left: 0 !important; min-height: 100vh !important; }</style>
 <main class="formulario-publico-page" id="formularioPublico">
     <header class="formulario-publico-header">
         <div class="formulario-publico-logo"><i class="fa fa-cube"></i></div>
@@ -431,7 +428,6 @@ if($esFormularioPublico):
             </div>
         </div>
         <button class="formulario-publico-submit" type="button" id="agendarPublico">Agendar y ver resumen <i class="fa fa-calendar-o"></i></button>
-        <footer class="formulario-publico-footer">GRACIAS POR ELEGIRNOS</footer>
     </section>
 </main>
 <script>
@@ -868,9 +864,8 @@ $enlaceCompartirRaw = trim((string) ($formularioCompartir["enlace"] ?? ""));
 $enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
 ?>
 <style>
-    body:has(.compartir-page) { overflow: hidden; }
-    body:has(.compartir-page) .main-footer { display: none !important; }
-    .compartir-page { height: calc(100vh - 50px); min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 16px 20px; background: #030817; color: #f5f7ff; font-family: 'Source Sans Pro', sans-serif; }
+    .compartir-page { position: relative; left: 0; width: calc(100vw - 230px); min-height: 0 !important; margin-top: 50px; margin-left: 230px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 24px 20px 32px; background: #030817; color: #f5f7ff; font-family: 'Source Sans Pro', sans-serif; }
+    body.sidebar-collapse .compartir-page { width: calc(100vw - 50px); margin-left: 50px; }
     .compartir-shell { width: 100%; max-width: 560px; text-align: center; }
     .compartir-card { padding: 24px 28px 22px; border: 1px solid #344052; border-radius: 22px; background: linear-gradient(145deg, #1e2a3d, #111a2d); box-shadow: 0 24px 50px rgba(0, 0, 0, .35); }
     .compartir-icon { width: 64px; height: 64px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0, 190, 151, .25); border-radius: 50%; color: #0fbd8e; font-size: 28px; background: rgba(5, 105, 98, .12); box-shadow: 0 0 27px rgba(0, 190, 151, .13); }
@@ -883,20 +878,19 @@ $enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
     .compartir-action-whatsapp { border: 1px solid rgba(13, 190, 145, .22); background: #10474a; color: #0fc18f; }
     .compartir-action-open { border: 1px solid #3b4659; background: rgba(45, 56, 76, .46); color: #f5f7ff; }
     .compartir-action i { margin-right: 8px; }
-    .compartir-brand { margin-top: 18px; color: #74809c; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
     [data-theme="light"] .compartir-page { background: #f4f6f9; color: #1f2937; }
     [data-theme="light"] .compartir-card { border-color: #dbe3ed; background: linear-gradient(145deg, #fff, #f7faff); box-shadow: 0 18px 40px rgba(31, 41, 55, .12); }
     [data-theme="light"] .compartir-copy { color: #64748b; }
     [data-theme="light"] .compartir-link { border-color: #dbe3ed; background: #f8fafc; color: #2563eb; }
     [data-theme="light"] .compartir-action-primary { background: var(--button-primary-color); color: var(--button-primary-text); }
     [data-theme="light"] .compartir-action-open { border-color: #cbd5e1; background: #fff; color: #334155; }
-    [data-theme="light"] .compartir-brand { color: #64748b; }
     [data-theme="dark"] .compartir-page { background: #030817; color: #f5f7ff; }
     [data-theme="dark"] .compartir-card { border-color: #344052; background: linear-gradient(145deg, #1e2a3d, #111a2d); }
-    @media (max-width: 600px) { .compartir-page { height: calc(100vh - 50px); padding: 10px 12px; } .compartir-card { padding: 20px 16px 18px; border-radius: 20px; } .compartir-card h1 { font-size: 23px; } .compartir-copy { font-size: 14px; } .compartir-link { padding: 12px 14px; font-size: 11px; } .compartir-action { min-height: 42px; font-size: 14px; } .compartir-brand { margin-top: 12px; } }
-    @media (max-height: 620px) { .compartir-page { padding-top: 6px; padding-bottom: 6px; } .compartir-card { padding-top: 14px; padding-bottom: 12px; } .compartir-icon { width: 48px; height: 48px; margin-bottom: 8px; font-size: 22px; } .compartir-card h1 { margin-bottom: 6px; font-size: 21px; } .compartir-copy { margin-bottom: 10px; } .compartir-link { margin-bottom: 10px; padding: 9px 12px; } .compartir-action { min-height: 36px; margin-bottom: 5px; } .compartir-brand { margin-top: 8px; } }
+    @media (max-width: 767px) { .compartir-page { width: 100%; margin-left: 0; margin-top: 50px; } }
+    @media (max-width: 600px) { .compartir-page { padding: 18px 12px 24px; } .compartir-card { padding: 20px 16px 18px; border-radius: 20px; } .compartir-card h1 { font-size: 23px; } .compartir-copy { font-size: 14px; } .compartir-link { padding: 12px 14px; font-size: 11px; } .compartir-action { min-height: 42px; font-size: 14px; } }
+    @media (max-height: 620px) { .compartir-page { padding-top: 12px; padding-bottom: 12px; } .compartir-card { padding-top: 14px; padding-bottom: 12px; } .compartir-icon { width: 48px; height: 48px; margin-bottom: 8px; font-size: 22px; } .compartir-card h1 { margin-bottom: 6px; font-size: 21px; } .compartir-copy { margin-bottom: 10px; } .compartir-link { margin-bottom: 10px; padding: 9px 12px; } .compartir-action { min-height: 36px; margin-bottom: 5px; } .compartir-brand { margin-top: 8px; } }
 </style>
-<main class="compartir-page"><section class="compartir-shell"><div class="compartir-card"><div class="compartir-icon"><i class="fa fa-share-alt"></i></div><h1>¡Listo para compartir!</h1><p class="compartir-copy">Tu formulario personalizado está activo. Comparte el siguiente enlace con tus clientes.</p><div class="compartir-link" id="enlaceCompartir"><?php echo $enlaceCompartir; ?></div><button class="compartir-action compartir-action-primary" type="button" id="copiarEnlace"><i class="fa fa-copy"></i>Copiar Link</button><button class="compartir-action compartir-action-whatsapp" type="button" id="whatsappEnlace"><i class="fa fa-whatsapp"></i>Enviar por WhatsApp</button><button class="compartir-action compartir-action-open" type="button" id="abrirEnlace"><i class="fa fa-external-link"></i>Abrir en nueva pestaña</button></div><div class="compartir-brand">POWERED BY LATAM5S</div></section></main>
+<main class="compartir-page"><section class="compartir-shell"><div class="compartir-card"><div class="compartir-icon"><i class="fa fa-share-alt"></i></div><h1>¡Listo para compartir!</h1><p class="compartir-copy">Tu formulario personalizado está activo. Comparte el siguiente enlace con tus clientes.</p><div class="compartir-link" id="enlaceCompartir"><?php echo $enlaceCompartir; ?></div><button class="compartir-action compartir-action-primary" type="button" id="copiarEnlace"><i class="fa fa-copy"></i>Copiar Link</button><button class="compartir-action compartir-action-whatsapp" type="button" id="whatsappEnlace"><i class="fa fa-whatsapp"></i>Enviar por WhatsApp</button><button class="compartir-action compartir-action-open" type="button" id="abrirEnlace"><i class="fa fa-external-link"></i>Abrir en nueva pestaña</button></div></section></main>
 <script>
 (function(){ var enlace = <?php echo json_encode($enlaceCompartirRaw); ?>; $('#copiarEnlace').on('click', function(){ navigator.clipboard.writeText(enlace).then(function(){ Swal.fire({toast:true,position:'top-end',icon:'success',title:'Link copiado',showConfirmButton:false,timer:1800}); }); }); $('#whatsappEnlace').on('click', function(){ if(!enlace){ Swal.fire({icon:'error',title:'No hay enlace para compartir',confirmButtonText:'Cerrar'}); return; } var mensaje = enlace + '\n\nCompleta este formulario'; window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(mensaje), '_blank'); }); $('#abrirEnlace').on('click', function(){ window.open(enlace, '_blank'); }); })();
 </script>

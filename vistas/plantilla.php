@@ -21,7 +21,8 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>sistemas de ventas </title>
+    <title>MOABCODE · Gestión de envíos</title>
+    <link rel="icon" type="image/x-icon" href="ISOTIPO.ico">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
@@ -33,7 +34,7 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
     <!-- Theme style -->
     <link rel="stylesheet" href="vistas/dist/css/AdminLTE.min.css">
     <!-- Dark Mode CSS -->
-    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260905-4">
+    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260906-23">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
@@ -43,8 +44,6 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
         body.solo-lectura #guardarApariencia,
         body.solo-lectura .config-card-save,
         body.solo-lectura [name="guardarCompartir"] { display: none !important; }
-        .subscription-alert { display: flex !important; align-items: center; clear: both; width: calc(100% - 30px); min-height: 48px; margin: 15px !important; padding: 12px 16px !important; border: 1px solid transparent; border-radius: 4px; font-size: 14px; line-height: 1.4; }
-        .subscription-alert i { margin-right: 8px; }
     </style>
 
 
@@ -74,17 +73,6 @@ if($esRegistro){
 
         include "modulos/menu.php";
 
-        if(isset($_SESSION["solo_lectura"]) && $_SESSION["solo_lectura"] === true){
-            echo '<div class="alert alert-warning subscription-alert" role="alert"><i class="fa fa-lock"></i><span>Tu período terminó. Estás en modo solo lectura; no puedes crear ni modificar información.</span></div>';
-        }elseif(isset($_SESSION["plan"]) && $_SESSION["plan"] !== "general" && isset($_SESSION["dias_restantes"]) && $_SESSION["dias_restantes"] !== null){
-            $tipoSuscripcion = $_SESSION["plan"] === "prueba" ? "prueba" : "suscripción mensual";
-            $diasRestantes = (int) $_SESSION["dias_restantes"];
-            $claseAlerta = $diasRestantes <= 3 ? "alert-warning" : "alert-info";
-            $mensajeRenovacion = $diasRestantes <= 3 ? " Renueva pronto para no quedar en modo solo lectura." : "";
-            echo '<div class="alert '.$claseAlerta.' subscription-alert" role="alert"><i class="fa fa-clock-o"></i><span>Te quedan '.$diasRestantes.' día(s) de tu '.$tipoSuscripcion.'.'.$mensajeRenovacion.'</span></div>';
-        }
-
-
         if(isset($_GET["ruta"])){
             if($ruta == "usuarios" ||
                 $ruta == "configuracion" ||
@@ -107,8 +95,6 @@ if($esRegistro){
 
         }
 
-
-        include "modulos/footer.php";
 
         echo '</div>';
 
