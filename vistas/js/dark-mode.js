@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cargar tema guardado
     const modalApariencia = document.getElementById('modalApariencia');
-    const temaBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-theme-current') : '';
-    const colorBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-color-current') : '';
+    const superficieTema = modalApariencia || document.querySelector('[data-theme-current]');
+    const temaBaseDatos = superficieTema ? superficieTema.getAttribute('data-theme-current') : '';
+    const colorBaseDatos = superficieTema ? superficieTema.getAttribute('data-color-current') : '';
     const primarioBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-primary-current') : '';
     const secundarioBaseDatos = modalApariencia ? modalApariencia.getAttribute('data-secondary-current') : '';
     const savedTheme = temaBaseDatos || localStorage.getItem('theme') || 'light';

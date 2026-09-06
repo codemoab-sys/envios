@@ -3,6 +3,8 @@ $configuracionLogin = ControladorConfiguracion::ctrMostrarConfiguracion();
 $nombreLogin = trim((string)($configuracionLogin["nombre_emprendimiento"] ?? ""));
 if($nombreLogin === "") $nombreLogin = "Mi emprendimiento";
 $nombreLogin = htmlspecialchars($nombreLogin, ENT_QUOTES, "UTF-8");
+$temaLogin = ($configuracionLogin["tema"] ?? "light") === "dark" ? "dark" : "light";
+$colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecera"] ?? "") ? $configuracionLogin["color_cabecera"] : "#dd4b39";
 ?>
 <style>
     body:has(.login-page-custom) { background: #f4f6f9; }
@@ -12,6 +14,8 @@ $nombreLogin = htmlspecialchars($nombreLogin, ENT_QUOTES, "UTF-8");
     .login-brand-custom .login-mark { width: 58px; height: 58px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: var(--header-color); color: #fff; font-size: 25px; font-weight: 700; }
     .login-brand-custom h1 { margin: 0 0 7px; color: var(--text-primary); font-size: 25px; font-weight: 700; }
     .login-brand-custom p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+    .login-theme-custom { position: fixed; top: 18px; right: 18px; width: 42px; height: 42px; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-card); color: var(--accent-warning); cursor: pointer; }
+    .login-theme-custom:hover { border-color: var(--accent-primary); }
     .login-field-custom { position: relative; margin-bottom: 16px; }
     .login-field-custom i { position: absolute; top: 15px; left: 15px; z-index: 2; color: var(--text-muted); }
     .login-field-custom .form-control { height: 48px; padding-left: 42px; border-color: var(--border-color); border-radius: 9px; background: var(--bg-input); color: var(--text-primary); }
@@ -21,7 +25,8 @@ $nombreLogin = htmlspecialchars($nombreLogin, ENT_QUOTES, "UTF-8");
     [data-theme="dark"] body:has(.login-page-custom) { background: #0f172a; }
     @media (max-width: 480px) { .login-page-custom { padding: 16px; } .login-panel-custom { padding: 26px 20px; } }
 </style>
-<main class="login-page-custom">
+<main class="login-page-custom" data-theme-current="<?php echo $temaLogin; ?>" data-color-current="<?php echo htmlspecialchars($colorLogin, ENT_QUOTES, "UTF-8"); ?>">
+    <button type="button" id="themeToggle" class="login-theme-custom" title="Cambiar tema" aria-label="Cambiar tema"><i class="fa fa-moon-o"></i></button>
     <section class="login-panel-custom" aria-labelledby="tituloLogin">
         <div class="login-brand-custom">
             <div class="login-mark"><?php echo strtoupper(substr(strip_tags($nombreLogin), 0, 1)); ?></div>

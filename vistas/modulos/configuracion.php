@@ -56,6 +56,8 @@ $dias = array(
     .configuracion-page .config-topbar { display: flex; justify-content: space-between; align-items: center; }
     .configuracion-page .btn-save, .configuracion-page .btn-update { border: 0; border-radius: 15px; color: #fff; font-size: 16px; font-weight: 700; padding: 14px 28px; }
     .configuracion-page .btn-save { background: #3987fa; padding-top: 5px; padding-bottom: 5px; }
+    .configuracion-page .config-card-save { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; border: 0; border-radius: 10px; background: #3987fa; color: #fff; font-size: 14px; font-weight: 700; padding: 11px 18px; cursor: pointer; }
+    .configuracion-page .config-card-save:hover { filter: brightness(1.08); }
     .configuracion-page .btn-update { background: #5547e6; height: 54px; white-space: nowrap; }
     .configuracion-page .password-row { display: flex; gap: 15px; align-items: end; }
     .configuracion-page .password-row .form-group { flex: 1; margin: 0; }
@@ -93,7 +95,6 @@ $dias = array(
 <div class="content-wrapper configuracion-page">
     <div class="config-topbar">
         <h1 class="configuracion-title">Configuración</h1>
-        <button type="submit" form="formConfiguracion" class="btn-save"><i class="fa fa-save"></i> Guardar</button>
     </div>
 
     <div class="configuracion-grid">
@@ -112,6 +113,7 @@ $dias = array(
                     </div>
 
                     <input type="hidden" name="guardarConfiguracion" value="1">
+                    <button type="submit" class="config-card-save"><i class="fa fa-save"></i> Guardar datos públicos</button>
                 </form>
             </div>
 
@@ -158,6 +160,7 @@ $dias = array(
                 </div>
             </div>
             <p class="help-text">* La “Anticipación” define cuántos días mínimos de margen necesitas para preparar el pedido antes del día de envío.</p>
+            <button type="submit" form="formConfiguracion" class="config-card-save"><i class="fa fa-save"></i> Guardar logística</button>
         </div>
     </div>
 </div>
