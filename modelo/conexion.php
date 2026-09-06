@@ -75,7 +75,7 @@ class Conexion{
     static private function prepararMultiTenant($link){
         if(self::$multiTenantPreparado) return;
 
-        $tablas = array("usuarios", "productos", "formularios_compartir", "respuestas_formulario");
+        $tablas = array("usuarios", "formularios_compartir", "respuestas_formulario");
         foreach($tablas as $tabla){
             $existe = $link->prepare("SHOW TABLES LIKE :tabla");
             $existe->bindValue(":tabla", $tabla, PDO::PARAM_STR);

@@ -35,26 +35,6 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 
 
 -- ============================================
--- TABLA: productos
--- ============================================
-CREATE TABLE IF NOT EXISTS `productos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) DEFAULT NULL,
-  `id_categoria` int(11) NOT NULL,
-  `codigo` varchar(50) DEFAULT NULL,
-  `descripcion` text NOT NULL,
-  `imagen` varchar(255) DEFAULT '',
-  `stock` int(11) DEFAULT 0,
-  `ventas` int(11) DEFAULT 0,
-  `precio_compra` decimal(10,2) DEFAULT 0.00,
-  `precio_venta` decimal(10,2) DEFAULT 0.00,
-  `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id_categoria` (`id_categoria`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
--- ============================================
 -- TABLA: configuracion
 -- (Agrega aqui tus campos cuando los definas)
 -- ============================================
@@ -181,3 +161,4 @@ CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
 DROP TABLE IF EXISTS `ventas`;
 DROP TABLE IF EXISTS `clientes`;
 DROP TABLE IF EXISTS `categorias`;
+DROP TABLE IF EXISTS `productos`;

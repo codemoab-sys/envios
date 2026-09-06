@@ -38,9 +38,6 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
     <style>
-        body.solo-lectura #modalAgregarProducto,
-        body.solo-lectura .btnEditarProducto,
-        body.solo-lectura .btnEliminarProducto,
         body.solo-lectura #btnMarcarCompletado,
         body.solo-lectura #btnEliminar,
         body.solo-lectura #guardarApariencia,
@@ -51,26 +48,7 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
     </style>
 
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
-
-    <!-- ChartJS http://www.chartjs.org/-->
-    <script src="vistas/bower_components/Chart.js/Chart.js"></script>
-
-    <!--=====================================
-    daterangepicker
-    ======================================-->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
-
-
-
-    <!--=====================================
-    PLUGINS DE JAVASCRIPT
-    ======================================-->
 
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -112,7 +90,6 @@ if($esRegistro){
                 $ruta == "configuracion" ||
                 $ruta == "inicio" ||
                 $ruta == "salir" ||
-                $ruta == "productos"||
                 $ruta == "login"||
                 $ruta == "compartir"||
                 $ruta == "envios" ||
@@ -176,15 +153,7 @@ if($esRegistro){
 
 
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-
-
-
-
-
     <script src="vistas/js/usuarios.js"></script>
-    <script src="vistas/js/productos.js"></script>
     <script src="vistas/js/configuracion.js"></script>
     <script src="vistas/js/dark-mode.js?v=20260905"></script>
 

@@ -156,12 +156,21 @@ class ModeloConfiguracion{
     static public function mdlGuardarApariencia($tema, $colorCabecera, $colorBotonPrimario, $colorBotonSecundario){
         try{
             $conexion = self::prepararTabla();
-            $actual = $conexion->query("SELECT id FROM configuracion ORDER BY id ASC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            if(!isset($_SESSION["id"]) || (int) $_SESSION["id"] <= 0){
+                return "error";
+            }
+            $usuarioId = (int) $_SESSION["id"];
+            $actualStmt = $conexion->prepare("SELECT id FROM configuracion WHERE usuario_id = :usuario_id LIMIT 1");
+            $actualStmt->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
+            $actualStmt->execute();
+            $actual = $actualStmt->fetch(PDO::FETCH_ASSOC);
             if($actual){
-                $stmt = $conexion->prepare("UPDATE configuracion SET tema = :tema, color_cabecera = :color_cabecera, color_boton_primario = :color_boton_primario, color_boton_secundario = :color_boton_secundario WHERE id = :id");
+                $stmt = $conexion->prepare("UPDATE configuracion SET tema = :tema, color_cabecera = :color_cabecera, color_boton_primario = :color_boton_primario, color_boton_secundario = :color_boton_secundario WHERE id = :id AND usuario_id = :usuario_id");
                 $stmt->bindParam(":id", $actual["id"], PDO::PARAM_INT);
+                $stmt->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
             }else{
-                $stmt = $conexion->prepare("INSERT INTO configuracion (nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho, tema, color_cabecera, color_boton_primario, color_boton_secundario) VALUES ('', '', '[]', '[]', :tema, :color_cabecera, :color_boton_primario, :color_boton_secundario)");
+                $stmt = $conexion->prepare("INSERT INTO configuracion (usuario_id, nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho, tema, color_cabecera, color_boton_primario, color_boton_secundario) VALUES (:usuario_id, '', '', '[]', '[]', :tema, :color_cabecera, :color_boton_primario, :color_boton_secundario)");
+                $stmt->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
             }
             $stmt->bindParam(":tema", $tema, PDO::PARAM_STR);
             $stmt->bindParam(":color_cabecera", $colorCabecera, PDO::PARAM_STR);
