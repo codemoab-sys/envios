@@ -42,14 +42,206 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
     .envios-button-icon { width: 46px; padding: 0; }
     .envios-button-icon i { margin: 0; }
     .envios-spacer { width: 1px; height: 25px; margin: 0 2px; background: #344057; }
-    .envios-board { min-height: 585px; margin-top: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid #26344b; border-radius: 25px; background: #030817; }
-    .envios-locked { width: 390px; max-width: 90%; text-align: center; }
-    .envios-lock { width: 70px; height: 70px; margin: 0 auto 28px; display: flex; align-items: center; justify-content: center; border: 1px solid #17386f; border-radius: 50%; color: #4386ef; font-size: 34px; background: #0c2045; box-shadow: 0 0 26px rgba(47, 111, 232, .17); }
-    .envios-locked h1 { margin: 0 0 12px; color: #f4f6ff; font-size: 20px; font-weight: 700; }
-    .envios-locked p { margin: 0 0 26px; color: #8490aa; font-size: 16px; }
-    .envios-view { padding: 0 27px; height: 61px; border: 0; border-radius: 13px; background: linear-gradient(100deg, #3c87ef, #4d38dc); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 18px rgba(47, 102, 237, .2); }
-    .envios-view i { margin-right: 9px; }
-    .envios-note { margin: 26px auto 0; padding-top: 20px; border-top: 1px solid #172034; color: #4f5b73; font-size: 13px; line-height: 1.45; }
+    .envios-agencia-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        min-height: 72px;
+        padding: 16px 20px 18px;
+        border: 2px solid #3d7bf7;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(11, 22, 36, 0.94), rgba(8, 17, 29, 0.98));
+        box-shadow: inset 0 0 0 1px rgba(115, 164, 255, 0.08);
+    }
+    .envios-agencia-mark {
+        width: 4px;
+        height: 28px;
+        border-radius: 6px;
+        background: linear-gradient(180deg, #6ab2ff, #3d7bf7);
+        box-shadow: 0 0 14px rgba(61, 123, 247, 0.7);
+    }
+    .envios-agencia-name {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: #eff5ff;
+        line-height: 1;
+    }
+    .envios-board { margin-top: 14px; border: 1px solid #26344b; border-radius: 25px; background: rgba(8, 18, 31, 0.96); overflow: hidden; }
+    .envios-board-header { display: none; }
+    .envios-cards-wrap { padding: 14px; }
+    .envios-cards { display: flex; flex-direction: column; gap: 14px; }
+    .envios-card {
+        background: linear-gradient(180deg, rgba(21, 35, 57, 0.9), rgba(12, 23, 39, 0.96));
+        border: 2px solid #3d7bf7;
+        border-radius: 18px;
+        padding: 18px 20px 16px;
+        box-shadow: inset 0 0 0 1px rgba(136, 171, 255, 0.08);
+    }
+    .envios-card-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .envios-check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .envios-check input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        margin: 0;
+        cursor: pointer;
+    }
+    .envios-check span {
+        display: block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #7a92be;
+        border-radius: 4px;
+        background: rgba(20, 30, 45, 0.7);
+    }
+    .envios-check input:checked + span {
+        background: linear-gradient(180deg, #3f8cff, #2b6df0);
+        border-color: #53a3ff;
+        position: relative;
+    }
+    .envios-check input:checked + span::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 4px;
+        height: 8px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .envios-person { flex: 1; min-width: 0; }
+    .envios-name-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+    .envios-name {
+        font-size: 19px;
+        font-weight: 700;
+        color: #edf5ff;
+    }
+    .envios-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 116px;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+    }
+    .envios-status-pendiente {
+        background: rgba(251, 191, 36, 0.18);
+        border-color: rgba(251, 191, 36, 0.45);
+        color: #f8d161;
+    }
+    .envios-status-completado {
+        background: rgba(34, 197, 94, 0.16);
+        border-color: rgba(34, 197, 94, 0.3);
+        color: #4ade80;
+    }
+    .envios-meta-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: #9ab1d3;
+        font-size: 14px;
+    }
+    .envios-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        color: #b8caec;
+    }
+    .envios-meta i {
+        color: #7ca7ff;
+        font-size: 13px;
+    }
+    .envios-meta strong {
+        color: #dfe9ff;
+        font-weight: 600;
+    }
+    .envios-fecha {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 0;
+        color: #cfe0ff;
+        font-size: 13px;
+    }
+    .envios-fecha .envios-fecha-label {
+        color: #dfe9ff;
+        font-weight: 600;
+    }
+    .envios-agencia-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        color: #cbe1ff;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+    .envios-agencia-mini i {
+        color: #a7c9ff;
+        font-size: 12px;
+    }
+    .envios-whatsapp {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(37, 211, 102, 0.12);
+        border: 1px solid rgba(37, 211, 102, 0.4);
+        color: #25d366;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .envios-address {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(120, 151, 204, 0.18);
+        color: #e0ebff;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+    .envios-address i {
+        color: #b9c8e7;
+        font-size: 14px;
+    }
+    .envios-empty { padding: 60px 20px; text-align: center; }
+    .envios-empty i { font-size: 48px; color: #26344b; margin-bottom: 16px; display: block; }
+    .envios-empty p { color: #8490aa; font-size: 15px; margin: 0; }
+    .envios-loading { text-align: center; color: #8490aa; padding: 30px; }
     @media (max-width: 767px) {
         .envios-page { padding: 12px; }
         .envios-toolbar-row { flex-wrap: wrap; }
@@ -58,9 +250,11 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
         .envios-toolbar-row:nth-child(2) .envios-button { flex: 1 1 calc(50% - 10px); }
         .envios-toolbar-row:nth-child(2) .envios-button-icon { flex: 0 0 46px; }
         .envios-spacer { display: none; }
-        .envios-board { min-height: 520px; }
-        .envios-locked p { font-size: 14px; }
-        .envios-view { max-width: 100%; padding: 0 20px; font-size: 16px; }
+        .envios-board { border-radius: 16px; }
+        .envios-card { padding: 16px 14px; }
+        .envios-name-row { align-items: flex-start; }
+        .envios-name { font-size: 17px; }
+        .envios-meta-row { gap: 10px 12px; font-size: 12px; }
     }
     @media (max-width: 480px) {
         .envios-page { padding: 8px; }
@@ -69,10 +263,10 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
         .envios-control, .envios-search, .envios-button { font-size: 13px; }
         .envios-control { min-width: 0; }
         .envios-date { width: calc(50% - 4px); }
-        .envios-board { min-height: 440px; border-radius: 16px; }
-        .envios-lock { width: 58px; height: 58px; margin-bottom: 20px; font-size: 28px; }
-        .envios-locked h1 { font-size: 18px; }
-        .envios-note { font-size: 12px; }
+        .envios-card-row { flex-wrap: wrap; }
+        .envios-whatsapp { margin-left: auto; }
+        .envios-name-row { flex-direction: column; align-items: flex-start; }
+        .envios-status { min-width: auto; }
     }
 </style>
 
@@ -80,39 +274,49 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
 <main class="envios-page">
     <section class="envios-toolbar" aria-label="Filtros de respuestas">
         <div class="envios-toolbar-row">
-            <select class="envios-control" aria-label="Estado">
-                <option>PENDIENTES</option>
-                <option>COMPLETADOS</option>
-                <option>TODOS</option>
+            <select class="envios-control" id="filtroEstado" aria-label="Estado">
+                <option value="todos">TODOS</option>
+                <option value="pendiente" selected>PENDIENTES</option>
+                <option value="completado">COMPLETADOS</option>
             </select>
-            <input class="envios-control envios-date" type="text" placeholder="dd- -- aaaa" aria-label="Fecha">
-            <input class="envios-search" type="search" placeholder="Buscar..." aria-label="Buscar respuestas">
+            <select class="envios-control" id="filtroAgencia" aria-label="Agencia o metodo de envio">
+                <option value="todos">TODAS LAS AGENCIAS</option>
+                <option value="RETIRO EN AGENCIA SHALOM">Shalom</option>
+                <option value="RETIRO EN AGENCIA OLVA COURIER">Olva Courier</option>
+                <option value="RETIRO EN AGENCIA MARVISUR">Marvisur</option>
+                <option value="RETIRO EN AGENCIA DINSIDES">Dinsides</option>
+                <option value="DELIVERY (SOLO LIMA)">Delivery (Solo Lima)</option>
+                <option value="DELIVERY (SOLO TRUJILLO)">Delivery (Solo Trujillo)</option>
+                <option value="RETIRO EN TIENDA">Retiro en tienda</option>
+                <option value="ENCOMIENDA">Encomienda</option>
+            </select>
+            <input class="envios-control envios-date" type="date" id="filtroFechaInicio" aria-label="Fecha de inicio" title="Fecha de inicio">
+            <input class="envios-control envios-date" type="date" id="filtroFechaFin" aria-label="Fecha de fin" title="Fecha de fin">
+            <input class="envios-search" type="search" id="buscadorRespuestas" placeholder="Buscar por nombre, telefono o agencia..." aria-label="Buscar respuestas por nombre, telefono o agencia">
         </div>
         <div class="envios-toolbar-row">
-            <button class="envios-button" type="button"><i class="fa fa-check-square-o"></i>Todo</button>
-            <button class="envios-button" type="button"><i class="fa fa-print"></i>Etiquetas</button>
-            <button class="envios-button envios-button-green" type="button"><i class="fa fa-file-excel-o"></i>Excel</button>
-            <button class="envios-button envios-button-icon" type="button" title="Actualizar"><i class="fa fa-refresh"></i></button>
+            <button class="envios-button" type="button" id="btnTodo"><i class="fa fa-check-square-o"></i><span>Todo</span></button>
+            <button class="envios-button envios-button-icon" type="button" id="btnActualizar" title="Actualizar"><i class="fa fa-refresh"></i></button>
             <span class="envios-spacer" aria-hidden="true"></span>
-            <button class="envios-button envios-button-primary" type="button"><i class="fa fa-plus-circle"></i>Estado</button>
-            <button class="envios-button envios-button-danger envios-button-icon" type="button" title="Eliminar"><i class="fa fa-trash-o"></i></button>
+            <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Completar</button>
+            <button class="envios-button envios-button-danger envios-button-icon" type="button" id="btnEliminar" title="Eliminar"><i class="fa fa-trash-o"></i></button>
         </div>
     </section>
 
     <section class="envios-board" aria-label="Respuestas del formulario">
-        <div class="envios-locked">
-            <div class="envios-lock"><i class="fa fa-lock"></i></div>
-            <h1>Plan Gratuito Limitado</h1>
-            <p>La visualización de respuestas no está incluida en su plan actual.</p>
-            <button class="envios-view" type="button" id="verRespuestas"><i class="fa fa-magic"></i>Ver <?php echo $totalRespuestas; ?> registros</button>
-            <div class="envios-note">Todas tus respuestas serán visibles aquí, incluidas las conversaciones que se descarten en WhatsApp. Con el plan gratuito, solo se almacenan 2 meses de respuestas.</div>
+        <div class="envios-board-header">
+            <h2>Respuestas del formulario</h2>
+            <span id="contadorRespuestasBoard"><?php echo $totalRespuestas; ?> registros</span>
+        </div>
+        <div class="envios-cards-wrap" id="contenedorTabla">
+            <div class="envios-cards" id="tablaRespuestas"></div>
+        </div>
+        <div class="envios-empty" id="vacioRespuestas" style="display:none">
+            <i class="fa fa-inbox"></i>
+            <p>No hay respuestas para mostrar</p>
         </div>
     </section>
 </main>
 </div>
 
-<script>
-$('#verRespuestas').on('click', function(){
-    Swal.fire({title:'Plan Gratuito Limitado',text:'Actualiza tu plan para visualizar las respuestas.',icon:'info',confirmButtonText:'Cerrar'});
-});
-</script>
+<script src="vistas/js/envios.js"></script>

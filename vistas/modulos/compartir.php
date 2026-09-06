@@ -698,40 +698,48 @@ $('#agendarPublico').on('click', function(){
     var ubicacionResumen = '';
     var direccionResumen = '';
     var fechaResumen = '';
+    var fechaValor = '';
 
     if(['delivery_lima', 'delivery_trujillo'].indexOf(metodoSeleccionado) !== -1){
         nombreResumen = $('#nombrePublico').val().trim();
         ubicacionResumen = $('#distritoPublico').val().trim();
         direccionResumen = $('#direccionPublica').val().trim() + ' - ' + $('#referenciaPublica').val().trim();
         fechaResumen = $('#fechaPublica option:selected').text();
+        fechaValor = $('#fechaPublica').val();
     }else if(metodoSeleccionado == 'retiro_tienda'){
         nombreResumen = $('#nombreRetiroPublico').val().trim();
         fechaResumen = $('#fechaRetiroPublica option:selected').text();
+        fechaValor = $('#fechaRetiroPublica').val();
     }else if(metodoSeleccionado == 'shalom'){
         nombreResumen = $('#nombreShalomPublico').val().trim();
         dniResumen = $('#dniShalomPublico').val().trim();
         ubicacionResumen = $('#agenciaShalomPublica').val().trim();
         fechaResumen = $('#fechaShalomPublica option:selected').text();
+        fechaValor = $('#fechaShalomPublica').val();
     }else if(metodoSeleccionado == 'olva'){
         nombreResumen = $('#nombreOlvaPublico').val().trim();
         dniResumen = $('#dniOlvaPublico').val().trim();
         ubicacionResumen = $('#agenciaOlvaPublica').val().trim();
         fechaResumen = $('#fechaOlvaPublica option:selected').text();
+        fechaValor = $('#fechaOlvaPublica').val();
     }else if(metodoSeleccionado == 'marvisur'){
         nombreResumen = $('#nombreMarvisurPublico').val().trim();
         dniResumen = $('#dniMarvisurPublico').val().trim();
         ubicacionResumen = $('#agenciaMarvisurPublica').val().trim();
         fechaResumen = $('#fechaMarvisurPublica option:selected').text();
+        fechaValor = $('#fechaMarvisurPublica').val();
     }else if(metodoSeleccionado == 'dinsides'){
         nombreResumen = $('#nombreDinsidesPublico').val().trim();
         dniResumen = $('#dniDinsidesPublico').val().trim();
         ubicacionResumen = $('#agenciaDinsidesPublica').val().trim();
         fechaResumen = $('#fechaDinsidesPublica option:selected').text();
+        fechaValor = $('#fechaDinsidesPublica').val();
     }else if(metodoSeleccionado == 'encomienda'){
         nombreResumen = $('#nombreEncomiendaPublico').val().trim();
         dniResumen = $('#dniPublico').val().trim();
         ubicacionResumen = $('#ubicacionEncomiendaPublica').val().trim();
         fechaResumen = $('#fechaEncomiendaPublica option:selected').text();
+        fechaValor = $('#fechaEncomiendaPublica').val();
     }
 
     var resumenWhatsApp = '*NUEVO ENVÍO (' + metodoTexto.toUpperCase() + ')*\n\n' +
@@ -765,7 +773,31 @@ $('#agendarPublico').on('click', function(){
         width: 520
     }).then(function(resultado){
         if(resultado.isConfirmed){
-            window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+            Swal.fire({title:'Guardando...',text:'Registrando tu respuesta...',allowOutsideClick:false,onBeforeOpen:function(){Swal.showLoading();}});
+            var formData = new FormData();
+            formData.append('guardarRespuestaAjax', '1');
+            formData.append('nombre', nombreResumen);
+            formData.append('telefono', whatsappPublico);
+            formData.append('direccion', ubicacionResumen + (direccionResumen ? ' - ' + direccionResumen : ''));
+            formData.append('agencia', (metodoTexto || 'SHALOM').toString().toUpperCase());
+            formData.append('fecha_envio', fechaValor && fechaValor !== 'Elige una fecha...' ? fechaValor : '');
+            formData.append('mensaje', resumenWhatsApp);
+            $.ajax({
+                url: 'ajax/envios.ajax.php',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(respuesta){
+                    Swal.close();
+                    window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+                },
+                error: function(){
+                    Swal.close();
+                    window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+                }
+            });
         }
     });
 });
@@ -820,7 +852,9 @@ $('#metodoPublico').on('change', function(){
     actualizarTema();
 })();
 </script>
-<?php else: ?>
+<?php else:
+$enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QUOTES, "UTF-8");
+?>
 <style>
     body:has(.compartir-page) { overflow: hidden; }
     body:has(.compartir-page) .main-footer { display: none !important; }
