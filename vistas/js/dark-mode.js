@@ -23,16 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
         primaryButtonColor: `${storagePrefix}_primaryButtonColor`,
         secondaryButtonColor: `${storagePrefix}_secondaryButtonColor`
     };
-    const cachedTheme = localStorage.getItem(storageKeys.theme) || localStorage.getItem('theme') || 'light';
-    const cachedHeaderColor = localStorage.getItem(storageKeys.headerColor) || localStorage.getItem('headerColor') || '#111827';
-    const cachedPrimaryColor = localStorage.getItem(storageKeys.primaryButtonColor) || localStorage.getItem('primaryButtonColor') || '#2563eb';
-    const cachedSecondaryColor = localStorage.getItem(storageKeys.secondaryButtonColor) || localStorage.getItem('secondaryButtonColor') || '#334155';
-    const headerColorResolved = (colorBaseDatos || cachedHeaderColor).toLowerCase() === '#dd4b39' ? '#111827' : (colorBaseDatos || cachedHeaderColor);
-    const savedTheme = temaBaseDatos || cachedTheme;
+    const cachedTheme = localStorage.getItem(storageKeys.theme) || '';
+    const cachedHeaderColor = localStorage.getItem(storageKeys.headerColor) || '';
+    const cachedPrimaryColor = localStorage.getItem(storageKeys.primaryButtonColor) || '';
+    const cachedSecondaryColor = localStorage.getItem(storageKeys.secondaryButtonColor) || '';
+    const savedTheme = cachedTheme || temaBaseDatos || 'light';
+    const headerColorBase = cachedHeaderColor || colorBaseDatos || '#111827';
+    const primaryColorBase = cachedPrimaryColor || primarioBaseDatos || '#2563eb';
+    const secondaryColorBase = cachedSecondaryColor || secundarioBaseDatos || '#334155';
+    const headerColorResolved = headerColorBase.toLowerCase() === '#dd4b39' ? '#111827' : headerColorBase;
     html.setAttribute('data-theme', savedTheme);
     updateIcon(savedTheme);
     aplicarColorCabecera(headerColorResolved);
-    aplicarColorBotones(primarioBaseDatos || cachedPrimaryColor, secundarioBaseDatos || cachedSecondaryColor);
+    aplicarColorBotones(primaryColorBase, secondaryColorBase);
 
     document.querySelectorAll('[data-theme-choice]').forEach(function(button) {
         button.addEventListener('click', function() {
@@ -47,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const colorCabecera = document.getElementById('colorCabecera');
     const codigoColorCabecera = document.getElementById('codigoColorCabecera');
     if(colorCabecera){
-        colorCabecera.value = headerColorResolved || colorCabecera.value || localStorage.getItem('headerColor') || '#111827';
+        colorCabecera.value = headerColorResolved || colorCabecera.value || '#111827';
         actualizarCodigoColor(colorCabecera.value);
         colorCabecera.addEventListener('input', function(){
             aplicarColorCabecera(colorCabecera.value);
@@ -75,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(valor){
                 colorCabecera.value = valor;
                 aplicarColorCabecera(valor);
-                localStorage.setItem('headerColor', valor);
+                localStorage.setItem(storageKeys.headerColor, valor);
             }
         });
         codigoColorCabecera.addEventListener('blur', function(){

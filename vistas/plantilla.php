@@ -142,7 +142,7 @@ if($esRegistro){
 
     <script src="vistas/js/usuarios.js"></script>
     <script src="vistas/js/configuracion.js"></script>
-    <script src="vistas/js/dark-mode.js?v=20260905"></script>
+    <script src="vistas/js/dark-mode.js?v=20260906-1"></script>
 
 
 
