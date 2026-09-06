@@ -104,13 +104,21 @@
                   </div>
                   <div class="apariencia-control">
                       <label>Paletas recomendadas</label>
-                      <div class="apariencia-paletas">
-                          <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#0f766e" data-primary="#2563eb" data-secondary="#334155"><span class="paleta-muestra" style="--muestra:#0f766e"></span><span>Claro turquesa</span></button>
-                          <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#1d4ed8" data-primary="#0ea5e9" data-secondary="#1e3a5f"><span class="paleta-muestra" style="--muestra:#1d4ed8"></span><span>Claro azul</span></button>
-                          <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#b45309" data-primary="#ea580c" data-secondary="#44403c"><span class="paleta-muestra" style="--muestra:#b45309"></span><span>Claro ámbar</span></button>
-                          <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#166534" data-primary="#16a34a" data-secondary="#365314"><span class="paleta-muestra" style="--muestra:#166534"></span><span>Oscuro bosque</span></button>
-                          <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#172554" data-primary="#3b82f6" data-secondary="#1e293b"><span class="paleta-muestra" style="--muestra:#172554"></span><span>Oscuro nocturno</span></button>
-                          <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#4c1d2c" data-primary="#f43f5e" data-secondary="#3f1d2e"><span class="paleta-muestra" style="--muestra:#4c1d2c"></span><span>Oscuro coral</span></button>
+                      <div class="apariencia-paletas-grupo">
+                          <span class="apariencia-paletas-label">Temas claros</span>
+                          <div class="apariencia-paletas">
+                              <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#0f766e" data-primary="#2563eb" data-secondary="#334155"><span class="paleta-muestra" style="--muestra:#0f766e"></span><span>Turquesa limpio</span></button>
+                              <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#1e40af" data-primary="#0284c7" data-secondary="#334155"><span class="paleta-muestra" style="--muestra:#1e40af"></span><span>Azul confianza</span></button>
+                              <button type="button" class="apariencia-paleta" data-theme-palette="light" data-header="#b45309" data-primary="#d97706" data-secondary="#3f3f46"><span class="paleta-muestra" style="--muestra:#b45309"></span><span>Ámbar activo</span></button>
+                          </div>
+                      </div>
+                      <div class="apariencia-paletas-grupo">
+                          <span class="apariencia-paletas-label">Temas oscuros</span>
+                          <div class="apariencia-paletas">
+                              <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#166534" data-primary="#22c55e" data-secondary="#1f2937"><span class="paleta-muestra" style="--muestra:#166534"></span><span>Bosque sereno</span></button>
+                              <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#1e3a8a" data-primary="#60a5fa" data-secondary="#0f172a"><span class="paleta-muestra" style="--muestra:#1e3a8a"></span><span>Azul nocturno</span></button>
+                              <button type="button" class="apariencia-paleta" data-theme-palette="dark" data-header="#881337" data-primary="#fb7185" data-secondary="#3f172a"><span class="paleta-muestra" style="--muestra:#881337"></span><span>Coral profundo</span></button>
+                          </div>
                       </div>
                   </div>
               </div>

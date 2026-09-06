@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function aplicarColorCabecera(color){
         document.documentElement.style.setProperty('--header-color', color);
+        document.documentElement.style.setProperty('--header-text-color', colorContraste(color));
     }
 
     function aplicarColorBotones(primario, secundario){
