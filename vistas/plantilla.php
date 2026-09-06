@@ -1,6 +1,15 @@
 <?php 
 
 session_start();
+Conexion::actualizarEstadoSuscripcionSesion();
+$esFormularioPublico = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "compartir" && isset($_GET["merchant"]);
+$esRegistro = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "registro";
+$ruta = isset($_GET["ruta"]) ? strtolower((string) $_GET["ruta"]) : "";
+$esAdministrador = isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador";
+if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdministrador){
+    http_response_code(403);
+    $ruta = "inicio";
+}
 
 
 ?>
@@ -28,6 +37,18 @@ session_start();
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
+    <style>
+        body.solo-lectura #modalAgregarProducto,
+        body.solo-lectura .btnEditarProducto,
+        body.solo-lectura .btnEliminarProducto,
+        body.solo-lectura #btnMarcarCompletado,
+        body.solo-lectura #btnEliminar,
+        body.solo-lectura #guardarApariencia,
+        body.solo-lectura .config-card-save,
+        body.solo-lectura [name="guardarCompartir"] { display: none !important; }
+        .subscription-alert { display: flex !important; align-items: center; clear: both; width: calc(100% - 30px); min-height: 48px; margin: 15px !important; padding: 12px 16px !important; border: 1px solid transparent; border-radius: 4px; font-size: 14px; line-height: 1.4; }
+        .subscription-alert i { margin-right: 8px; }
+    </style>
 
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
@@ -60,13 +81,10 @@ session_start();
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 
-<body class="hold-transition skin-red sidebar-mini fixed">
+<body class="hold-transition skin-red sidebar-mini fixed<?php echo isset($_SESSION["solo_lectura"]) && $_SESSION["solo_lectura"] === true ? ' solo-lectura' : ''; ?>">
 
     <?php
     
-$esFormularioPublico = isset($_GET["ruta"]) && strtolower($_GET["ruta"]) == "compartir" && isset($_GET["merchant"]);
-$esRegistro = isset($_GET["ruta"]) && strtolower($_GET["ruta"]) === "registro";
-
 if($esRegistro){
     include "modulos/registro.php";
 }elseif((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || $esFormularioPublico){
@@ -78,18 +96,18 @@ if($esRegistro){
 
         include "modulos/menu.php";
 
+        if(isset($_SESSION["solo_lectura"]) && $_SESSION["solo_lectura"] === true){
+            echo '<div class="alert alert-warning subscription-alert" role="alert"><i class="fa fa-lock"></i><span>Tu período terminó. Estás en modo solo lectura; no puedes crear ni modificar información.</span></div>';
+        }elseif(isset($_SESSION["plan"]) && $_SESSION["plan"] !== "general" && isset($_SESSION["dias_restantes"]) && $_SESSION["dias_restantes"] !== null){
+            $tipoSuscripcion = $_SESSION["plan"] === "prueba" ? "prueba" : "suscripción mensual";
+            $diasRestantes = (int) $_SESSION["dias_restantes"];
+            $claseAlerta = $diasRestantes <= 3 ? "alert-warning" : "alert-info";
+            $mensajeRenovacion = $diasRestantes <= 3 ? " Renueva pronto para no quedar en modo solo lectura." : "";
+            echo '<div class="alert '.$claseAlerta.' subscription-alert" role="alert"><i class="fa fa-clock-o"></i><span>Te quedan '.$diasRestantes.' día(s) de tu '.$tipoSuscripcion.'.'.$mensajeRenovacion.'</span></div>';
+        }
+
 
         if(isset($_GET["ruta"])){
-
-            $ruta = strtolower($_GET["ruta"]);
-
-            $esAdministrador = isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador";
-
-            if($ruta === "usuarios" && !$esAdministrador){
-                http_response_code(403);
-                $ruta = "inicio";
-            }
-
             if($ruta == "usuarios" ||
                 $ruta == "configuracion" ||
                 $ruta == "inicio" ||

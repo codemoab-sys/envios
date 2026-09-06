@@ -13,6 +13,10 @@ class ControladorConfiguracion{
         if(!isset($_POST["guardarConfiguracion"]) && !isset($_POST["actualizarPasswordConfiguracion"])){
             return;
         }
+        if(!Conexion::puedeEscribir()){
+            self::mostrarAlerta("warning", "Tu período terminó. Puedes consultar la información, pero no crear ni modificar datos.");
+            return;
+        }
 
         if(isset($_POST["actualizarPasswordConfiguracion"])){
             $password = trim($_POST["nuevaPassword"] ?? "");

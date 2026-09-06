@@ -43,6 +43,10 @@
                                 <th>usuario</th>
                                 <th>foto</th>
                                 <th>perfil</th>
+                                <th>plan</th>
+                                <th>inicio</th>
+                                <th>vencimiento</th>
+                                <th>tiempo restante</th>
                                 <th>estado</th>
                                 <th>acciones</th>
 
@@ -74,15 +78,34 @@
 
                             foreach ($usuarios as $key => $value) {
 
+                                $planUsuario = strtolower(trim((string)($value["plan"] ?? "")));
+                                $fechaInicioUsuario = !empty($value["fecha_inicio"]) ? date("d/m/Y H:i", strtotime($value["fecha_inicio"])) : "-";
+                                $fechaVencimientoUsuario = !empty($value["fecha_vencimiento"]) ? date("d/m/Y H:i", strtotime($value["fecha_vencimiento"])) : "-";
+                                if((int)($value["estado"] ?? 0) === 0){
+                                    $tiempoUsuario = "Desactivado";
+                                }elseif($planUsuario === "general" || $planUsuario === ""){
+                                    $tiempoUsuario = "Sin límite";
+                                }elseif(!empty($value["fecha_vencimiento"]) && strtotime($value["fecha_vencimiento"]) <= time()){
+                                    $tiempoUsuario = "Solo lectura";
+                                }else{
+                                    $diasUsuario = !empty($value["fecha_vencimiento"]) ? max(0, (int) ceil((strtotime($value["fecha_vencimiento"]) - time()) / 86400)) : 0;
+                                    $tiempoUsuario = $diasUsuario . " día(s)";
+                                }
+                                $planVisible = $planUsuario === "prueba" ? "Usuario/prueba" : ($planUsuario === "mensual" ? "Usuario mensual" : "General");
+
                                 echo '
 
                                    <tr>
 
-                                <td>1</td>
-                                <td>'.$value["nombre"].'</td>
-                                <td>'.$value["usuario"].'</td>
+                                <td>'.($key + 1).'</td>
+                                <td>'.htmlspecialchars((string) $value["nombre"], ENT_QUOTES, "UTF-8").'</td>
+                                <td>'.htmlspecialchars((string) $value["usuario"], ENT_QUOTES, "UTF-8").'</td>
                                 <td><i class="fa fa-user usuarios-foto-icon" aria-label="Usuario"></i></td>
-                                <td>'.$value["perfil"].'</td>';
+                                <td>'.htmlspecialchars($value["perfil"], ENT_QUOTES, "UTF-8").'</td>
+                                <td>'.htmlspecialchars($planVisible, ENT_QUOTES, "UTF-8").'</td>
+                                <td>'.$fechaInicioUsuario.'</td>
+                                <td>'.$fechaVencimientoUsuario.'</td>
+                                <td>'.htmlspecialchars($tiempoUsuario, ENT_QUOTES, "UTF-8").'</td>';
 
                                 if($value["estado"] != 0){
 
@@ -417,6 +440,18 @@ MODAL EDITAR USUARIO
 
                                 </div>
 
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <select class="form-control input-lg" name="editarPlan" id="editarPlan">
+                                        <option value="general">Sin límite</option>
+                                        <option value="mensual">Usuario mensual</option>
+                                        <option value="prueba">Usuario/prueba (3 días)</option>
+                                    </select>
+                                </div>
+                                <p class="help-block">Al guardar, el plan inicia hoy y calcula automáticamente su vencimiento.</p>
                             </div>
 
 

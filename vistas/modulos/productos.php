@@ -39,7 +39,6 @@
                                    <th>Imagen</th>
                                    <th>Código</th>
                                    <th>Descripción</th>
-                                   <th>Categoría</th>
                                    <th>Stock</th>
                                    <th>Precio de compra</th>
                                    <th>Precio de venta</th>
@@ -199,7 +198,7 @@ MODAL AGREGAR ProductoS
                                        <span class="input-group-addon"><i class="fa fa-code"></i></span>
 
                                        <input type="text" class="form-control input-lg" id="nuevoCodigo"
-                                           name="nuevoCodigo" placeholder="Ingresar código" readonly required>
+                                           name="nuevoCodigo" placeholder="Ingresar código" required>
 
                                    </div>
 
@@ -397,32 +396,6 @@ MODAL EDITAR ProductoS
 
                        <div class="modal-body">
                            <div class="box-body">
-
-                               <!-- ENTRADA PARA SELECIONAR LA CATEGORIA -->
-
-                               <div class="form-group">
-
-                                   <div class="input-group">
-
-                                       <span class="input-group-addon"><i class="fa fa-th"></i></span>
-
-                                       <select class="form-control input-lg" name="editarCategoria">
-
-
-                                           <option id="editarCategoria"></option>
-
-
-
-
-
-                                       </select>
-
-                                   </div>
-
-                               </div>
-
-
-
 
 
                                <!-- ENTRADA PARA EL CODIGO -->

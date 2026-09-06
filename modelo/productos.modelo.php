@@ -48,30 +48,9 @@ class ModeloProductos{
 
 
 
-	static public function mdlMostrarSumaVentas($tabla){
-
-		$stmt = Conexion::conectar()->prepare("SELECT SUM(ventas) as total FROM $tabla WHERE tenant_id=:tenant_id");
-		$stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
-
-		$stmt -> execute();
-
-		return $stmt -> fetch();
-
-		$stmt -> close();
-
-		$stmt = null;
-
-
-
-
-
-
-
-
-	}
-
-
     static public function mdlEliminarProducto($tabla,$datos){
+
+		if(!Conexion::puedeEscribir()) return "error";
 
 		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE id=:id AND tenant_id=:tenant_id");
 
@@ -104,6 +83,7 @@ class ModeloProductos{
 
     static public function mdlIngresarProducto($tabla,$datos){
 
+		if(!Conexion::puedeEscribir()) return "error";
 
 		$stmt = Conexion::conectar()->prepare("INSERT INTO $tabla(tenant_id,id_categoria,codigo,descripcion,imagen,stock,precio_compra,precio_venta)VALUES(:tenant_id,:id_categoria,:codigo,:descripcion,:imagen,:stock,:precio_compra,:precio_venta)");
 		 $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
@@ -136,6 +116,7 @@ class ModeloProductos{
 
     static public function mdlEditarProducto($tabla,$datos){
 
+		if(!Conexion::puedeEscribir()) return "error";
 		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET id_categoria=:id_categoria,descripcion=:descripcion,imagen=:imagen,stock=:stock,precio_compra=:precio_compra,precio_venta=:precio_venta WHERE codigo=:codigo AND tenant_id=:tenant_id");
 		$stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
 
@@ -169,6 +150,8 @@ class ModeloProductos{
 	ACTUALIZAR PRODUCTO
 	=============================================*/
     static public function mdlActualizarProducto($tabla, $item1, $valor1, $valor){
+
+		if(!Conexion::puedeEscribir()) return "error";
 
         $columnasPermitidas = ["estado", "stock"];
         if(!in_array($item1, $columnasPermitidas)){

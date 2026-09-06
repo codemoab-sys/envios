@@ -59,6 +59,7 @@ class ModeloEnvios{
         try{
             $tenantId = (int) ($datos["tenant_id"] ?? Conexion::tenantId());
             if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
+            if(!Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó");
             $conexion = self::prepararTabla();
             $stmt = $conexion->prepare("INSERT INTO respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);

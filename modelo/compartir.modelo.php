@@ -43,7 +43,7 @@ class ModeloCompartir{
                     $actualizar->execute(array(":enlace" => $formulario["enlace"], ":id" => $formulario["id"]));
                 }
             }
-            if(!$formulario){
+            if(!$formulario && Conexion::puedeEscribir()){
                 $token = bin2hex(random_bytes(8));
                 $enlace = self::crearEnlace($token);
                 $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
@@ -71,6 +71,7 @@ class ModeloCompartir{
 
     static public function mdlGuardar($datos){
         try{
+            if(!Conexion::puedeEscribir()) return "error";
             $conexion = self::prepararTabla();
             $token = bin2hex(random_bytes(8));
             $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");

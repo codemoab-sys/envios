@@ -29,6 +29,7 @@ class ControladorEnvios{
     }
 
     static public function ctrCambiarEstado($id, $nuevoEstado){
+        if(!Conexion::puedeEscribir()) return array("estado" => "error", "mensaje" => "Tu período terminó; solo puedes consultar los envíos");
         if($id <= 0){
             return array("estado" => "error", "mensaje" => "ID invalido");
         }
@@ -40,6 +41,7 @@ class ControladorEnvios{
     }
 
     static public function ctrEliminarRespuesta($id){
+        if(!Conexion::puedeEscribir()) return array("estado" => "error", "mensaje" => "Tu período terminó; solo puedes consultar los envíos");
         if($id <= 0){
             return array("estado" => "error", "mensaje" => "ID invalido");
         }

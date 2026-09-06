@@ -31,7 +31,7 @@ class ModeloUsuarios{
             }
 
             $encriptada = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
-            $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, usuario, password, perfil, foto, estado) VALUES (:nombre, :usuario, :password, 'Usuario/prueba', '', 1)");
+            $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, usuario, password, perfil, foto, estado, plan, fecha_inicio, fecha_vencimiento) VALUES (:nombre, :usuario, :password, 'Usuario/prueba', '', 1, 'prueba', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY))");
             $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
             $stmt->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);
             $stmt->bindParam(":password", $encriptada, PDO::PARAM_STR);
@@ -102,8 +102,11 @@ class ModeloUsuarios{
     static public function mdlEditarUsuario($tabla, $datos){
 
         $filtroTenant = self::administradorGeneral() ? "" : " AND tenant_id=:tenant_id";
-        $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET nombre = :nombre, password = :password, perfil = :perfil, foto = :foto WHERE usuario = :usuario" . $filtroTenant);
+        $plan = in_array(($datos["plan"] ?? ""), array("general", "mensual", "prueba"), true) ? $datos["plan"] : "general";
+        $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET nombre = :nombre, password = :password, perfil = :perfil, foto = :foto, plan = :plan, fecha_inicio = NOW(), fecha_vencimiento = CASE WHEN :plan_fecha = 'prueba' THEN DATE_ADD(NOW(), INTERVAL 3 DAY) WHEN :plan_fecha = 'mensual' THEN DATE_ADD(NOW(), INTERVAL 1 MONTH) ELSE NULL END WHERE usuario = :usuario" . $filtroTenant);
         if($filtroTenant !== "") $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
+        $stmt->bindValue(":plan", $plan, PDO::PARAM_STR);
+        $stmt->bindValue(":plan_fecha", $plan, PDO::PARAM_STR);
 
 
         $stmt -> bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
@@ -144,8 +147,11 @@ class ModeloUsuarios{
     static public function mdlIngresarUsuario($tabla,$datos){
 
 
-        $stmt=Conexion::conectar()->prepare("INSERT INTO $tabla(tenant_id,nombre,usuario,password,perfil,foto) VALUES (:tenant_id,:nombre,:usuario,:password,:perfil,:foto)");
+        $plan = strtolower(trim((string) ($datos["perfil"] ?? ""))) === "usuario/prueba" ? "prueba" : (strtolower(trim((string) ($datos["perfil"] ?? ""))) === "usuario" ? "mensual" : "general");
+        $stmt=Conexion::conectar()->prepare("INSERT INTO $tabla(tenant_id,nombre,usuario,password,perfil,foto,plan,fecha_inicio,fecha_vencimiento) VALUES (:tenant_id,:nombre,:usuario,:password,:perfil,:foto,:plan,NOW(),CASE WHEN :plan_fecha = 'prueba' THEN DATE_ADD(NOW(), INTERVAL 3 DAY) WHEN :plan_fecha = 'mensual' THEN DATE_ADD(NOW(), INTERVAL 1 MONTH) ELSE NULL END)");
         $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
+        $stmt->bindValue(":plan", $plan, PDO::PARAM_STR);
+        $stmt->bindValue(":plan_fecha", $plan, PDO::PARAM_STR);
 
         $stmt->bindParam(":nombre" ,$datos["nombre"],PDO::PARAM_STR);
         $stmt->bindParam(":usuario" ,$datos["usuario"],PDO::PARAM_STR);

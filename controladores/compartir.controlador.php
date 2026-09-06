@@ -12,6 +12,10 @@ class ControladorCompartir{
 
     static public function ctrGuardar(){
         if(!isset($_POST["guardarCompartir"])){ return; }
+        if(!Conexion::puedeEscribir()){
+            echo '<script>Swal.fire({icon:"warning",title:"Cuenta en modo solo lectura",text:"Tu período terminó; no puedes crear nuevos formularios.",confirmButtonText:"Cerrar"});</script>';
+            return;
+        }
         $titulo = trim($_POST["tituloCompartir"] ?? "");
         $descripcion = trim($_POST["descripcionCompartir"] ?? "");
         if($titulo == ""){

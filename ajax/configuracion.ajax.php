@@ -3,11 +3,17 @@
 session_start();
 require_once "../controladores/configuracion.controlador.php";
 require_once "../modelo/configuracion.modelo.php";
+require_once "../modelo/conexion.php";
 
 header("Content-Type: application/json; charset=UTF-8");
 
 if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] != "ok" || !isset($_SESSION["id"])){ 
     echo json_encode(array("estado" => "error", "mensaje" => "Sesión no válida"));
+    exit;
+}
+
+if(!Conexion::puedeEscribir() && (isset($_POST["actualizarPasswordAjax"]) || isset($_POST["guardarAparienciaAjax"]))){
+    echo json_encode(array("estado" => "error", "mensaje" => "Tu período terminó; la cuenta está en modo solo lectura"));
     exit;
 }
 

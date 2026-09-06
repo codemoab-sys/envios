@@ -29,13 +29,15 @@ class ControladorUsuarios{
 
                 if($respuesta["estado"]==1){
 
+                    Conexion::prepararSuscripcion($respuesta);
+
                     $_SESSION["iniciarSesion"]="ok";
                     $_SESSION["id"]= $respuesta["id"];
                     $_SESSION["nombre"]= $respuesta["nombre"];
                     $_SESSION["usuario"]= $respuesta["usuario"];
                     $_SESSION["foto"]= $respuesta["foto"];
                     $_SESSION["perfil"]= $respuesta["perfil"];
-                    $_SESSION["tenant_id"]= $respuesta["id"];
+                    $_SESSION["tenant_id"]= !empty($respuesta["tenant_id"]) ? $respuesta["tenant_id"] : $respuesta["id"];
 
                     echo '<script>
 
@@ -231,7 +233,8 @@ class ControladorUsuarios{
 							   "usuario" => $_POST["editarUsuario"],
 							   "password" => $encriptar,
 							   "perfil" => $_POST["editarPerfil"],
-							   "foto" => $ruta);
+                               "foto" => $ruta,
+                               "plan" => $_POST["editarPlan"] ?? "");
 
 
                     $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);

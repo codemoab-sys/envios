@@ -19,6 +19,10 @@ if(isset($_POST["guardarRespuestaAjax"])){
         echo json_encode(array("estado" => "error", "mensaje" => "El formulario no pertenece a una empresa válida"));
         exit;
     }
+    if(!Conexion::tenantPuedeEscribir($tenantId)){
+        echo json_encode(array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó; el formulario está temporalmente cerrado"));
+        exit;
+    }
     $datos = array(
         "tenant_id" => $tenantId,
         "nombre" => trim($_POST["nombre"] ?? ""),

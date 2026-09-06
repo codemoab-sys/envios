@@ -6,6 +6,7 @@ class ControladorProductos{
 
     static public function ctrEliminarProducto(){
 
+		if(!Conexion::puedeEscribir()) return;
 
         if(isset($_GET["idProducto"])){
 
@@ -68,7 +69,7 @@ class ControladorProductos{
 
         $tabla = "productos";
 
-        $orden="ventas";
+		$orden="id";
 
         $respuesta=ModeloProductos::mdlMostrarProductos($tabla,$item,$valor,$orden);
 
@@ -83,6 +84,7 @@ class ControladorProductos{
 
     static public function ctrCrearProducto(){
 
+		if(!Conexion::puedeEscribir()) return;
 
 		if(isset($_POST["nuevoCodigo"])){
 
@@ -206,6 +208,7 @@ class ControladorProductos{
 
     static public function ctrEditarProducto(){
 
+		if(!Conexion::puedeEscribir()) return;
         if(isset($_POST["editarDescripcion"])){
 
 
@@ -290,7 +293,7 @@ class ControladorProductos{
 
                 $tabla = "productos";
 
-                $datos = array("id_categoria" => $_POST["editarCategoria"],
+				$datos = array("id_categoria" => 0,
 							   "codigo" => $_POST["editarCodigo"],
 							   "descripcion" => $_POST["editarDescripcion"],
 							   "stock" => $_POST["editarStock"],
@@ -336,24 +339,6 @@ class ControladorProductos{
 
 
     }
-
-
-		/*=============================================
-	MOSTRAR SUMA VENTAS
-	=============================================*/
-
-	static public function ctrMostrarSumaVentas(){
-
-		$tabla="productos";
-
-		$respuesta=ModeloProductos::mdlMostrarSumaVentas($tabla);
-
-		return $respuesta;
-
-
-
-
-	}
 
 
 

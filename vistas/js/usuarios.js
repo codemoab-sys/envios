@@ -32,6 +32,7 @@ $(".tablas").on("click", ".btnEditarUsuario", function () {
             $("#editarUsuario").val(respuesta["usuario"]);
             $("#editarPerfil").html(respuesta["perfil"]);
 			$("#editarPerfil").val(respuesta["perfil"]);
+            $("#editarPlan").val(respuesta["plan"] || (respuesta["perfil"] === "Usuario/prueba" ? "prueba" : (respuesta["perfil"] === "Usuario" ? "mensual" : "general")));
 			$("#fotoActual").val(respuesta["foto"]);
 
             $("#passwordActual").val(respuesta["password"]);

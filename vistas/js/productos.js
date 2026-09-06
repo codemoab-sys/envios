@@ -1,49 +1,4 @@
 /*=============================================
-CAPTURANDO LA CATEGORIA PARA ASIGNAR CÓDIGO
-=============================================*/
-
-$("#nuevaCategoria").change(function(){
-
-    var idCategoria = $(this).val();
-    
-	var datos = new FormData();
-  	datos.append("idCategoria", idCategoria);
-
-  	$.ajax({
-
-      url:"ajax/productos.ajax.php",
-      method: "POST",
-      data: datos,
-      cache: false,
-      contentType: false,
-      processData: false,
-      dataType:"json",
-            success: function (respuesta) {
-                  
-      	if(!respuesta){
-
-      		var nuevoCodigo = idCategoria+"01";
-      		$("#nuevoCodigo").val(nuevoCodigo);
-
-      	}else{
-
-               console.log(respuesta)
-
-      		var nuevoCodigo = Number(respuesta["codigo"]) + 1;
-          	$("#nuevoCodigo").val(nuevoCodigo);
-
-      	}
-                
-      }
-
-  	})
-
-})
-
-
-
-
-/*=============================================
 EDITAR PRODUCTO
 =============================================*/
 
@@ -67,33 +22,6 @@ $(".tablas tbody").on("click", "button.btnEditarProducto", function () {
       processData: false,
       dataType: "json",
         success: function (respuesta) {
-
-            var datosCategoria = new FormData();
-            datosCategoria.append("idCategoria", respuesta["id_categoria"]);
-
-            console.log(respuesta["id_categoria"])
-
-            $.ajax({
-
-                url:"ajax/categorias.ajax.php",
-                method: "POST",
-                data: datosCategoria,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: "json",
-                success: function (respuesta) {
-
-                    console.log(respuesta["categorias"]);
-                     
-                    $("#editarCategoria").val(respuesta["id"]);
-                    $("#editarCategoria").html(respuesta["categorias"]);
-
-                 
-                 }
-
-             })
-
 
             $("#editarCodigo").val(respuesta["codigo"]);
             $("#editarDescripcion").val(respuesta["descripcion"]);
