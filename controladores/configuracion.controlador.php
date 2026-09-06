@@ -93,6 +93,21 @@ class ControladorConfiguracion{
 
     }
 
+    static public function ctrGuardarApariencia($tema, $colorCabecera, $colorBotonPrimario, $colorBotonSecundario){
+        $tema = $tema === "dark" ? "dark" : "light";
+        $colorCabecera = strtolower(trim($colorCabecera));
+        $colorBotonPrimario = strtolower(trim($colorBotonPrimario));
+        $colorBotonSecundario = strtolower(trim($colorBotonSecundario));
+        if(!preg_match('/^#[0-9a-f]{6}$/i', $colorCabecera) || !preg_match('/^#[0-9a-f]{6}$/i', $colorBotonPrimario) || !preg_match('/^#[0-9a-f]{6}$/i', $colorBotonSecundario)){
+            return array("estado" => "error", "mensaje" => "Color de cabecera no válido");
+        }
+        $respuesta = ModeloConfiguracion::mdlGuardarApariencia($tema, $colorCabecera, $colorBotonPrimario, $colorBotonSecundario);
+        return array(
+            "estado" => $respuesta === "ok" ? "ok" : "error",
+            "mensaje" => $respuesta === "ok" ? "Apariencia guardada" : "No se pudo guardar la apariencia"
+        );
+    }
+
     static private function mostrarAlerta($tipo, $titulo, $ruta = ""){
 
         $redireccion = $ruta == "" ? "" : ".then(function(){window.location=\"".$ruta."\";})";

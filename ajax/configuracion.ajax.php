@@ -16,4 +16,9 @@ if(isset($_POST["actualizarPasswordAjax"])){
     exit;
 }
 
+if(isset($_POST["guardarAparienciaAjax"])){ 
+    echo json_encode(ControladorConfiguracion::ctrGuardarApariencia($_POST["tema"] ?? "light", $_POST["color_cabecera"] ?? "#dd4b39", $_POST["color_boton_primario"] ?? "#3b82f6", $_POST["color_boton_secundario"] ?? "#202c42"));
+    exit;
+}
+
 echo json_encode(array("estado" => "error", "mensaje" => "Solicitud no válida"));

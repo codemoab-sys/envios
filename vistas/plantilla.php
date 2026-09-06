@@ -24,7 +24,7 @@ session_start();
     <!-- Theme style -->
     <link rel="stylesheet" href="vistas/dist/css/AdminLTE.min.css">
     <!-- Dark Mode CSS -->
-    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css">
+    <link rel="stylesheet" href="vistas/dist/css/dark-mode.css?v=20260905-3">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
@@ -167,7 +167,7 @@ if((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || 
     <script src="vistas/js/ventas.js"></script>
     <script src="vistas/js/reportes.js"></script>
     <script src="vistas/js/configuracion.js"></script>
-    <script src="vistas/js/dark-mode.js"></script>
+    <script src="vistas/js/dark-mode.js?v=20260905"></script>
 
 
 

@@ -15,6 +15,10 @@ class ModeloConfiguracion{
             dias_despacho TEXT NOT NULL,
             hora_corte TIME NOT NULL DEFAULT '18:00:00',
             anticipacion INT NOT NULL DEFAULT 0,
+            tema VARCHAR(10) NOT NULL DEFAULT 'light',
+            color_cabecera VARCHAR(7) NOT NULL DEFAULT '#dd4b39',
+            color_boton_primario VARCHAR(7) NOT NULL DEFAULT '#3b82f6',
+            color_boton_secundario VARCHAR(7) NOT NULL DEFAULT '#202c42',
             PRIMARY KEY (id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
@@ -25,7 +29,11 @@ class ModeloConfiguracion{
             "metodos_envio" => "TEXT NOT NULL",
             "dias_despacho" => "TEXT NOT NULL",
             "hora_corte" => "TIME NOT NULL DEFAULT '18:00:00'",
-            "anticipacion" => "INT NOT NULL DEFAULT 0"
+            "anticipacion" => "INT NOT NULL DEFAULT 0",
+            "tema" => "VARCHAR(10) NOT NULL DEFAULT 'light'",
+            "color_cabecera" => "VARCHAR(7) NOT NULL DEFAULT '#dd4b39'",
+            "color_boton_primario" => "VARCHAR(7) NOT NULL DEFAULT '#3b82f6'",
+            "color_boton_secundario" => "VARCHAR(7) NOT NULL DEFAULT '#202c42'"
         );
 
         foreach($nuevasColumnas as $columna => $definicion){
@@ -94,6 +102,26 @@ class ModeloConfiguracion{
             return "error";
         }
 
+    }
+
+    static public function mdlGuardarApariencia($tema, $colorCabecera, $colorBotonPrimario, $colorBotonSecundario){
+        try{
+            $conexion = self::prepararTabla();
+            $actual = $conexion->query("SELECT id FROM configuracion ORDER BY id ASC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            if($actual){
+                $stmt = $conexion->prepare("UPDATE configuracion SET tema = :tema, color_cabecera = :color_cabecera, color_boton_primario = :color_boton_primario, color_boton_secundario = :color_boton_secundario WHERE id = :id");
+                $stmt->bindParam(":id", $actual["id"], PDO::PARAM_INT);
+            }else{
+                $stmt = $conexion->prepare("INSERT INTO configuracion (nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho, tema, color_cabecera, color_boton_primario, color_boton_secundario) VALUES ('', '', '[]', '[]', :tema, :color_cabecera, :color_boton_primario, :color_boton_secundario)");
+            }
+            $stmt->bindParam(":tema", $tema, PDO::PARAM_STR);
+            $stmt->bindParam(":color_cabecera", $colorCabecera, PDO::PARAM_STR);
+            $stmt->bindParam(":color_boton_primario", $colorBotonPrimario, PDO::PARAM_STR);
+            $stmt->bindParam(":color_boton_secundario", $colorBotonSecundario, PDO::PARAM_STR);
+            return $stmt->execute() ? "ok" : "error";
+        }catch(PDOException $e){
+            return "error";
+        }
     }
 
 }

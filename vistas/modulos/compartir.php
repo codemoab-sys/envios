@@ -872,6 +872,15 @@ $enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QU
     .compartir-action-open { border: 1px solid #3b4659; background: rgba(45, 56, 76, .46); color: #f5f7ff; }
     .compartir-action i { margin-right: 8px; }
     .compartir-brand { margin-top: 18px; color: #74809c; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+    [data-theme="light"] .compartir-page { background: #f4f6f9; color: #1f2937; }
+    [data-theme="light"] .compartir-card { border-color: #dbe3ed; background: linear-gradient(145deg, #fff, #f7faff); box-shadow: 0 18px 40px rgba(31, 41, 55, .12); }
+    [data-theme="light"] .compartir-copy { color: #64748b; }
+    [data-theme="light"] .compartir-link { border-color: #dbe3ed; background: #f8fafc; color: #2563eb; }
+    [data-theme="light"] .compartir-action-primary { background: var(--button-primary-color); color: var(--button-primary-text); }
+    [data-theme="light"] .compartir-action-open { border-color: #cbd5e1; background: #fff; color: #334155; }
+    [data-theme="light"] .compartir-brand { color: #64748b; }
+    [data-theme="dark"] .compartir-page { background: #030817; color: #f5f7ff; }
+    [data-theme="dark"] .compartir-card { border-color: #344052; background: linear-gradient(145deg, #1e2a3d, #111a2d); }
     @media (max-width: 600px) { .compartir-page { height: calc(100vh - 50px); padding: 10px 12px; } .compartir-card { padding: 20px 16px 18px; border-radius: 20px; } .compartir-card h1 { font-size: 23px; } .compartir-copy { font-size: 14px; } .compartir-link { padding: 12px 14px; font-size: 11px; } .compartir-action { min-height: 42px; font-size: 14px; } .compartir-brand { margin-top: 12px; } }
     @media (max-height: 620px) { .compartir-page { padding-top: 6px; padding-bottom: 6px; } .compartir-card { padding-top: 14px; padding-bottom: 12px; } .compartir-icon { width: 48px; height: 48px; margin-bottom: 8px; font-size: 22px; } .compartir-card h1 { margin-bottom: 6px; font-size: 21px; } .compartir-copy { margin-bottom: 10px; } .compartir-link { margin-bottom: 10px; padding: 9px 12px; } .compartir-action { min-height: 36px; margin-bottom: 5px; } .compartir-brand { margin-top: 8px; } }
 </style>

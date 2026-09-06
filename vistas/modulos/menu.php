@@ -11,24 +11,12 @@
                   <a href="inicio"><i class="fa fa-circle text-success"></i> enlinea</a>
               </div>
           </div>
-          <!-- search form -->
-          <form action="#" method="get" class="sidebar-form">
-              <div class="input-group">
-                  <input type="text" name="q" class="form-control" placeholder="Search...">
-                  <span class="input-group-btn">
-                      <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i
-                              class="fa fa-search"></i>
-                      </button>
-                  </span>
-              </div>
-          </form>
-          <!-- /.search form -->
           <!-- sidebar menu: : style can be found in sidebar.less -->
           <ul class="sidebar-menu" data-widget="tree">
               <li class="header">menu de navegacion</li>
               <li>
                   <a href="inicio">
-                      <i class="fa fa-th"></i> <span>inicio</span>
+                      <i class="fa fa-home"></i> <span>inicio</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
@@ -36,7 +24,7 @@
               </li>
               <li>
                   <a href="usuarios">
-                      <i class="fa fa-th"></i> <span>usuarios</span>
+                      <i class="fa fa-users"></i> <span>usuarios</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
@@ -44,7 +32,7 @@
               </li>
               <li>
                   <a href="configuracion">
-                      <i class="fa fa-th"></i> <span>configuracion</span>
+                      <i class="fa fa-cog"></i> <span>configuracion</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
@@ -52,7 +40,7 @@
               </li>
               <li>
                   <a href="compartir">
-                      <i class="fa fa-th"></i> <span>Compartir</span>
+                      <i class="fa fa-share-alt"></i> <span>Compartir</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>
@@ -60,7 +48,7 @@
               </li>
               <li>
                   <a href="envios">
-                      <i class="fa fa-th"></i> <span>Envios</span>
+                      <i class="fa fa-truck"></i> <span>Envios</span>
                       <span class="pull-right-container">
                           <small class="label pull-right bg-green">Hot</small>
                       </span>

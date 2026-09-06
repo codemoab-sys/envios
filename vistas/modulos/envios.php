@@ -245,6 +245,24 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
     .envios-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; border-top: 1px solid #26344b; color: #9ab1d3; font-size: 13px; }
     .envios-pagination button { min-width: 36px; height: 32px; border: 1px solid #33415a; border-radius: 8px; background: #202c42; color: #dce5f8; cursor: pointer; }
     .envios-pagination button:disabled { opacity: .4; cursor: not-allowed; }
+    [data-theme="light"] .envios-page { background: #f4f6f9; color: #1f2937; }
+    [data-theme="light"] .envios-toolbar { border-color: #dbe3ed; background: linear-gradient(145deg, #fff, #f4f7fb); box-shadow: 0 8px 22px rgba(31, 41, 55, .08); }
+    [data-theme="light"] .envios-control, [data-theme="light"] .envios-search, [data-theme="light"] .envios-button { border-color: #cbd5e1; background: #fff; color: #334155; }
+    [data-theme="light"] .envios-search { color: #334155; background-color: #fff; }
+    [data-theme="light"] .envios-button i { color: #64748b; }
+    [data-theme="light"] .envios-button-primary { border-color: #2563eb; background: #2563eb; color: #fff; }
+    [data-theme="light"] .envios-button-primary i { color: #fff; }
+    [data-theme="light"] .envios-button-green { border-color: #0f9f82; background: #ecfdf5; color: #087f68; }
+    [data-theme="light"] .envios-button-danger { border-color: #e5a1aa; background: #fff1f2; color: #be3b4b; }
+    [data-theme="light"] .envios-spacer { background: #d5dde8; }
+    [data-theme="light"] .envios-board { border-color: #dbe3ed; background: #fff; }
+    [data-theme="light"] .envios-card { border-color: #80aaf5; background: linear-gradient(180deg, #fff, #f7faff); box-shadow: 0 5px 15px rgba(31, 41, 55, .06); }
+    [data-theme="light"] .envios-name { color: #172033; }
+    [data-theme="light"] .envios-meta, [data-theme="light"] .envios-meta strong, [data-theme="light"] .envios-fecha, [data-theme="light"] .envios-fecha .envios-fecha-label, [data-theme="light"] .envios-agencia-mini { color: #334155; }
+    [data-theme="light"] .envios-meta i, [data-theme="light"] .envios-agencia-mini i { color: #2563eb; }
+    [data-theme="light"] .envios-address { border-top-color: #e2e8f0; color: #334155; }
+    [data-theme="light"] .envios-pagination { border-top-color: #e2e8f0; color: #64748b; }
+    [data-theme="light"] .envios-pagination button { border-color: #cbd5e1; background: #fff; color: #334155; }
     @media (max-width: 767px) {
         .envios-page { padding: 12px; }
         .envios-toolbar-row { flex-wrap: wrap; }
