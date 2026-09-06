@@ -1,15 +1,16 @@
     <?php
     $configuracionCabecera = ControladorConfiguracion::ctrMostrarConfiguracion();
-    $nombreEmprendimiento = trim((string)($configuracionCabecera["nombre_emprendimiento"] ?? ""));
-    if($nombreEmprendimiento === "") $nombreEmprendimiento = "Mi emprendimiento";
+    $nombreEmprendimiento = "Gestión de envíos";
     $nombreEmprendimientoSeguro = htmlspecialchars($nombreEmprendimiento, ENT_QUOTES, "UTF-8");
     $temaGuardado = ($configuracionCabecera["tema"] ?? "light") === "dark" ? "dark" : "light";
     $colorCabeceraGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_cabecera"] ?? "") ? $configuracionCabecera["color_cabecera"] : "#dd4b39";
     $colorBotonPrimarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_primario"] ?? "") ? $configuracionCabecera["color_boton_primario"] : "#3b82f6";
     $colorBotonSecundarioGuardado = preg_match('/^#[0-9a-f]{6}$/i', $configuracionCabecera["color_boton_secundario"] ?? "") ? $configuracionCabecera["color_boton_secundario"] : "#202c42";
-    $inicialesEmprendimiento = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nombreEmprendimiento), 0, 2));
-    if($inicialesEmprendimiento === "") $inicialesEmprendimiento = "ME";
+    $inicialesEmprendimiento = "MC";
     ?>
+        <style>
+            .user-icon-header { display: block; width: 90px; height: 90px; margin: 0 auto; padding-top: 25px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 38px; text-align: center; }
+        </style>
     <header class="main-header">
       <!-- Logo -->
       <a href="inicio" class="logo">
@@ -33,13 +34,13 @@
 
                   <li class="dropdown user user-menu">
                       <a href="inicio" class="dropdown-toggle" data-toggle="dropdown">
-                          <img src="<?php  echo $_SESSION["foto"]; ?>" class="user-image" alt="User Image">
+                          <i class="fa fa-user user-image" aria-label="Usuario"></i>
                           <span class="hidden-xs"><?php  echo $_SESSION["nombre"]; ?></span>
                       </a>
                       <ul class="dropdown-menu">
                           <!-- User image -->
                           <li class="user-header">
-                              <img src="<?php  echo $_SESSION["foto"]; ?>" class="img-circle" alt="User Image">
+                              <i class="fa fa-user user-icon-header" aria-label="Usuario"></i>
 
                               <p>
                                   <?php  echo $_SESSION["nombre"]; ?>

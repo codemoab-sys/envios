@@ -6,7 +6,7 @@ $formularioCompartir = $esFormularioPublico
 
 if($esFormularioPublico):
     $tituloFormulario = htmlspecialchars($formularioCompartir["titulo"] ?? "Papu billas", ENT_QUOTES, "UTF-8");
-    $configuracionPublica = ControladorConfiguracion::ctrMostrarConfiguracion();
+    $configuracionPublica = ModeloConfiguracion::mdlMostrarConfiguracionPorUsuario((int) ($formularioCompartir["tenant_id"] ?? 0));
     $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
     $agenciasShalom = array();
     $agenciasOlva = array();
@@ -767,15 +767,22 @@ $('#agendarPublico').on('click', function(){
         html: resumenHtml,
         confirmButtonText: '<i class="fa fa-whatsapp"></i> Enviar por WhatsApp',
         cancelButtonText: 'Editar',
+        showDenyButton: true,
+        denyButtonText: '<i class="fa fa-check"></i> Terminar',
         showCancelButton: true,
         reverseButtons: true,
         confirmButtonColor: '#20c968',
         width: 520
     }).then(function(resultado){
-        if(resultado.isConfirmed){
+        if(resultado.isDenied || resultado.isConfirmed){
+            if(resultado.isConfirmed){
+                var mensajeWhatsApp = window.location.origin + window.location.pathname + '?ruta=compartir&merchant=' + <?php echo json_encode($formularioCompartir["token"] ?? ""); ?> + '\n\nCompleta este formulario';
+                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(mensajeWhatsApp), '_blank');
+            }
             Swal.fire({title:'Guardando...',text:'Registrando tu respuesta...',allowOutsideClick:false,onBeforeOpen:function(){Swal.showLoading();}});
             var formData = new FormData();
             formData.append('guardarRespuestaAjax', '1');
+            formData.append('merchant', <?php echo json_encode($_GET["merchant"] ?? ""); ?>);
             formData.append('nombre', nombreResumen);
             formData.append('telefono', whatsappPublico);
             formData.append('direccion', ubicacionResumen + (direccionResumen ? ' - ' + direccionResumen : ''));
@@ -791,11 +798,15 @@ $('#agendarPublico').on('click', function(){
                 dataType: 'json',
                 success: function(respuesta){
                     Swal.close();
-                    window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+                    $('#formularioPublico input').val('');
+                    $('#formularioPublico select').prop('selectedIndex', 0);
+                    $('.formulario-publico-delivery-fields, .formulario-publico-agencia-results').removeClass('visible');
+                    $('#metodoPublico').trigger('change');
+                    $('#formularioPublico')[0].scrollIntoView({behavior: 'smooth', block: 'start'});
                 },
                 error: function(){
                     Swal.close();
-                    window.open('https://wa.me/51' + whatsappEmprendimiento + '?text=' + encodeURIComponent(resumenWhatsApp), '_blank');
+                    Swal.fire({icon:'error',title:'No se pudo registrar',text:'Inténtalo nuevamente.',confirmButtonText:'Cerrar'});
                 }
             });
         }
@@ -853,7 +864,8 @@ $('#metodoPublico').on('change', function(){
 })();
 </script>
 <?php else:
-$enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QUOTES, "UTF-8");
+$enlaceCompartirRaw = trim((string) ($formularioCompartir["enlace"] ?? ""));
+$enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
 ?>
 <style>
     body:has(.compartir-page) { overflow: hidden; }
@@ -886,6 +898,6 @@ $enlaceCompartir = htmlspecialchars($formularioCompartir["enlace"] ?? "", ENT_QU
 </style>
 <main class="compartir-page"><section class="compartir-shell"><div class="compartir-card"><div class="compartir-icon"><i class="fa fa-share-alt"></i></div><h1>¡Listo para compartir!</h1><p class="compartir-copy">Tu formulario personalizado está activo. Comparte el siguiente enlace con tus clientes.</p><div class="compartir-link" id="enlaceCompartir"><?php echo $enlaceCompartir; ?></div><button class="compartir-action compartir-action-primary" type="button" id="copiarEnlace"><i class="fa fa-copy"></i>Copiar Link</button><button class="compartir-action compartir-action-whatsapp" type="button" id="whatsappEnlace"><i class="fa fa-whatsapp"></i>Enviar por WhatsApp</button><button class="compartir-action compartir-action-open" type="button" id="abrirEnlace"><i class="fa fa-external-link"></i>Abrir en nueva pestaña</button></div><div class="compartir-brand">POWERED BY LATAM5S</div></section></main>
 <script>
-(function(){ var enlace = <?php echo json_encode($enlaceCompartir); ?>; $('#copiarEnlace').on('click', function(){ navigator.clipboard.writeText(enlace).then(function(){ Swal.fire({toast:true,position:'top-end',icon:'success',title:'Link copiado',showConfirmButton:false,timer:1800}); }); }); $('#whatsappEnlace').on('click', function(){ window.open('https://wa.me/?text=' + encodeURIComponent('Completa este formulario: ' + enlace), '_blank'); }); $('#abrirEnlace').on('click', function(){ window.open(enlace, '_blank'); }); })();
+(function(){ var enlace = <?php echo json_encode($enlaceCompartirRaw); ?>; $('#copiarEnlace').on('click', function(){ navigator.clipboard.writeText(enlace).then(function(){ Swal.fire({toast:true,position:'top-end',icon:'success',title:'Link copiado',showConfirmButton:false,timer:1800}); }); }); $('#whatsappEnlace').on('click', function(){ if(!enlace){ Swal.fire({icon:'error',title:'No hay enlace para compartir',confirmButtonText:'Cerrar'}); return; } var mensaje = enlace + '\n\nCompleta este formulario'; window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(mensaje), '_blank'); }); $('#abrirEnlace').on('click', function(){ window.open(enlace, '_blank'); }); })();
 </script>
 <?php endif; ?>

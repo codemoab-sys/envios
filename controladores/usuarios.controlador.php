@@ -11,18 +11,20 @@ class ControladorUsuarios{
 
         if(isset($_POST["usuario"])){
 
-            $encriptar=crypt($_POST["password"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+            $usuarioIngresado = trim((string) $_POST["usuario"]);
+            $passwordIngresada = trim((string) ($_POST["password"] ?? ""));
+            $encriptar=crypt($passwordIngresada, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
 
             $tabla="usuarios";
 
             $item="usuario";
 
-            $valor=$_POST["usuario"];
+            $valor=$usuarioIngresado;
 
 
-            $respuesta=ModeloUsuarios::mdlMostrarUsuarios($tabla,$item,$valor);
+            $respuesta=ModeloUsuarios::mdlMostrarUsuarioParaLogin($valor);
 
-            if($respuesta && $respuesta["usuario"] == $_POST["usuario"] && $respuesta["password"] == $encriptar){
+            if($respuesta && strcasecmp($respuesta["usuario"], $usuarioIngresado) === 0 && hash_equals($respuesta["password"], $encriptar)){
 
 
                 if($respuesta["estado"]==1){
@@ -33,6 +35,7 @@ class ControladorUsuarios{
                     $_SESSION["usuario"]= $respuesta["usuario"];
                     $_SESSION["foto"]= $respuesta["foto"];
                     $_SESSION["perfil"]= $respuesta["perfil"];
+                    $_SESSION["tenant_id"]= $respuesta["id"];
 
                     echo '<script>
 
@@ -82,8 +85,10 @@ class ControladorUsuarios{
         $respuesta = ModeloUsuarios::mdlRegistrarCuenta($nombre, $whatsapp, $password);
         if($respuesta === "ok"){
             echo '<script>window.location="?ruta=login&registro=ok";</script>';
+        }elseif($respuesta === "existe"){
+            echo '<div class="login-alert">Ese WhatsApp ya está registrado.</div>';
         }else{
-            echo '<div class="login-alert">Ese WhatsApp ya está registrado o no se pudo crear la cuenta.</div>';
+            echo '<div class="login-alert">No se pudo crear la cuenta. Verifica la conexión con la base de datos.</div>';
         }
     }
 

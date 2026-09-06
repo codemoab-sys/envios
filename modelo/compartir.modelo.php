@@ -8,6 +8,7 @@ class ModeloCompartir{
         $conexion = Conexion::conectar();
         $conexion->exec("CREATE TABLE IF NOT EXISTS formularios_compartir (
             id INT NOT NULL AUTO_INCREMENT,
+            tenant_id INT NULL,
             titulo VARCHAR(150) NOT NULL,
             descripcion VARCHAR(255) NULL,
             token VARCHAR(64) NOT NULL,
@@ -15,6 +16,7 @@ class ModeloCompartir{
             estado TINYINT(1) NOT NULL DEFAULT 1,
             fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
+            KEY idx_formularios_tenant (tenant_id),
             UNIQUE KEY uk_formularios_compartir_token (token)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         return $conexion;
@@ -23,20 +25,30 @@ class ModeloCompartir{
     static public function mdlMostrarActivo(){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->query("SELECT * FROM formularios_compartir WHERE estado = 1 ORDER BY id DESC LIMIT 1");
+            $stmt = $conexion->prepare("SELECT * FROM formularios_compartir WHERE estado = 1 AND tenant_id = :tenant_id ORDER BY id DESC LIMIT 1");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
+            $stmt->execute();
             $formulario = $stmt->fetch(PDO::FETCH_ASSOC);
-            if($formulario && (strpos($formulario["enlace"], "localhost./form") !== false || strpos($formulario["enlace"], "/form?merchant=") !== false || strpos($formulario["enlace"], "localhost/compartir?") !== false)){
-                $formulario["enlace"] = str_replace("localhost./form", "localhost/compartir", $formulario["enlace"]);
-                $formulario["enlace"] = str_replace("/form?merchant=", "/compartir?merchant=", $formulario["enlace"]);
-                $formulario["enlace"] = str_replace("localhost/compartir?", "localhost/envios/compartir?", $formulario["enlace"]);
-                $stmt = $conexion->prepare("UPDATE formularios_compartir SET enlace = :enlace WHERE id = :id");
-                $stmt->execute(array(":enlace" => $formulario["enlace"], ":id" => $formulario["id"]));
+            if($formulario){
+                $enlaceAnterior = (string) ($formulario["enlace"] ?? "");
+                if($enlaceAnterior === "" || strpos($enlaceAnterior, "merchant=") === false || strpos($enlaceAnterior, "/compartir") === false){
+                    $formulario["enlace"] = self::crearEnlace($formulario["token"]);
+                }else{
+                    $formulario["enlace"] = str_replace("localhost./form", "localhost/compartir", $enlaceAnterior);
+                    $formulario["enlace"] = str_replace("/form?merchant=", "/compartir?merchant=", $formulario["enlace"]);
+                    $formulario["enlace"] = str_replace("localhost/compartir?", "localhost/envios/compartir?", $formulario["enlace"]);
+                }
+                if($formulario["enlace"] !== $enlaceAnterior){
+                    $actualizar = $conexion->prepare("UPDATE formularios_compartir SET enlace = :enlace WHERE id = :id");
+                    $actualizar->execute(array(":enlace" => $formulario["enlace"], ":id" => $formulario["id"]));
+                }
             }
             if(!$formulario){
                 $token = bin2hex(random_bytes(8));
                 $enlace = self::crearEnlace($token);
-                $stmt = $conexion->prepare("INSERT INTO formularios_compartir (titulo, descripcion, token, enlace) VALUES (:titulo, :descripcion, :token, :enlace)");
+                $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
                 $stmt->execute(array(
+                    ":tenant_id" => Conexion::tenantId(),
                     ":titulo" => "Formulario personalizado",
                     ":descripcion" => "Completa tus datos para coordinar tu envío.",
                     ":token" => $token,
@@ -61,7 +73,8 @@ class ModeloCompartir{
         try{
             $conexion = self::prepararTabla();
             $token = bin2hex(random_bytes(8));
-            $stmt = $conexion->prepare("INSERT INTO formularios_compartir (titulo, descripcion, token, enlace) VALUES (:titulo, :descripcion, :token, :enlace)");
+            $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindValue(":titulo", $datos["titulo"], PDO::PARAM_STR);
             $stmt->bindValue(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
             $stmt->bindValue(":token", $token, PDO::PARAM_STR);
@@ -74,7 +87,7 @@ class ModeloCompartir{
 
     static public function mdlMostrarPorToken($token){
         try{
-            $stmt = self::prepararTabla()->prepare("SELECT * FROM formularios_compartir WHERE token = :token AND estado = 1 LIMIT 1");
+            $stmt = self::prepararTabla()->prepare("SELECT * FROM formularios_compartir WHERE token = :token AND estado = 1 AND tenant_id IS NOT NULL AND tenant_id > 0 LIMIT 1");
             $stmt->bindValue(":token", $token, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();

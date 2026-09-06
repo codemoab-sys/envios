@@ -1,3 +1,6 @@
+    <style>
+        .usuarios-foto-icon { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; border-radius: 50%; background: #eef2f7; color: #536176; font-size: 18px; }
+    </style>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -78,7 +81,7 @@
                                 <td>1</td>
                                 <td>'.$value["nombre"].'</td>
                                 <td>'.$value["usuario"].'</td>
-                                <td><img src="'.$value["foto"].'" width="40px"></td>
+                                <td><i class="fa fa-user usuarios-foto-icon" aria-label="Usuario"></i></td>
                                 <td>'.$value["perfil"].'</td>';
 
                                 if($value["estado"] != 0){
@@ -109,7 +112,7 @@
                                         </button>
 
 
-                                        <button class="btn btn-danger btnEliminarUsuario" idUsuario="'.$value["id"].'"  fotoUsuario="'.$value["foto"].'"  usuario="'.$value["usuario"].'">
+                                        <button class="btn btn-danger btnEliminarUsuario" idUsuario="'.$value["id"].'"  fotoUsuario=""  usuario="'.$value["usuario"].'">
 
 
                                             <i class="fa fa-times"></i>

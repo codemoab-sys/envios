@@ -1,7 +1,6 @@
 <?php
 $configuracionLogin = ControladorConfiguracion::ctrMostrarConfiguracion();
-$nombreLogin = trim((string)($configuracionLogin["nombre_emprendimiento"] ?? ""));
-if($nombreLogin === "") $nombreLogin = "Mi emprendimiento";
+$nombreLogin = "Gestión de envíos";
 $nombreLogin = htmlspecialchars($nombreLogin, ENT_QUOTES, "UTF-8");
 $temaLogin = ($configuracionLogin["tema"] ?? "light") === "dark" ? "dark" : "light";
 $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecera"] ?? "") ? $configuracionLogin["color_cabecera"] : "#dd4b39";
@@ -30,7 +29,7 @@ $colorLogin = preg_match('/^#[0-9a-f]{6}$/i', $configuracionLogin["color_cabecer
     <button type="button" id="themeToggle" class="login-theme-custom" title="Cambiar tema" aria-label="Cambiar tema"><i class="fa fa-moon-o"></i></button>
     <section class="login-panel-custom" aria-labelledby="tituloLogin">
         <div class="login-brand-custom">
-            <div class="login-mark"><?php echo strtoupper(substr(strip_tags($nombreLogin), 0, 1)); ?></div>
+            <div class="login-mark">MC</div>
             <h1 id="tituloLogin"><?php echo $nombreLogin; ?></h1>
             <p>Ingresa para administrar tus envíos</p>
         </div>

@@ -92,16 +92,10 @@ if($esRegistro){
 
             if($ruta == "usuarios" ||
                 $ruta == "configuracion" ||
-                $ruta == "categorias" ||
-                $ruta == "ventas" ||
                 $ruta == "inicio" ||
-                $ruta == "reportes" ||
                 $ruta == "salir" ||
-                $ruta == "crear-venta" ||
                 $ruta == "productos"||
                 $ruta == "login"||
-                $ruta == "editar-venta"||
-                $ruta == "clientes"||
                 $ruta == "compartir"||
                 $ruta == "envios" ||
                 $ruta == "registro"){
@@ -172,11 +166,7 @@ if($esRegistro){
 
 
     <script src="vistas/js/usuarios.js"></script>
-    <script src="vistas/js/categorias.js"></script>
     <script src="vistas/js/productos.js"></script>
-    <script src="vistas/js/clientes.js"></script>
-    <script src="vistas/js/ventas.js"></script>
-    <script src="vistas/js/reportes.js"></script>
     <script src="vistas/js/configuracion.js"></script>
     <script src="vistas/js/dark-mode.js?v=20260905"></script>
 

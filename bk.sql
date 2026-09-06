@@ -17,6 +17,7 @@
 -- ============================================
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) DEFAULT NULL,
   `nombre` varchar(100) NOT NULL,
   `usuario` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -25,18 +26,8 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `estado` int(1) DEFAULT 1,
   `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `tenant_id` (`tenant_id`),
   UNIQUE KEY `usuario` (`usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
--- ============================================
--- TABLA: categorias
--- ============================================
-CREATE TABLE IF NOT EXISTS `categorias` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `categorias` varchar(100) NOT NULL,
-  `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -45,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `categorias` (
 -- ============================================
 CREATE TABLE IF NOT EXISTS `productos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) DEFAULT NULL,
   `id_categoria` int(11) NOT NULL,
   `codigo` varchar(50) DEFAULT NULL,
   `descripcion` text NOT NULL,
@@ -60,47 +52,12 @@ CREATE TABLE IF NOT EXISTS `productos` (
 
 
 -- ============================================
--- TABLA: clientes
--- ============================================
-CREATE TABLE IF NOT EXISTS `clientes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `documento` varchar(20) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `direccion` text DEFAULT NULL,
-  `fecha_nacimiento` date DEFAULT NULL,
-  `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
--- ============================================
--- TABLA: ventas
--- ============================================
-CREATE TABLE IF NOT EXISTS `ventas` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `codigo` int(11) NOT NULL,
-  `id_cliente` int(11) DEFAULT NULL,
-  `id_vendedor` int(11) NOT NULL,
-  `productos` text DEFAULT NULL,
-  `impuesto` decimal(10,2) DEFAULT 0.00,
-  `neto` decimal(10,2) DEFAULT 0.00,
-  `total` decimal(10,2) DEFAULT 0.00,
-  `metodo_pago` varchar(50) DEFAULT NULL,
-  `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id_cliente` (`id_cliente`),
-  KEY `id_vendedor` (`id_vendedor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
--- ============================================
 -- TABLA: configuracion
 -- (Agrega aqui tus campos cuando los definas)
 -- ============================================
 CREATE TABLE IF NOT EXISTS `configuracion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) DEFAULT NULL,
   `nombre_empresa` varchar(200) DEFAULT '',
   `ruc` varchar(20) DEFAULT '',
   `telefono` varchar(20) DEFAULT '',
@@ -109,7 +66,8 @@ CREATE TABLE IF NOT EXISTS `configuracion` (
   `logo` varchar(255) DEFAULT '',
   `mensaje_ticket` text DEFAULT NULL,
   `fecha` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -185,6 +143,7 @@ WHERE `usuario` = 'admin'
 -- ============================================
 CREATE TABLE IF NOT EXISTS `formularios_compartir` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) DEFAULT NULL,
   `titulo` varchar(150) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   `token` varchar(64) NOT NULL,
@@ -201,6 +160,7 @@ CREATE TABLE IF NOT EXISTS `formularios_compartir` (
 -- ============================================
 CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) DEFAULT NULL,
   `nombre` varchar(150) NOT NULL,
   `telefono` varchar(30) DEFAULT NULL,
   `direccion` varchar(255) DEFAULT NULL,
@@ -215,3 +175,6 @@ CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
 -- ============================================
 -- FIN DEL ARCHIVO
 -- ============================================
+DROP TABLE IF EXISTS `ventas`;
+DROP TABLE IF EXISTS `clientes`;
+DROP TABLE IF EXISTS `categorias`;

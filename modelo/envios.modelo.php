@@ -8,6 +8,7 @@ class ModeloEnvios{
         $conexion = Conexion::conectar();
         $conexion->exec("CREATE TABLE IF NOT EXISTS respuestas_formulario (
             id INT NOT NULL AUTO_INCREMENT,
+            tenant_id INT NULL,
             nombre VARCHAR(150) NOT NULL,
             telefono VARCHAR(30) NULL,
             direccion VARCHAR(255) NULL,
@@ -17,6 +18,7 @@ class ModeloEnvios{
             mensaje TEXT NULL,
             fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
+            INDEX idx_respuestas_tenant (tenant_id),
             INDEX idx_respuestas_estado (estado),
             INDEX idx_respuestas_fecha (fecha)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -44,7 +46,9 @@ class ModeloEnvios{
 
     static public function mdlContarRespuestas(){
         try{
-            $stmt = self::prepararTabla()->query("SELECT COUNT(*) FROM respuestas_formulario");
+            $stmt = self::prepararTabla()->prepare("SELECT COUNT(*) FROM respuestas_formulario WHERE tenant_id=:tenant_id");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
+            $stmt->execute();
             return (int) $stmt->fetchColumn();
         }catch(PDOException $e){
             return 0;
@@ -53,8 +57,11 @@ class ModeloEnvios{
 
     static public function mdlGuardarRespuesta($datos){
         try{
+            $tenantId = (int) ($datos["tenant_id"] ?? Conexion::tenantId());
+            if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("INSERT INTO respuestas_formulario (nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
+            $stmt = $conexion->prepare("INSERT INTO respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
+            $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
             $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
@@ -78,31 +85,33 @@ class ModeloEnvios{
             $offset = ($pagina - 1) * $limite;
             $where = "";
             $parametros = array();
+            $where = " WHERE tenant_id = :tenant_id";
+            $parametros[":tenant_id"] = Conexion::tenantId();
 
             if($estado !== "todos"){
-                $where .= " WHERE estado = :estado";
+                $where .= " AND estado = :estado";
                 $parametros[":estado"] = $estado;
             }
 
             if($agencia !== "todos"){
-                $where .= ($where === "" ? " WHERE " : " AND ") . "agencia = :agencia";
+                $where .= " AND agencia = :agencia";
                 $parametros[":agencia"] = $agencia;
             }
 
             if($fechaInicio !== ""){
-                $where .= ($where === "" ? " WHERE " : " AND ") . "(fecha_envio >= :fecha_inicio OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) >= :fecha_inicio_registro))";
+                $where .= " AND (fecha_envio >= :fecha_inicio OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) >= :fecha_inicio_registro))";
                 $parametros[":fecha_inicio"] = $fechaInicio;
                 $parametros[":fecha_inicio_registro"] = $fechaInicio;
             }
 
             if($fechaFin !== ""){
-                $where .= ($where === "" ? " WHERE " : " AND ") . "(fecha_envio <= :fecha_fin OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) <= :fecha_fin_registro))";
+                $where .= " AND (fecha_envio <= :fecha_fin OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) <= :fecha_fin_registro))";
                 $parametros[":fecha_fin"] = $fechaFin;
                 $parametros[":fecha_fin_registro"] = $fechaFin;
             }
 
             if($busqueda !== ""){
-                $where .= ($where === "" ? " WHERE " : " AND ") . "(nombre LIKE :busqueda OR telefono LIKE :busqueda2 OR direccion LIKE :busqueda3 OR agencia LIKE :busqueda4)";
+                $where .= " AND (nombre LIKE :busqueda OR telefono LIKE :busqueda2 OR direccion LIKE :busqueda3 OR agencia LIKE :busqueda4)";
                 $parametros[":busqueda"] = "%" . $busqueda . "%";
                 $parametros[":busqueda2"] = "%" . $busqueda . "%";
                 $parametros[":busqueda3"] = "%" . $busqueda . "%";
@@ -134,7 +143,8 @@ class ModeloEnvios{
     static public function mdlCambiarEstado($id, $nuevoEstado){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("UPDATE respuestas_formulario SET estado = :estado WHERE id = :id");
+            $stmt = $conexion->prepare("UPDATE respuestas_formulario SET estado = :estado WHERE id = :id AND tenant_id=:tenant_id");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindParam(":estado", $nuevoEstado, PDO::PARAM_STR);
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             if($stmt->execute()){
@@ -149,7 +159,8 @@ class ModeloEnvios{
     static public function mdlEliminarRespuesta($id){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("DELETE FROM respuestas_formulario WHERE id = :id");
+            $stmt = $conexion->prepare("DELETE FROM respuestas_formulario WHERE id = :id AND tenant_id=:tenant_id");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             if($stmt->execute()){
                 return array("estado" => "ok");

@@ -42,6 +42,12 @@ class ModeloConfiguracion{
             }
         }
 
+        if(!in_array("usuario_id", $columnas)){
+            $conexion->exec("ALTER TABLE configuracion ADD COLUMN usuario_id INT NULL AFTER id");
+        }
+
+        $conexion->exec("UPDATE configuracion SET usuario_id = (SELECT id FROM usuarios WHERE perfil = 'administrador' ORDER BY id ASC LIMIT 1) WHERE usuario_id IS NULL AND id = (SELECT id_configuracion FROM (SELECT MIN(id) AS id_configuracion FROM configuracion) AS primera_configuracion)");
+
         foreach(array("razon_social", "ruc", "direccion", "telefono", "correo") as $columnaAntigua){
             if(in_array($columnaAntigua, $columnas)){
                 $conexion->exec("ALTER TABLE configuracion MODIFY COLUMN $columnaAntigua VARCHAR(255) NULL");
@@ -55,7 +61,13 @@ class ModeloConfiguracion{
     static public function mdlMostrarConfiguracion($tabla){
 
         try{
-            $stmt = self::prepararTabla()->prepare("SELECT * FROM $tabla ORDER BY id ASC LIMIT 1");
+            $conexion = self::prepararTabla();
+            if(isset($_SESSION["id"]) && (int) $_SESSION["id"] > 0){
+                $stmt = $conexion->prepare("SELECT * FROM $tabla WHERE usuario_id = :usuario_id LIMIT 1");
+                $stmt->bindValue(":usuario_id", (int) $_SESSION["id"], PDO::PARAM_INT);
+            }else{
+                $stmt = $conexion->prepare("SELECT * FROM $tabla ORDER BY id ASC LIMIT 1");
+            }
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();
         }catch(PDOException $e){
@@ -64,19 +76,44 @@ class ModeloConfiguracion{
 
     }
 
+    static public function mdlMostrarConfiguracionPorUsuario($usuarioId){
+        try{
+            $stmt = self::prepararTabla()->prepare("SELECT * FROM configuracion WHERE usuario_id = :usuario_id LIMIT 1");
+            $stmt->bindValue(":usuario_id", (int) $usuarioId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();
+        }catch(PDOException $e){
+            return array();
+        }
+    }
+
     static public function mdlGuardarConfiguracion($tabla, $datos){
 
         try{
             $conexion = self::prepararTabla();
-            $actual = $conexion->query("SELECT id FROM $tabla ORDER BY id ASC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            if(!isset($_SESSION["id"]) || (int) $_SESSION["id"] <= 0){
+                return "error";
+            }
+            $usuarioId = (int) $_SESSION["id"];
+            $usuario = $conexion->prepare("UPDATE usuarios SET usuario = :whatsapp WHERE id = :usuario_id");
+            $usuario->bindValue(":whatsapp", $datos["whatsapp"], PDO::PARAM_STR);
+            $usuario->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
+            if(!$usuario->execute()){
+                return "error";
+            }
+            $actualStmt = $conexion->prepare("SELECT id FROM $tabla WHERE usuario_id = :usuario_id LIMIT 1");
+            $actualStmt->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
+            $actualStmt->execute();
+            $actual = $actualStmt->fetch(PDO::FETCH_ASSOC);
 
             if($actual){
-                $stmt = $conexion->prepare("UPDATE $tabla SET nombre_emprendimiento = :nombre_emprendimiento, whatsapp = :whatsapp, metodos_envio = :metodos_envio, dias_despacho = :dias_despacho, hora_corte = :hora_corte, anticipacion = :anticipacion WHERE id = :id");
+                $stmt = $conexion->prepare("UPDATE $tabla SET nombre_emprendimiento = :nombre_emprendimiento, whatsapp = :whatsapp, metodos_envio = :metodos_envio, dias_despacho = :dias_despacho, hora_corte = :hora_corte, anticipacion = :anticipacion WHERE id = :id AND usuario_id = :usuario_id");
                 $stmt->bindParam(":id", $actual["id"], PDO::PARAM_INT);
             }else{
-                $stmt = $conexion->prepare("INSERT INTO $tabla (nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho, hora_corte, anticipacion) VALUES (:nombre_emprendimiento, :whatsapp, :metodos_envio, :dias_despacho, :hora_corte, :anticipacion)");
+                $stmt = $conexion->prepare("INSERT INTO $tabla (usuario_id, nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho, hora_corte, anticipacion) VALUES (:usuario_id, :nombre_emprendimiento, :whatsapp, :metodos_envio, :dias_despacho, :hora_corte, :anticipacion)");
             }
 
+            $stmt->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre_emprendimiento", $datos["nombre_emprendimiento"], PDO::PARAM_STR);
             $stmt->bindParam(":whatsapp", $datos["whatsapp"], PDO::PARAM_STR);
             $stmt->bindParam(":metodos_envio", $datos["metodos_envio"], PDO::PARAM_STR);
@@ -89,6 +126,18 @@ class ModeloConfiguracion{
             return "error";
         }
 
+    }
+
+    static public function mdlWhatsappExiste($whatsapp, $usuarioId){
+        try{
+            $stmt = Conexion::conectar()->prepare("SELECT id FROM usuarios WHERE usuario = :whatsapp AND id <> :usuario_id LIMIT 1");
+            $stmt->bindValue(":whatsapp", $whatsapp, PDO::PARAM_STR);
+            $stmt->bindValue(":usuario_id", (int) $usuarioId, PDO::PARAM_INT);
+            $stmt->execute();
+            return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            return true;
+        }
     }
 
     static public function mdlActualizarPassword($tabla, $password, $id){

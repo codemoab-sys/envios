@@ -3,11 +3,24 @@
 session_start();
 require_once "../controladores/envios.controlador.php";
 require_once "../modelo/envios.modelo.php";
+require_once "../modelo/compartir.modelo.php";
 
 header("Content-Type: application/json; charset=UTF-8");
 
 if(isset($_POST["guardarRespuestaAjax"])){
+    $merchant = trim((string) ($_POST["merchant"] ?? ""));
+    if($merchant === ""){
+        echo json_encode(array("estado" => "error", "mensaje" => "Enlace de formulario no válido"));
+        exit;
+    }
+    $formulario = ModeloCompartir::mdlMostrarPorToken($merchant);
+    $tenantId = (int) ($formulario["tenant_id"] ?? 0);
+    if($tenantId <= 0){
+        echo json_encode(array("estado" => "error", "mensaje" => "El formulario no pertenece a una empresa válida"));
+        exit;
+    }
     $datos = array(
+        "tenant_id" => $tenantId,
         "nombre" => trim($_POST["nombre"] ?? ""),
         "telefono" => trim($_POST["telefono"] ?? ""),
         "direccion" => trim($_POST["direccion"] ?? ""),

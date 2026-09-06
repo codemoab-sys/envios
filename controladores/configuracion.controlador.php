@@ -53,6 +53,11 @@ class ControladorConfiguracion{
             return;
         }
 
+        if(ModeloConfiguracion::mdlWhatsappExiste($datos["whatsapp"], $_SESSION["id"] ?? 0)){
+            self::mostrarAlerta("error", "Ese WhatsApp ya está registrado en otra cuenta");
+            return;
+        }
+
         if(count(json_decode($datos["metodos_envio"], true) ?: array()) == 0){
             self::mostrarAlerta("error", "Selecciona al menos un método de envío o retiro");
             return;
@@ -66,6 +71,7 @@ class ControladorConfiguracion{
         $respuesta = ModeloConfiguracion::mdlGuardarConfiguracion("configuracion", $datos);
 
         if($respuesta == "ok"){
+            $_SESSION["usuario"] = $datos["whatsapp"];
             self::mostrarAlerta("success", "La configuración se guardó correctamente", "configuracion");
         }else{
             self::mostrarAlerta("error", "No se pudo guardar la configuración");

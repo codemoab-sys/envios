@@ -73,14 +73,6 @@
 
                             foreach ($Productos as $key => $value) {
 
-                                $item="id";
-                                $valor=$value["id_categoria"];
-
-                                $categoria=ControladorCategorias::ctrMostrarCategorias($item,$valor);
-
-
-
-
                                 echo '
 
                                    <tr>
@@ -92,7 +84,6 @@
                                 
                                 <td>'.$value["codigo"].'</td>
                                 <td>'.$value["descripcion"].'</td>
-                                <td>'.$categoria["categorias"].'</td>
                                 <td>'.$value["stock"].'</td>
                                 <td>'.$value["precio_compra"].'</td>
                                 <td>'.$value["precio_venta"].'</td>;                                                                                                          
@@ -194,48 +185,6 @@ MODAL AGREGAR ProductoS
 
                        <div class="modal-body">
                            <div class="box-body">
-
-                               <!-- ENTRADA PARA SELECIONAR LA CATEGORIA -->
-
-                               <div class="form-group">
-
-                                   <div class="input-group">
-
-                                       <span class="input-group-addon"><i class="fa fa-th"></i></span>
-
-                                       <select class="form-control input-lg" id="nuevaCategoria" name="nuevaCategoria">
-
-
-                                           <option value="">seleccionar categoria</option>
-
-                                           <?php 
-
-                                        $item=null;
-                                        $valor=null;
-
-                                        $categorias = ControladorCategorias::ctrMostrarCategorias($item,$valor);
-
-                                        foreach ($categorias as $key => $value) {
-
-                                            echo '<option value="'.$value["id"].'">'.$value["categorias"].'</option>';
-
-
-
-                                        
-                                        }
-
-
-
-
-                                        ?>
-
-
-
-                                       </select>
-
-                                   </div>
-
-                               </div>
 
 
 

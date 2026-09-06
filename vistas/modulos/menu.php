@@ -1,10 +1,13 @@
   <aside class="main-sidebar">
+      <style>
+          .user-icon-sidebar { display: block; width: 40px; height: 40px; padding-top: 10px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; text-align: center; }
+      </style>
       <!-- sidebar: style can be found in sidebar.less -->
       <section class="sidebar">
           <!-- Sidebar user panel -->
           <div class="user-panel">
               <div class="pull-left image">
-                  <img src="<?php  echo $_SESSION["foto"]; ?>" class="img-circle" alt="User Image">
+                  <i class="fa fa-user user-icon-sidebar" aria-label="Usuario"></i>
               </div>
               <div class="pull-left info">
                   <p><?php  echo $_SESSION["nombre"]; ?></p>

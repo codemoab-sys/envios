@@ -84,7 +84,7 @@ class ControladorProductos{
     static public function ctrCrearProducto(){
 
 
-        if(isset($_POST["nuevaCategoria"])){
+		if(isset($_POST["nuevoCodigo"])){
 
             	/*=============================================
 				VALIDAR IMAGEN
@@ -154,7 +154,7 @@ class ControladorProductos{
                 	$tabla = "productos";
 
 
-                    $datos=array("id_categoria"=>$_POST["nuevaCategoria"],
+					$datos=array("id_categoria"=>0,
                     "codigo"=>$_POST["nuevoCodigo"],
                     "descripcion"=>$_POST["nuevaDescripcion"],
                     "stock"=>$_POST["nuevoStock"],
