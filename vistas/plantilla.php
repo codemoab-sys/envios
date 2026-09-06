@@ -4,6 +4,7 @@ session_start();
 Conexion::actualizarEstadoSuscripcionSesion();
 $esFormularioPublico = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "compartir" && isset($_GET["merchant"]);
 $esRegistro = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "registro";
+$esWeb = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "web";
 $ruta = isset($_GET["ruta"]) ? strtolower((string) $_GET["ruta"]) : "";
 $esAdministrador = isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador";
 if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdministrador){
@@ -62,7 +63,9 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
 
     <?php
     
-if($esRegistro){
+if($esWeb){
+    include "modulos/web.php";
+}elseif($esRegistro){
     include "modulos/registro.php";
 }elseif((isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") || $esFormularioPublico){
 
