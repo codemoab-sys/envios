@@ -11,5 +11,6 @@ Desktop.ini
 
 # Archivos de configuración local
 .env
+modelo/conexion.php
 
 gcm-diagnose.log
