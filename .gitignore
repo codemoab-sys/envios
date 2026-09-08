@@ -4,6 +4,8 @@ password*.txt
 # Archivos SQL (excepto bk.sql)
 *.sql
 !bk.sql
+!migraciones/
+!migraciones/*.sql
 
 # Archivos de sistema
 Thumbs.db

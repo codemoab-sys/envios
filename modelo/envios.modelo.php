@@ -6,7 +6,7 @@ class ModeloEnvios{
 
     static private function prepararTabla(){
         $conexion = Conexion::conectar();
-        $conexion->exec("CREATE TABLE IF NOT EXISTS respuestas_formulario (
+        $conexion->exec("CREATE TABLE IF NOT EXISTS envio_respuestas_formulario (
             id INT NOT NULL AUTO_INCREMENT,
             tenant_id INT NULL,
             nombre VARCHAR(150) NOT NULL,
@@ -24,18 +24,18 @@ class ModeloEnvios{
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         try{
-            $result = $conexion->query("SHOW COLUMNS FROM respuestas_formulario LIKE 'agencia'");
+            $result = $conexion->query("SHOW COLUMNS FROM envio_respuestas_formulario LIKE 'agencia'");
             if($result && $result->rowCount() === 0){
-                $conexion->exec("ALTER TABLE respuestas_formulario ADD COLUMN agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM' AFTER direccion");
+                $conexion->exec("ALTER TABLE envio_respuestas_formulario ADD COLUMN agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM' AFTER direccion");
             }
         }catch(PDOException $e){
             // Ignorar si la tabla ya está creada con la columna o si la BD no admite la verificación.
         }
 
         try{
-            $result = $conexion->query("SHOW COLUMNS FROM respuestas_formulario LIKE 'fecha_envio'");
+            $result = $conexion->query("SHOW COLUMNS FROM envio_respuestas_formulario LIKE 'fecha_envio'");
             if($result && $result->rowCount() === 0){
-                $conexion->exec("ALTER TABLE respuestas_formulario ADD COLUMN fecha_envio VARCHAR(50) NULL AFTER agencia");
+                $conexion->exec("ALTER TABLE envio_respuestas_formulario ADD COLUMN fecha_envio VARCHAR(50) NULL AFTER agencia");
             }
         }catch(PDOException $e){
             // Ignorar si la columna ya existe.
@@ -46,7 +46,7 @@ class ModeloEnvios{
 
     static public function mdlContarRespuestas(){
         try{
-            $stmt = self::prepararTabla()->prepare("SELECT COUNT(*) FROM respuestas_formulario WHERE tenant_id=:tenant_id");
+            $stmt = self::prepararTabla()->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->execute();
             return (int) $stmt->fetchColumn();
@@ -61,7 +61,7 @@ class ModeloEnvios{
             if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
             if(!Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó");
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("INSERT INTO respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
+            $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
@@ -119,7 +119,7 @@ class ModeloEnvios{
                 $parametros[":busqueda4"] = "%" . $busqueda . "%";
             }
 
-            $totalStmt = $conexion->prepare("SELECT COUNT(*) FROM respuestas_formulario" . $where);
+            $totalStmt = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario" . $where);
             $totalStmt->execute($parametros);
             $total = (int) $totalStmt->fetchColumn();
             $totalPaginas = max(1, (int) ceil($total / $limite));
@@ -128,7 +128,7 @@ class ModeloEnvios{
                 $offset = ($pagina - 1) * $limite;
             }
 
-            $sql = "SELECT * FROM respuestas_formulario" . $where . " ORDER BY fecha DESC LIMIT " . $limite . " OFFSET " . $offset;
+            $sql = "SELECT * FROM envio_respuestas_formulario" . $where . " ORDER BY fecha DESC LIMIT " . $limite . " OFFSET " . $offset;
             $stmt = $conexion->prepare($sql);
             $stmt->execute($parametros);
             return array(
@@ -144,7 +144,7 @@ class ModeloEnvios{
     static public function mdlCambiarEstado($id, $nuevoEstado){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("UPDATE respuestas_formulario SET estado = :estado WHERE id = :id AND tenant_id=:tenant_id");
+            $stmt = $conexion->prepare("UPDATE envio_respuestas_formulario SET estado = :estado WHERE id = :id AND tenant_id=:tenant_id");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindParam(":estado", $nuevoEstado, PDO::PARAM_STR);
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
@@ -160,7 +160,7 @@ class ModeloEnvios{
     static public function mdlEliminarRespuesta($id){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("DELETE FROM respuestas_formulario WHERE id = :id AND tenant_id=:tenant_id");
+            $stmt = $conexion->prepare("DELETE FROM envio_respuestas_formulario WHERE id = :id AND tenant_id=:tenant_id");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             if($stmt->execute()){

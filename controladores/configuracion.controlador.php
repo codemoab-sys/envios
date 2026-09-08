@@ -4,7 +4,7 @@ class ControladorConfiguracion{
 
     static public function ctrMostrarConfiguracion(){
 
-        return ModeloConfiguracion::mdlMostrarConfiguracion("configuracion");
+        return ModeloConfiguracion::mdlMostrarConfiguracion("envio_configuracion");
 
     }
 
@@ -27,7 +27,7 @@ class ControladorConfiguracion{
             }
 
             $encriptar = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
-            $respuesta = ModeloConfiguracion::mdlActualizarPassword("usuarios", $encriptar, $_SESSION["id"]);
+            $respuesta = ModeloConfiguracion::mdlActualizarPassword("envio_usuarios", $encriptar, $_SESSION["id"]);
 
             if($respuesta == "ok"){
                 self::mostrarAlerta("success", "La contraseña se actualizó correctamente", "configuracion");
@@ -72,7 +72,7 @@ class ControladorConfiguracion{
             return;
         }
 
-        $respuesta = ModeloConfiguracion::mdlGuardarConfiguracion("configuracion", $datos);
+        $respuesta = ModeloConfiguracion::mdlGuardarConfiguracion("envio_configuracion", $datos);
 
         if($respuesta == "ok"){
             $_SESSION["usuario"] = $datos["whatsapp"];
@@ -94,7 +94,7 @@ class ControladorConfiguracion{
         }
 
         $encriptar = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
-        $respuesta = ModeloConfiguracion::mdlActualizarPassword("usuarios", $encriptar, $id);
+        $respuesta = ModeloConfiguracion::mdlActualizarPassword("envio_usuarios", $encriptar, $id);
 
         return array(
             "estado" => $respuesta == "ok" ? "ok" : "error",

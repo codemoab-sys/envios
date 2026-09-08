@@ -2,10 +2,9 @@
 -- BACKUP BASE DE DATOS: enviosbd
 -- ============================================
 -- INSTRUCCIONES:
--- 1. Agrega tus tablas aqui con IF NOT EXISTS
--- 2. Si la tabla ya existe, MySQL la salta automaticamente
--- 3. Si no existe, la crea
--- 4. Comenta con -- lo que no quieras ejecutar
+-- 1. Este archivo solo crea tablas con prefijo envio_.
+-- 2. Si una tabla envio_ ya existe, MySQL la conserva sin modificarla.
+-- 3. No elimina ni altera tablas de otros sistemas.
 -- ============================================
 
 -- Ejecutar este archivo en phpMyAdmin o consola MySQL
@@ -15,7 +14,7 @@
 -- ============================================
 -- TABLA: usuarios
 -- ============================================
-CREATE TABLE IF NOT EXISTS `usuarios` (
+CREATE TABLE IF NOT EXISTS `envio_usuarios` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) DEFAULT NULL,
   `nombre` varchar(100) NOT NULL,
@@ -38,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 -- TABLA: configuracion
 -- (Agrega aqui tus campos cuando los definas)
 -- ============================================
-CREATE TABLE IF NOT EXISTS `configuracion` (
+CREATE TABLE IF NOT EXISTS `envio_configuracion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `usuario_id` int(11) DEFAULT NULL,
   `nombre_empresa` varchar(200) DEFAULT '',
@@ -58,12 +57,12 @@ CREATE TABLE IF NOT EXISTS `configuracion` (
 -- USUARIO ADMIN POR DEFECTO
 -- (Password: admin123)
 -- ============================================
-INSERT INTO `usuarios` (`nombre`, `usuario`, `password`, `perfil`, `foto`, `estado`)
+INSERT INTO `envio_usuarios` (`nombre`, `usuario`, `password`, `perfil`, `foto`, `estado`)
 SELECT 'Administrador', 'admin', '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S', 'administrador', '', 1
-WHERE NOT EXISTS (SELECT 1 FROM `usuarios` WHERE `usuario` = 'admin');
+WHERE NOT EXISTS (SELECT 1 FROM `envio_usuarios` WHERE `usuario` = 'admin');
 
 -- Repara el usuario admin si una versión anterior guardó únicamente el salt.
-UPDATE `usuarios`
+UPDATE `envio_usuarios`
 SET `password` = '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S'
 WHERE `usuario` = 'admin'
   AND `password` = '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$';
@@ -124,7 +123,7 @@ WHERE `usuario` = 'admin'
 -- TABLA: formularios_compartir
 -- (Link compartible para formulario público)
 -- ============================================
-CREATE TABLE IF NOT EXISTS `formularios_compartir` (
+CREATE TABLE IF NOT EXISTS `envio_formularios_compartir` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) DEFAULT NULL,
   `titulo` varchar(150) NOT NULL,
@@ -141,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `formularios_compartir` (
 -- TABLA: respuestas_formulario
 -- (Respuestas del formulario compartido - usado en Envios)
 -- ============================================
-CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
+CREATE TABLE IF NOT EXISTS `envio_respuestas_formulario` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) DEFAULT NULL,
   `nombre` varchar(150) NOT NULL,
@@ -158,7 +157,4 @@ CREATE TABLE IF NOT EXISTS `respuestas_formulario` (
 -- ============================================
 -- FIN DEL ARCHIVO
 -- ============================================
-DROP TABLE IF EXISTS `ventas`;
-DROP TABLE IF EXISTS `clientes`;
-DROP TABLE IF EXISTS `categorias`;
-DROP TABLE IF EXISTS `productos`;
+-- No hay instrucciones DROP: las tablas de otros sistemas se conservan.

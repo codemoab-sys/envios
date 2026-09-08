@@ -41,7 +41,7 @@ class AjaxUsuarios{
 
     public function ajaxActivarUsuario(){
 
-        $tabla="usuarios";
+        $tabla="envio_usuarios";
 
         $item1="estado";
         $valor1=$this->activarUsuario;

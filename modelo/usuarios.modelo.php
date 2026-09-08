@@ -10,7 +10,7 @@ class ModeloUsuarios{
     }
 
     static public function mdlMostrarUsuarioParaLogin($usuario){
-        $stmt = Conexion::conectar()->prepare("SELECT * FROM usuarios WHERE usuario = :usuario LIMIT 1");
+        $stmt = Conexion::conectar()->prepare("SELECT * FROM envio_usuarios WHERE usuario = :usuario LIMIT 1");
         $stmt->bindValue(":usuario", $usuario, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -19,10 +19,10 @@ class ModeloUsuarios{
     static public function mdlRegistrarCuenta($nombre, $whatsapp, $password){
         try{
             // La preparación usa ALTER TABLE y debe ejecutarse fuera de la transacción.
-            ModeloConfiguracion::mdlMostrarConfiguracion("configuracion");
+            ModeloConfiguracion::mdlMostrarConfiguracion("envio_configuracion");
             $conexion = Conexion::conectar();
             $conexion->beginTransaction();
-            $consulta = $conexion->prepare("SELECT id FROM usuarios WHERE usuario = :usuario LIMIT 1");
+            $consulta = $conexion->prepare("SELECT id FROM envio_usuarios WHERE usuario = :usuario LIMIT 1");
             $consulta->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);
             $consulta->execute();
             if($consulta->fetch()){
@@ -31,7 +31,7 @@ class ModeloUsuarios{
             }
 
             $encriptada = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
-            $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, usuario, password, perfil, foto, estado, plan, fecha_inicio, fecha_vencimiento) VALUES (:nombre, :usuario, :password, 'Usuario/prueba', '', 1, 'prueba', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY))");
+            $stmt = $conexion->prepare("INSERT INTO envio_usuarios (nombre, usuario, password, perfil, foto, estado, plan, fecha_inicio, fecha_vencimiento) VALUES (:nombre, :usuario, :password, 'Usuario/prueba', '', 1, 'prueba', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY))");
             $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
             $stmt->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);
             $stmt->bindParam(":password", $encriptada, PDO::PARAM_STR);
@@ -40,12 +40,12 @@ class ModeloUsuarios{
                 return "error";
             }
             $usuarioId = (int) $conexion->lastInsertId();
-            $asignarTenant = $conexion->prepare("UPDATE usuarios SET tenant_id = :tenant_id WHERE id = :id");
+            $asignarTenant = $conexion->prepare("UPDATE envio_usuarios SET tenant_id = :tenant_id WHERE id = :id");
             $asignarTenant->bindValue(":tenant_id", $usuarioId, PDO::PARAM_INT);
             $asignarTenant->bindValue(":id", $usuarioId, PDO::PARAM_INT);
             $asignarTenant->execute();
 
-            $crear = $conexion->prepare("INSERT INTO configuracion (usuario_id, nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho) VALUES (:usuario_id, :nombre, :whatsapp, '[]', '[]')");
+            $crear = $conexion->prepare("INSERT INTO envio_configuracion (usuario_id, nombre_emprendimiento, whatsapp, metodos_envio, dias_despacho) VALUES (:usuario_id, :nombre, :whatsapp, '[]', '[]')");
             $crear->bindValue(":usuario_id", $usuarioId, PDO::PARAM_INT);
             $crear->bindParam(":nombre", $nombre, PDO::PARAM_STR);
             $crear->bindParam(":whatsapp", $whatsapp, PDO::PARAM_STR);

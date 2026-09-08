@@ -6,7 +6,7 @@ class ModeloCompartir{
 
     static private function prepararTabla(){
         $conexion = Conexion::conectar();
-        $conexion->exec("CREATE TABLE IF NOT EXISTS formularios_compartir (
+        $conexion->exec("CREATE TABLE IF NOT EXISTS envio_formularios_compartir (
             id INT NOT NULL AUTO_INCREMENT,
             tenant_id INT NULL,
             titulo VARCHAR(150) NOT NULL,
@@ -25,7 +25,7 @@ class ModeloCompartir{
     static public function mdlMostrarActivo(){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("SELECT * FROM formularios_compartir WHERE estado = 1 AND tenant_id = :tenant_id ORDER BY id DESC LIMIT 1");
+            $stmt = $conexion->prepare("SELECT * FROM envio_formularios_compartir WHERE estado = 1 AND tenant_id = :tenant_id ORDER BY id DESC LIMIT 1");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->execute();
             $formulario = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -39,14 +39,14 @@ class ModeloCompartir{
                     $formulario["enlace"] = str_replace("localhost/compartir?", "localhost/envios/compartir?", $formulario["enlace"]);
                 }
                 if($formulario["enlace"] !== $enlaceAnterior){
-                    $actualizar = $conexion->prepare("UPDATE formularios_compartir SET enlace = :enlace WHERE id = :id");
+                    $actualizar = $conexion->prepare("UPDATE envio_formularios_compartir SET enlace = :enlace WHERE id = :id");
                     $actualizar->execute(array(":enlace" => $formulario["enlace"], ":id" => $formulario["id"]));
                 }
             }
             if(!$formulario && Conexion::puedeEscribir()){
                 $token = bin2hex(random_bytes(8));
                 $enlace = self::crearEnlace($token);
-                $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
+                $stmt = $conexion->prepare("INSERT INTO envio_formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
                 $stmt->execute(array(
                     ":tenant_id" => Conexion::tenantId(),
                     ":titulo" => "Formulario personalizado",
@@ -54,7 +54,7 @@ class ModeloCompartir{
                     ":token" => $token,
                     ":enlace" => $enlace
                 ));
-                $formulario = $conexion->query("SELECT * FROM formularios_compartir WHERE id = LAST_INSERT_ID()")->fetch(PDO::FETCH_ASSOC);
+                $formulario = $conexion->query("SELECT * FROM envio_formularios_compartir WHERE id = LAST_INSERT_ID()")->fetch(PDO::FETCH_ASSOC);
             }
             return $formulario ?: array();
         }catch(PDOException $e){
@@ -74,7 +74,7 @@ class ModeloCompartir{
             if(!Conexion::puedeEscribir()) return "error";
             $conexion = self::prepararTabla();
             $token = bin2hex(random_bytes(8));
-            $stmt = $conexion->prepare("INSERT INTO formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
+            $stmt = $conexion->prepare("INSERT INTO envio_formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindValue(":titulo", $datos["titulo"], PDO::PARAM_STR);
             $stmt->bindValue(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
@@ -88,7 +88,7 @@ class ModeloCompartir{
 
     static public function mdlMostrarPorToken($token){
         try{
-            $stmt = self::prepararTabla()->prepare("SELECT * FROM formularios_compartir WHERE token = :token AND estado = 1 AND tenant_id IS NOT NULL AND tenant_id > 0 LIMIT 1");
+            $stmt = self::prepararTabla()->prepare("SELECT * FROM envio_formularios_compartir WHERE token = :token AND estado = 1 AND tenant_id IS NOT NULL AND tenant_id > 0 LIMIT 1");
             $stmt->bindValue(":token", $token, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();

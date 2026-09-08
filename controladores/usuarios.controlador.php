@@ -15,7 +15,7 @@ class ControladorUsuarios{
             $passwordIngresada = trim((string) ($_POST["password"] ?? ""));
             $encriptar=crypt($passwordIngresada, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
 
-            $tabla="usuarios";
+            $tabla="envio_usuarios";
 
             $item="usuario";
 
@@ -115,7 +115,7 @@ class ControladorUsuarios{
 
     static public function ctrMostrarUsuarios($item,$valor){
 
-        $tabla="usuarios";
+        $tabla="envio_usuarios";
 
         $respuesta=ModeloUsuarios::mdlMostrarUsuarios($tabla,$item,$valor);
 
@@ -212,7 +212,7 @@ class ControladorUsuarios{
 
                 }
 
-                $tabla = "usuarios";
+                $tabla = "envio_usuarios";
 
 
                 if($_POST["editarPassword"] != ""){
@@ -364,7 +364,7 @@ class ControladorUsuarios{
           
                 }
 
-                    $tabla="usuarios";
+                    $tabla="envio_usuarios";
 
 
                     $encriptar=crypt($_POST["nuevoPassword"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
@@ -432,7 +432,7 @@ class ControladorUsuarios{
 
         if(isset($_GET["idUsuario"])){
 
-            $tabla="usuarios";
+                $tabla="envio_usuarios";
             $datos=$_GET["idUsuario"];
 
             if($_GET["fotoUsuario"]  !=""){
