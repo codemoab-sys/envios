@@ -16,7 +16,7 @@ if($esFormularioPublico):
     if(in_array("shalom", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
-            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion, referencia FROM agencia_shalon ORDER BY nombre ASC");
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion, referencia FROM envio_agencia_shalon ORDER BY nombre ASC");
             $agenciasShalom = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasShalom = array();
@@ -25,7 +25,7 @@ if($esFormularioPublico):
     if(in_array("olva", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
-            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM agencia_olva ORDER BY nombre ASC");
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM envio_agencia_olva ORDER BY nombre ASC");
             $agenciasOlva = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasOlva = array();
@@ -34,7 +34,7 @@ if($esFormularioPublico):
     if(in_array("marvisur", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
-            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM agencia_marvisur ORDER BY nombre ASC");
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, distrito, provincia, departamento, direccion FROM envio_agencia_marvisur ORDER BY nombre ASC");
             $agenciasMarvisur = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasMarvisur = array();
@@ -43,7 +43,7 @@ if($esFormularioPublico):
     if(in_array("dinsides", $metodosConfigurados, true)){
         try{
             $conexionAgencias = Conexion::conectar();
-            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, observacion FROM agencia_dinsides ORDER BY nombre ASC");
+            $consultaAgencias = $conexionAgencias->query("SELECT id, nombre, observacion FROM envio_agencia_dinsides ORDER BY nombre ASC");
             $agenciasDinsides = $consultaAgencias->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $agenciasDinsides = array();
@@ -52,7 +52,7 @@ if($esFormularioPublico):
     if(in_array("encomienda", $metodosConfigurados, true)){
         try{
             $conexionUbicaciones = Conexion::conectar();
-            $consultaUbicaciones = $conexionUbicaciones->query("SELECT id, departamento, provincia, distrito FROM ubicaciones_encomienda WHERE activo = 1 ORDER BY departamento ASC, provincia ASC, distrito ASC");
+            $consultaUbicaciones = $conexionUbicaciones->query("SELECT id, departamento, provincia, distrito FROM envio_ubicaciones_encomienda WHERE activo = 1 ORDER BY departamento ASC, provincia ASC, distrito ASC");
             $ubicacionesEncomienda = $consultaUbicaciones->fetchAll(PDO::FETCH_ASSOC);
         }catch(PDOException $e){
             $ubicacionesEncomienda = array();
@@ -76,7 +76,7 @@ if($esFormularioPublico):
     $distritosTrujillo = array();
     try{
         $conexionDistritos = Conexion::conectar();
-        $consultaDistritos = $conexionDistritos->query("SELECT zona, distrito FROM distritos_delivery WHERE activo = 1 ORDER BY zona ASC, distrito ASC");
+        $consultaDistritos = $conexionDistritos->query("SELECT zona, distrito FROM envio_distritos_delivery WHERE activo = 1 ORDER BY zona ASC, distrito ASC");
         foreach($consultaDistritos->fetchAll(PDO::FETCH_ASSOC) as $registroDistrito){
             if($registroDistrito["zona"] === "lima") $distritosLima[] = $registroDistrito["distrito"];
             if($registroDistrito["zona"] === "trujillo") $distritosTrujillo[] = $registroDistrito["distrito"];
