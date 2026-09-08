@@ -30,7 +30,7 @@ class ModeloUsuarios{
                 return "existe";
             }
 
-            $encriptada = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+            $encriptada = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conexion->prepare("INSERT INTO envio_usuarios (nombre, usuario, password, perfil, foto, estado, plan, fecha_inicio, fecha_vencimiento) VALUES (:nombre, :usuario, :password, 'Usuario/prueba', '', 1, 'prueba', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY))");
             $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
             $stmt->bindParam(":usuario", $whatsapp, PDO::PARAM_STR);

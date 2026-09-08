@@ -13,7 +13,7 @@ class ControladorUsuarios{
 
             $usuarioIngresado = trim((string) $_POST["usuario"]);
             $passwordIngresada = trim((string) ($_POST["password"] ?? ""));
-            $encriptar=crypt($passwordIngresada, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+            $encriptar = password_hash($passwordIngresada, PASSWORD_DEFAULT);
 
             $tabla="envio_usuarios";
 
@@ -24,7 +24,7 @@ class ControladorUsuarios{
 
             $respuesta=ModeloUsuarios::mdlMostrarUsuarioParaLogin($valor);
 
-            if($respuesta && strcasecmp($respuesta["usuario"], $usuarioIngresado) === 0 && hash_equals($respuesta["password"], $encriptar)){
+            if($respuesta && strcasecmp($respuesta["usuario"], $usuarioIngresado) === 0 && password_verify($passwordIngresada, $respuesta["password"])){
 
 
                 if($respuesta["estado"]==1){
@@ -218,7 +218,7 @@ class ControladorUsuarios{
                 if($_POST["editarPassword"] != ""){
 
 
-                    $encriptar = crypt($_POST["editarPassword"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+                    $encriptar = password_hash($_POST["editarPassword"], PASSWORD_DEFAULT);
 
 
                 }else{
@@ -367,7 +367,7 @@ class ControladorUsuarios{
                     $tabla="envio_usuarios";
 
 
-                    $encriptar=crypt($_POST["nuevoPassword"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+                    $encriptar = password_hash($_POST["nuevoPassword"], PASSWORD_DEFAULT);
 
                     $datos=array(
 

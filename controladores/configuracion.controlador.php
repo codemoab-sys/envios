@@ -26,7 +26,7 @@ class ControladorConfiguracion{
                 return;
             }
 
-            $encriptar = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+            $encriptar = password_hash($password, PASSWORD_DEFAULT);
             $respuesta = ModeloConfiguracion::mdlActualizarPassword("envio_usuarios", $encriptar, $_SESSION["id"]);
 
             if($respuesta == "ok"){
@@ -93,7 +93,7 @@ class ControladorConfiguracion{
             return array("estado" => "error", "mensaje" => "La contraseña debe tener al menos 6 caracteres");
         }
 
-        $encriptar = crypt($password, '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+        $encriptar = password_hash($password, PASSWORD_DEFAULT);
         $respuesta = ModeloConfiguracion::mdlActualizarPassword("envio_usuarios", $encriptar, $id);
 
         return array(
