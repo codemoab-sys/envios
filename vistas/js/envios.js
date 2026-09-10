@@ -340,6 +340,7 @@ $(document).ready(function(){
     }
 
     function imprimirEtiquetas(envios, formato){
+        var remitente = escaparHtmlTexto((window.nombreEmprendimientoEtiqueta || '').toString().trim() || 'Emprendimiento');
         var etiquetas = envios.map(function(item){
             var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
             var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
@@ -350,7 +351,7 @@ $(document).ready(function(){
             var direccion = escaparHtmlTexto(item.direccion || '-');
             var documento = escaparHtmlTexto(dni || '-');
             return '<article class="etiqueta-envio">' +
-                '<div class="etiqueta-linea etiqueta-remitente"><span>REMITENTE</span><strong>MODA A&amp;B</strong></div>' +
+                '<div class="etiqueta-linea etiqueta-remitente"><span>REMITENTE</span><strong>' + remitente + '</strong></div>' +
                 '<div class="etiqueta-seccion">DESTINATARIO:</div>' +
                 '<div class="etiqueta-nombre">' + nombre + '</div>' +
                 '<div class="etiqueta-datos"><strong>N°DOC: ' + documento + '</strong><strong>Cel: ' + telefono + '</strong></div>' +

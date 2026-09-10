@@ -1,5 +1,7 @@
 <?php
 $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
+$configuracionEnvios = ControladorConfiguracion::ctrMostrarConfiguracion();
+$nombreEmprendimientoEtiqueta = trim((string) ($configuracionEnvios["nombre_emprendimiento"] ?? ""));
 ?>
 
 <style>
@@ -358,4 +360,5 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
 </main>
 </div>
 
+<script>var nombreEmprendimientoEtiqueta = <?php echo json_encode($nombreEmprendimientoEtiqueta, JSON_UNESCAPED_UNICODE); ?>;</script>
 <script src="vistas/js/envios.js?v=<?php echo (int) filemtime(__DIR__ . '/../js/envios.js'); ?>"></script>
