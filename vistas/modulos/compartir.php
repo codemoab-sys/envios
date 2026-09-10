@@ -745,6 +745,15 @@ $('#agendarPublico').on('click', function(){
         (ubicacionResumen ? 'Ubicación: ' + ubicacionResumen + '\n' : '') +
         (direccionResumen ? 'Dirección: ' + direccionResumen + '\n' : '') +
         (fechaResumen && fechaResumen != 'Elige una fecha...' ? 'Fecha: ' + fechaResumen : '');
+    var mensajeCliente = 'Hola *' + nombreResumen + '*!\n\n' +
+        'Hemos registrado tu solicitud de envío correctamente.\n\n' +
+        'Método: ' + metodoTexto + '\n' +
+        'WhatsApp: +51 ' + whatsappPublico + '\n' +
+        (dniResumen ? 'DNI/CE: ' + dniResumen + '\n' : '') +
+        (ubicacionResumen ? 'Ubicación: ' + ubicacionResumen + '\n' : '') +
+        (direccionResumen ? 'Dirección: ' + direccionResumen + '\n' : '') +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? 'Fecha: ' + fechaResumen + '\n' : '') +
+        '\nGracias por tu compra.';
 
     var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
         '<div style="padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;color:#8b98aa;font-size:13px;font-weight:700;letter-spacing:1px">RESUMEN</div>' +
@@ -772,8 +781,13 @@ $('#agendarPublico').on('click', function(){
     }).then(function(resultado){
         if(resultado.isDenied || resultado.isConfirmed){
             if(resultado.isConfirmed){
-                var mensajeWhatsApp = window.location.origin + window.location.pathname + '?ruta=compartir&merchant=' + <?php echo json_encode($formularioCompartir["token"] ?? ""); ?> + '\n\nCompleta este formulario';
-                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(mensajeWhatsApp), '_blank');
+                var destinosWhatsApp = [];
+                if(whatsappPublico && whatsappPublico !== whatsappEmprendimiento) destinosWhatsApp.push({numero: whatsappPublico, mensaje: mensajeCliente});
+                if(whatsappEmprendimiento) destinosWhatsApp.push({numero: whatsappEmprendimiento, mensaje: resumenWhatsApp});
+                for(var indiceWhatsApp = 0; indiceWhatsApp < destinosWhatsApp.length; indiceWhatsApp++) {
+                    var destinoWhatsApp = destinosWhatsApp[indiceWhatsApp];
+                    window.open('https://wa.me/51' + destinoWhatsApp.numero + '?text=' + encodeURIComponent(destinoWhatsApp.mensaje), '_blank');
+                }
             }
             Swal.fire({title:'Guardando...',text:'Registrando tu respuesta...',allowOutsideClick:false,onBeforeOpen:function(){Swal.showLoading();}});
             var formData = new FormData();
@@ -890,7 +904,7 @@ $enlaceCompartir = htmlspecialchars($enlaceCompartirRaw, ENT_QUOTES, "UTF-8");
     @media (max-width: 600px) { .compartir-page { padding: 18px 12px 24px; } .compartir-card { padding: 20px 16px 18px; border-radius: 20px; } .compartir-card h1 { font-size: 23px; } .compartir-copy { font-size: 14px; } .compartir-link { padding: 12px 14px; font-size: 11px; } .compartir-action { min-height: 42px; font-size: 14px; } }
     @media (max-height: 620px) { .compartir-page { padding-top: 12px; padding-bottom: 12px; } .compartir-card { padding-top: 14px; padding-bottom: 12px; } .compartir-icon { width: 48px; height: 48px; margin-bottom: 8px; font-size: 22px; } .compartir-card h1 { margin-bottom: 6px; font-size: 21px; } .compartir-copy { margin-bottom: 10px; } .compartir-link { margin-bottom: 10px; padding: 9px 12px; } .compartir-action { min-height: 36px; margin-bottom: 5px; } }
 </style>
-<main class="compartir-page"><section class="compartir-shell"><div class="compartir-card"><div class="compartir-icon"><i class="fa fa-share-alt"></i></div><h1>¡Listo para compartir!</h1><p class="compartir-copy">Tu formulario personalizado está activo. Comparte el siguiente enlace con tus clientes.</p><div class="compartir-link" id="enlaceCompartir"><?php echo $enlaceCompartir; ?></div><button class="compartir-action compartir-action-primary" type="button" id="copiarEnlace"><i class="fa fa-copy"></i>Copiar Link</button><button class="compartir-action compartir-action-whatsapp" type="button" id="whatsappEnlace"><i class="fa fa-whatsapp"></i>Enviar por WhatsApp</button><button class="compartir-action compartir-action-open" type="button" id="abrirEnlace"><i class="fa fa-external-link"></i>Abrir en nueva pestaña</button></div></section></main>
+<main class="compartir-page"><section class="compartir-shell"><div class="compartir-card"><div class="compartir-icon"><i class="fa fa-share-alt"></i></div><h1>¡Listo para compartir!</h1><p class="compartir-copy">Tu formulario personalizado está activo. Comparte el siguiente enlace con tus clientes.</p><div class="compartir-link" id="enlaceCompartir"><?php echo $enlaceCompartir; ?></div><button class="compartir-action compartir-action-primary" type="button" id="copiarEnlace"><i class="fa fa-copy"></i>Copiar Link</button><button class="compartir-action compartir-action-whatsapp" type="button" id="whatsappEnlace"><i class="fa fa-whatsapp"></i>Compartir enlace con cliente</button><button class="compartir-action compartir-action-open" type="button" id="abrirEnlace"><i class="fa fa-external-link"></i>Abrir en nueva pestaña</button></div></section></main>
 <script>
 (function(){ var enlace = <?php echo json_encode($enlaceCompartirRaw); ?>; $('#copiarEnlace').on('click', function(){ navigator.clipboard.writeText(enlace).then(function(){ Swal.fire({toast:true,position:'top-end',icon:'success',title:'Link copiado',showConfirmButton:false,timer:1800}); }); }); $('#whatsappEnlace').on('click', function(){ if(!enlace){ Swal.fire({icon:'error',title:'No hay enlace para compartir',confirmButtonText:'Cerrar'}); return; } var mensaje = enlace + '\n\nCompleta este formulario'; window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(mensaje), '_blank'); }); $('#abrirEnlace').on('click', function(){ window.open(enlace, '_blank'); }); })();
 </script>

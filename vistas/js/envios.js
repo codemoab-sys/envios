@@ -241,7 +241,13 @@ $(document).ready(function(){
         }
     });
 
-    $('#btnExcel').on('click', function(){
+    $('#selectorReporteExcel').on('change', function(){
+        descargarReporteSeleccionado($(this).val());
+        $(this).val('');
+    });
+
+    function descargarReporteSeleccionado(tipoReporte){
+        if(!tipoReporte) return;
         var seleccionados = $('.seleccionar-fila:checked');
         if(seleccionados.length === 0){
             Swal.fire('Atencion', 'Selecciona al menos un envio para exportar', 'info');
@@ -252,14 +258,44 @@ $(document).ready(function(){
             var envio = registrosPorId[$(this).val()];
             if(envio) envios.push(envio);
         });
-        exportarExcel(envios);
-    });
+        if(tipoReporte === 'shalom'){
+            envios = envios.filter(function(item){
+                var agencia = (item.agencia || 'SHALOM').toString().trim().toUpperCase();
+                return agencia === 'SHALOM' || agencia === 'RETIRO EN AGENCIA SHALOM';
+            });
+            if(envios.length === 0){
+                Swal.fire('Atencion', 'Entre los envios seleccionados no hay registros de Shalom', 'info');
+                return;
+            }
+        }
+        exportarExcel(envios, tipoReporte);
+    }
 
-    function exportarExcel(envios){
-        var encabezados = ['Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
+    function exportarExcel(envios, tipoReporte){
+        var esReporteShalom = tipoReporte === 'shalom';
+        var encabezados = esReporteShalom
+            ? ['DESTINATARIO (DOC)', 'TELF. DESTINATARIO', 'CONTACTO (DOC)', 'TELF. CONTACTO', 'NRO GRR', 'ORIGEN', 'DESTINO', 'MERCADERIA', 'ALTO', 'ANCHO', 'LARGO', 'PESO', 'CANTIDAD']
+            : ['Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
         var filas = envios.map(function(item){
             var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
             var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+            if(esReporteShalom){
+                return [
+                    item.nombre || '',
+                    item.telefono || '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    item.direccion || '',
+                    '',
+                    item.alto !== undefined && item.alto !== '' ? item.alto : 0,
+                    item.ancho !== undefined && item.ancho !== '' ? item.ancho : 0,
+                    item.largo !== undefined && item.largo !== '' ? item.largo : 0,
+                    item.peso !== undefined && item.peso !== '' ? item.peso : 0,
+                    item.cantidad !== undefined && item.cantidad !== '' ? item.cantidad : 1
+                ];
+            }
             return [
                 item.nombre || '',
                 item.telefono || '',
@@ -278,7 +314,7 @@ $(document).ready(function(){
         var archivo = new Blob(['\uFEFF' + contenido], {type: 'text/csv;charset=utf-8;'});
         var enlace = document.createElement('a');
         enlace.href = URL.createObjectURL(archivo);
-        enlace.download = 'reporte-envios-' + convertirFechaInput(new Date()) + '.csv';
+        enlace.download = (esReporteShalom ? 'reporte-shalom-' : 'reporte-general-') + convertirFechaInput(new Date()) + '.csv';
         document.body.appendChild(enlace);
         enlace.click();
         document.body.removeChild(enlace);

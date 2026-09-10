@@ -29,6 +29,7 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
         font-weight: 600;
     }
     .envios-control { padding: 0 13px; }
+    .envios-reporte-label { color: #aebbd2; font-size: 13px; font-weight: 700; white-space: nowrap; }
     .envios-date { width: 138px; color: #dde5f5; }
     .envios-search { flex: 1; min-width: 100px; padding: 0 14px 0 35px; color: #a7b1c8; font-weight: 400; background: #10192b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237b88a2' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E") 12px center no-repeat; }
     .envios-button { height: 36px; padding: 0 14px; border: 1px solid #33415a; border-radius: 9px; background: #202c42; color: #dce5f8; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -325,7 +326,12 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
                 <option value="dos-columnas">Etiquetas en 2 columnas</option>
                 <option value="tres-columnas">Etiquetas en 3 columnas</option>
             </select>
-            <button class="envios-button envios-button-green" type="button" id="btnExcel"><i class="fa fa-file-excel-o"></i>Excel</button>
+            <span class="envios-reporte-label">Tipo de reporte:</span>
+            <select class="envios-control" id="selectorReporteExcel" aria-label="Selecciona el tipo de reporte para descargar">
+                <option value="" selected>Selecciona un reporte...</option>
+                <option value="shalom">Shalom (formato de agencia)</option>
+                <option value="general">General (todos los envíos)</option>
+            </select>
             <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Completar</button>
             <button class="envios-button envios-button-danger envios-button-icon" type="button" id="btnEliminar" title="Eliminar"><i class="fa fa-trash-o"></i></button>
         </div>
@@ -352,4 +358,4 @@ $totalRespuestas = ControladorEnvios::ctrContarRespuestas();
 </main>
 </div>
 
-<script src="vistas/js/envios.js"></script>
+<script src="vistas/js/envios.js?v=<?php echo (int) filemtime(__DIR__ . '/../js/envios.js'); ?>"></script>
