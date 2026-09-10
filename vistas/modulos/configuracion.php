@@ -124,7 +124,7 @@ $dias = array(
                     <div class="password-row">
                         <div class="form-group">
                             <label class="form-label" for="nuevaPassword">NUEVA CONTRASEÑA</label>
-                            <input class="form-control" type="password" id="nuevaPassword" name="nuevaPassword" minlength="6">
+                            <input class="form-control" type="password" id="nuevaPassword" name="nuevaPassword" minlength="6" maxlength="8">
                         </div>
                         <button type="submit" name="actualizarPasswordConfiguracion" value="1" class="btn-update">Actualizar</button>
                     </div>

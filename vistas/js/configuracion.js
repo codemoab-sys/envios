@@ -6,8 +6,8 @@ $(document).on("submit", "#formPasswordConfiguracion", function(event){
     var boton = $(formulario).find("button[type='submit']");
     var password = $(formulario).find("[name='nuevaPassword']").val().trim();
 
-    if(password.length < 6){
-        Swal.fire({icon: "error", title: "La contraseña debe tener al menos 6 caracteres", confirmButtonText: "Cerrar"});
+    if(password.length < 6 || password.length > 8){
+        Swal.fire({icon: "error", title: "La contraseña debe tener entre 6 y 8 caracteres", confirmButtonText: "Cerrar"});
         return;
     }
 

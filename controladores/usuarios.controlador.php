@@ -16,9 +16,7 @@ class ControladorUsuarios{
             $encriptar = password_hash($passwordIngresada, PASSWORD_DEFAULT);
 
             $tabla="envio_usuarios";
-
             $item="usuario";
-
             $valor=$usuarioIngresado;
 
 
@@ -79,8 +77,8 @@ class ControladorUsuarios{
         $whatsapp = preg_replace('/\D/', '', (string)($_POST["whatsapp"] ?? ""));
         $password = (string)($_POST["passwordRegistro"] ?? "");
 
-        if($nombre === "" || !preg_match('/^9[0-9]{8}$/', $whatsapp) || strlen($password) < 6){
-            echo '<div class="login-alert">Completa el nombre, un WhatsApp válido y una contraseña de al menos 6 caracteres.</div>';
+        if($nombre === "" || !preg_match('/^9[0-9]{8}$/', $whatsapp) || strlen($password) < 6 || strlen($password) > 8){
+            echo '<div class="login-alert">La contraseña debe tener entre 6 y 8 caracteres.</div>';
             return;
         }
 
@@ -217,6 +215,10 @@ class ControladorUsuarios{
 
                 if($_POST["editarPassword"] != ""){
 
+                    if(strlen($_POST["editarPassword"]) < 6 || strlen($_POST["editarPassword"]) > 8){
+                        echo '<div class="alert alert-danger">La contraseña debe tener entre 6 y 8 caracteres.</div>';
+                        return;
+                    }
 
                     $encriptar = password_hash($_POST["editarPassword"], PASSWORD_DEFAULT);
 
@@ -366,6 +368,10 @@ class ControladorUsuarios{
 
                     $tabla="envio_usuarios";
 
+                    if(strlen((string)($_POST["nuevoPassword"] ?? "")) < 6 || strlen((string)($_POST["nuevoPassword"] ?? "")) > 8){
+                        echo '<div class="alert alert-danger">La contraseña debe tener entre 6 y 8 caracteres.</div>';
+                        return;
+                    }
 
                     $encriptar = password_hash($_POST["nuevoPassword"], PASSWORD_DEFAULT);
 

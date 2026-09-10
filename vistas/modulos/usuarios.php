@@ -253,7 +253,7 @@ MODAL AGREGAR USUARIO
                                     <span class="input-group-addon"><i class="fa fa-lock"></i></span>
 
                                     <input type="password" class="form-control input-lg" name="nuevoPassword"
-                                        placeholder="Ingresar contraseña" required>
+                                        placeholder="Ingresar contraseña" minlength="6" maxlength="8" required>
 
                                 </div>
 
@@ -409,7 +409,7 @@ MODAL EDITAR USUARIO
                                     <span class="input-group-addon"><i class="fa fa-lock"></i></span>
 
                                     <input type="password" class="form-control input-lg" name="editarPassword"
-                                        placeholder="Escriba la nueva contraseña">
+                                        placeholder="Escriba la nueva contraseña" minlength="6" maxlength="8">
 
                                     <input type="hidden" id="passwordActual" name="passwordActual">
 

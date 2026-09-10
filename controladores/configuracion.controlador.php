@@ -21,8 +21,8 @@ class ControladorConfiguracion{
         if(isset($_POST["actualizarPasswordConfiguracion"])){
             $password = trim($_POST["nuevaPassword"] ?? "");
 
-            if($password == ""){
-                self::mostrarAlerta("error", "Escribe una nueva contraseña");
+            if(strlen($password) < 6 || strlen($password) > 8){
+                self::mostrarAlerta("error", "La contraseña debe tener entre 6 y 8 caracteres");
                 return;
             }
 
@@ -85,12 +85,8 @@ class ControladorConfiguracion{
 
     static public function ctrActualizarPassword($password, $id){
 
-        if(trim($password) == ""){
-            return array("estado" => "error", "mensaje" => "Escribe una nueva contraseña");
-        }
-
-        if(strlen($password) < 6){
-            return array("estado" => "error", "mensaje" => "La contraseña debe tener al menos 6 caracteres");
+        if(strlen($password) < 6 || strlen($password) > 8){
+            return array("estado" => "error", "mensaje" => "La contraseña debe tener entre 6 y 8 caracteres");
         }
 
         $encriptar = password_hash($password, PASSWORD_DEFAULT);

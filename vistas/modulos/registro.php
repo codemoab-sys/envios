@@ -14,7 +14,7 @@ body:has(.registro-page) { background: #f4f6f9; }
         <form method="post">
             <div class="registro-field"><label for="nombreEmprendimientoRegistro">Nombre del emprendimiento</label><input id="nombreEmprendimientoRegistro" name="nombreEmprendimiento" required maxlength="150"></div>
             <div class="registro-field"><label for="whatsappRegistro">WhatsApp</label><input id="whatsappRegistro" name="whatsapp" type="tel" pattern="9[0-9]{8}" maxlength="9" placeholder="9XXXXXXXX" required></div>
-            <div class="registro-field"><label for="passwordRegistro">Contraseña</label><input id="passwordRegistro" name="passwordRegistro" type="password" minlength="6" required></div>
+            <div class="registro-field"><label for="passwordRegistro">Contraseña</label><input id="passwordRegistro" name="passwordRegistro" type="password" minlength="6" maxlength="8" required></div>
             <button class="registro-submit" type="submit" name="registrarCuenta" value="1">Crear cuenta</button>
             <?php ControladorUsuarios::ctrRegistrarCuenta(); ?>
         </form>
