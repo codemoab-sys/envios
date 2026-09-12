@@ -753,14 +753,22 @@ $('#agendarPublico').on('click', function(){
         agenciaResumen = ubicacionResumen;
     }
 
-    var iconoPaquete = '▣';
-    var iconoPersona = '◉';
-    var iconoTelefono = '#';
-    var iconoDocumento = '№';
-    var iconoAgencia = '▤';
-    var iconoDireccion = '⌖';
-    var iconoCamion = '➜';
-    var iconoCalendario = '◷';
+    var iconoPaquete = '\ud83d\udce6';
+    var iconoPersona = '\ud83d\udc64';
+    var iconoTelefono = '\ud83e\udd74';
+    var iconoDocumento = '\ud83c\udd94';
+    var iconoAgencia = '\ud83c\udfe2';
+    var iconoDireccion = '\ud83d\udccd';
+    var iconoCamion = '\ud83d\ude9a';
+    var iconoCalendario = '\ud83d\udcc5';
+    var iconoPaqueteHtml = '<i class="fa fa-cube"></i>';
+    var iconoPersonaHtml = '<i class="fa fa-user"></i>';
+    var iconoTelefonoHtml = '<i class="fa fa-phone"></i>';
+    var iconoDocumentoHtml = '<i class="fa fa-id-card-o"></i>';
+    var iconoAgenciaHtml = '<i class="fa fa-building-o"></i>';
+    var iconoDireccionHtml = '<i class="fa fa-map-marker"></i>';
+    var iconoCamionHtml = '<i class="fa fa-truck"></i>';
+    var iconoCalendarioHtml = '<i class="fa fa-calendar"></i>';
     var resumenWhatsApp = iconoPaquete + ' *NUEVO ENVÍO (' + tipoResumen + ')*\n\n' +
         iconoPersona + ' ' + nombreResumen + '\n' +
         iconoTelefono + ' ' + whatsappPublico + '\n' +
@@ -774,14 +782,14 @@ $('#agendarPublico').on('click', function(){
     var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
         '<div style="padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;color:#8b98aa;font-size:13px;font-weight:700;letter-spacing:1px">RESUMEN</div>' +
         '<div style="line-height:1.65;font-size:15px">' +
-        '<div>' + iconoPaquete + ' &nbsp;<b>NUEVO ENVÍO (' + escaparResumen(tipoResumen) + ')</b></div>' +
-        '<div>' + iconoPersona + ' &nbsp;' + escaparResumen(nombreResumen) + '</div>' +
-        '<div>' + iconoTelefono + ' &nbsp;+51 ' + escaparResumen(whatsappPublico) + '</div>' +
-        (dniResumen ? '<div>' + iconoDocumento + ' &nbsp;DNI: ' + escaparResumen(dniResumen) + '</div>' : '') +
-        (agenciaResumen ? '<div>' + iconoAgencia + ' &nbsp;Agencia: ' + escaparResumen(agenciaResumen) + '</div>' : '') +
-        (direccionResumen ? '<div>' + iconoDireccion + ' &nbsp;' + escaparResumen(direccionResumen) + '</div>' : '') +
-        '<div>' + iconoCamion + ' &nbsp;' + escaparResumen(courierResumen) + '</div>' +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>' + iconoCalendario + ' &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
+        '<div>' + iconoPaqueteHtml + ' &nbsp;<b>NUEVO ENVÍO (' + escaparResumen(tipoResumen) + ')</b></div>' +
+        '<div>' + iconoPersonaHtml + ' &nbsp;' + escaparResumen(nombreResumen) + '</div>' +
+        '<div>' + iconoTelefonoHtml + ' &nbsp;+51 ' + escaparResumen(whatsappPublico) + '</div>' +
+        (dniResumen ? '<div>' + iconoDocumentoHtml + ' &nbsp;DNI: ' + escaparResumen(dniResumen) + '</div>' : '') +
+        (agenciaResumen ? '<div>' + iconoAgenciaHtml + ' &nbsp;Agencia: ' + escaparResumen(agenciaResumen) + '</div>' : '') +
+        (direccionResumen ? '<div>' + iconoDireccionHtml + ' &nbsp;' + escaparResumen(direccionResumen) + '</div>' : '') +
+        '<div>' + iconoCamionHtml + ' &nbsp;' + escaparResumen(courierResumen) + '</div>' +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>' + iconoCalendarioHtml + ' &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
         '</div></div>';
 
     var formData = new FormData();
