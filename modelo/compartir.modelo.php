@@ -1,6 +1,7 @@
 <?php
 
 require_once "conexion.php";
+require_once "configuracion.modelo.php";
 
 class ModeloCompartir{
 
@@ -46,10 +47,12 @@ class ModeloCompartir{
             if(!$formulario && Conexion::puedeEscribir()){
                 $token = bin2hex(random_bytes(8));
                 $enlace = self::crearEnlace($token);
+                $configuracion = ModeloConfiguracion::mdlMostrarConfiguracion("envio_configuracion");
+                $tituloPorDefecto = trim((string) ($configuracion["nombre_emprendimiento"] ?? "")) !== "" ? $configuracion["nombre_emprendimiento"] : "Formulario personalizado";
                 $stmt = $conexion->prepare("INSERT INTO envio_formularios_compartir (tenant_id, titulo, descripcion, token, enlace) VALUES (:tenant_id, :titulo, :descripcion, :token, :enlace)");
                 $stmt->execute(array(
                     ":tenant_id" => Conexion::tenantId(),
-                    ":titulo" => "Formulario personalizado",
+                    ":titulo" => $tituloPorDefecto,
                     ":descripcion" => "Completa tus datos para coordinar tu envío.",
                     ":token" => $token,
                     ":enlace" => $enlace

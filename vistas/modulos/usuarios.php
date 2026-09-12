@@ -1,5 +1,7 @@
     <style>
         .usuarios-foto-icon { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; border-radius: 50%; background: #eef2f7; color: #536176; font-size: 18px; }
+        .usuarios-password-toggle { cursor: pointer; user-select: none; color: #3c8dbc; font-weight: 600; }
+        .usuarios-password-toggle:hover { text-decoration: underline; }
     </style>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">

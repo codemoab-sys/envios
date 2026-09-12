@@ -54,18 +54,18 @@ CREATE TABLE IF NOT EXISTS `envio_configuracion` (
 
 
 -- ============================================
--- USUARIO ADMIN POR DEFECTO
--- (Password: admin123)
+-- USUARIO ADMIN EN PRODUCCIÓN
+-- (usuario: 999999999 / password hash actual)
 -- ============================================
 INSERT INTO `envio_usuarios` (`nombre`, `usuario`, `password`, `perfil`, `foto`, `estado`)
-SELECT 'Administrador', 'admin', '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S', 'administrador', '', 1
-WHERE NOT EXISTS (SELECT 1 FROM `envio_usuarios` WHERE `usuario` = 'admin');
+SELECT 'Administrador', '999999999', '$2y$12$mECTTxIYW6McIVhmsA5H3.PGdWS3Tp952pB9CVWiGIT1xbQEAmm.a', 'administrador', '', 1
+WHERE NOT EXISTS (SELECT 1 FROM `envio_usuarios` WHERE `usuario` IN ('admin', '999999999'));
 
--- Repara el usuario admin si una versión anterior guardó únicamente el salt.
+-- Mantiene el hash real de producción para el usuario administrador actual.
 UPDATE `envio_usuarios`
-SET `password` = '$2a$07$asxx54ahjppf45sd87a5aunxs9bkpyGmGE/.vekdjFg83yRec789S'
-WHERE `usuario` = 'admin'
-  AND `password` = '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$';
+SET `password` = '$2y$12$mECTTxIYW6McIVhmsA5H3.PGdWS3Tp952pB9CVWiGIT1xbQEAmm.a'
+WHERE `usuario` IN ('admin', '999999999')
+  AND (`password` IS NULL OR `password` <> '$2y$12$mECTTxIYW6McIVhmsA5H3.PGdWS3Tp952pB9CVWiGIT1xbQEAmm.a');
 
 
 -- ============================================
