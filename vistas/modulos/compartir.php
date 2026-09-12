@@ -5,8 +5,8 @@ $formularioCompartir = $esFormularioPublico
     : ControladorCompartir::ctrMostrarActivo();
 
 if($esFormularioPublico):
-    $tituloFormulario = htmlspecialchars($formularioCompartir["titulo"] ?? "Papu billas", ENT_QUOTES, "UTF-8");
     $configuracionPublica = ModeloConfiguracion::mdlMostrarConfiguracionPorUsuario((int) ($formularioCompartir["tenant_id"] ?? 0));
+    $tituloFormulario = htmlspecialchars($configuracionPublica["nombre_emprendimiento"] ?? ($formularioCompartir["titulo"] ?? "Papu billas"), ENT_QUOTES, "UTF-8");
     $metodosConfigurados = json_decode($configuracionPublica["metodos_envio"] ?? "[]", true) ?: array();
     $agenciasShalom = array();
     $agenciasOlva = array();
