@@ -5,7 +5,7 @@ $configuracionInicio = ControladorConfiguracion::ctrMostrarConfiguracion();
 $nombreEmprendimientoInicio = trim((string) ($configuracionInicio["nombre_emprendimiento"] ?? ""));
 ?>
 <style>
-    .inicio-page { min-height: calc(100vh - 50px); box-sizing: border-box; overflow-x: hidden; padding: 68px 3.1% 20px !important; background: var(--bg-body); color: var(--text-primary); }
+    .inicio-page { min-height: calc(100vh - 50px); box-sizing: border-box; overflow-x: hidden; padding: 72px 3.1% 20px !important; background: var(--bg-body); color: var(--text-primary); }
     .inicio-hero { display: flex; align-items: flex-end; justify-content: space-between; width: 100%; max-width: 1180px; gap: 20px; margin: 0 auto 20px; }
     .inicio-eyebrow { margin: 0 0 9px; color: var(--accent-primary); font-size: 10px; font-weight: 800; letter-spacing: 2.4px; text-transform: uppercase; }
     .inicio-title { margin: 0; color: var(--text-primary); font-family: Georgia, 'Times New Roman', serif; font-size: 34px; font-weight: 700; letter-spacing: 0; line-height: 1.16; }
@@ -32,8 +32,8 @@ $nombreEmprendimientoInicio = trim((string) ($configuracionInicio["nombre_empren
     .inicio-guide strong { display: block; color: var(--text-primary); font-size: 13px; }
     .inicio-guide span { display: block; margin-top: 5px; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
     @media (max-width: 1050px) { .inicio-grid { grid-template-columns: minmax(0, 1fr) minmax(235px, .72fr); } .inicio-overview { grid-template-columns: minmax(150px, .78fr) minmax(0, 1.22fr); } }
-    @media (max-width: 800px) { .inicio-page { padding-top: 46px !important; } .inicio-hero { align-items: flex-start; flex-direction: column; } .inicio-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .inicio-page { padding: 20px 16px 18px !important; } .inicio-title { font-size: 28px; } .inicio-overview { grid-template-columns: 1fr; padding: 16px; } .inicio-actions { grid-template-columns: 1fr; } .inicio-guide { padding: 20px 16px; } }
+    @media (max-width: 800px) { .inicio-page { padding-top: 64px !important; } .inicio-hero { align-items: flex-start; flex-direction: column; } .inicio-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .inicio-page { padding: 64px 16px 18px !important; } .inicio-title { font-size: 28px; } .inicio-overview { grid-template-columns: 1fr; padding: 16px; } .inicio-actions { grid-template-columns: 1fr; } .inicio-guide { padding: 20px 16px; } }
 </style>
 
 <main class="content-wrapper inicio-page">

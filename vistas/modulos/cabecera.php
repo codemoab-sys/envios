@@ -12,19 +12,29 @@
     ?>
         <style>
             .user-icon-header { display: block; width: 90px; height: 90px; margin: 0 auto; padding-top: 25px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 38px; text-align: center; }
-            .main-header .logo { overflow: visible !important; }
-            .main-header .logo .brand-logo-lg { display: block; width: 100%; max-width: 170px; height: auto; }
+            .main-header { position: relative; background: var(--header-color) !important; }
+            .main-header .logo { position: absolute; top: 0; left: 50%; z-index: 1; width: 190px !important; height: 50px; overflow: visible !important; padding: 4px 10px !important; background: var(--header-color) !important; transform: translateX(-50%); }
+            .main-header .logo .brand-logo-lg { display: block !important; width: 100% !important; max-width: 170px; height: 42px; margin: 0 auto; object-fit: contain; }
             .brand-logo-mini { display: none !important; }
+            .main-header .navbar { position: relative; z-index: 2; width: 100%; margin-left: 0 !important; background: transparent !important; }
+            .main-header .navbar-custom-menu { position: absolute; top: 0; right: 0; z-index: 3; }
+            .main-header .navbar-custom-menu .user-menu > a { display: flex; align-items: center; justify-content: center; height: 50px; padding-top: 0 !important; padding-bottom: 0 !important; }
+            .main-header .navbar-custom-menu .user-image { flex: 0 0 auto; margin-top: 5px !important; }
+            .main-header .sidebar-toggle,
+            .main-header .sidebar-toggle:hover,
+            .main-header .sidebar-toggle:focus { background: transparent !important; color: var(--header-text-color, #fff) !important; }
             .sidebar-mini.sidebar-collapse .main-header .logo .logo-mini,
             .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-mini { display: none !important; }
             .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg,
             .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-lg { display: block !important; }
             @media (max-width: 768px) {
-                .main-header { display: flex !important; align-items: center; height: 50px; }
-                .main-header .logo { float: none !important; width: auto !important; flex: 1; text-align: center; padding: 0 10px; }
-                .main-header .logo .brand-logo-lg { max-width: 110px; margin: 0 auto; }
-                .sidebar-mini.sidebar-collapse .main-header .logo { width: auto !important; }
-                .main-header .navbar { float: none !important; margin-left: 0 !important; flex: 0 0 auto; min-height: 50px; }
+                .main-header { display: block !important; height: 50px !important; min-height: 50px; max-height: 50px; }
+                .main-header .logo { float: none !important; left: 50%; width: 190px !important; height: 50px; text-align: center; padding: 4px 10px !important; }
+                .main-header .logo .brand-logo-lg { display: block !important; width: 100% !important; max-width: 170px; height: 42px; margin: 0 auto; object-fit: contain; }
+                .sidebar-mini.sidebar-collapse .main-header .logo { width: 190px !important; }
+                .main-header .navbar { position: relative; float: none !important; width: 100%; height: 50px; margin-left: 0 !important; min-height: 50px; }
+                .main-header .navbar > .sidebar-toggle { position: absolute; top: 0; left: 0; z-index: 4; width: 50px; height: 50px; padding: 15px; }
+                .main-header .navbar-custom-menu { top: 0; right: 0; z-index: 4; height: 50px; }
             }
         </style>
     <header class="main-header">

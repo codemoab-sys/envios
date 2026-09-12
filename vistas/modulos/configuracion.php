@@ -43,7 +43,7 @@ $dias = array(
 
 <style>
     .wrapper:has(.configuracion-page) { background: #060b1e; }
-    .configuracion-page { background: #060b1e; min-height: 0 !important; padding: 78px 35px 0 !important; color: #98a7bf; }
+    .configuracion-page { background: #060b1e; min-height: calc(100vh - 50px) !important; padding: 78px 35px 48px !important; color: #98a7bf; overflow: visible; }
     .configuracion-page .configuracion-title { color: #f4f7fb; font-size: 30px; font-weight: 700; margin: 0 0 36px; }
     .configuracion-page .configuracion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1480px; margin: 0 auto; }
     .configuracion-page .config-card { background: #182337; border: 1px solid #2b3a52; border-radius: 28px; padding: 30px; box-shadow: 0 12px 30px rgba(0,0,0,.12); }
@@ -77,8 +77,8 @@ $dias = array(
     .configuracion-page .input-icon i { position: absolute; left: 17px; top: 19px; color: #3987fa; z-index: 2; }
     .configuracion-page .input-icon .form-control { padding-left: 43px; }
     .configuracion-page .input-icon.anticipacion i { color: #11c99a; }
-    @media (max-width: 900px) { .configuracion-page { padding: 62px 15px 20px !important; } .configuracion-page .configuracion-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .configuracion-page .config-topbar { align-items: flex-start; gap: 15px; } .configuracion-page .configuracion-title { font-size: 25px; } .configuracion-page .config-card { padding: 20px; border-radius: 20px; } .configuracion-page .password-row, .configuracion-page .fields-inline { display: block; } .configuracion-page .btn-update { margin-top: 15px; width: 100%; } }
+    @media (max-width: 900px) { .configuracion-page { padding: 62px 15px 48px !important; } .configuracion-page .configuracion-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .configuracion-page .config-topbar { align-items: flex-start; gap: 15px; } .configuracion-page .configuracion-title { font-size: 25px; } .configuracion-page .config-card { padding: 20px; border-radius: 20px; } .configuracion-page .password-row, .configuracion-page .fields-inline { display: block; } .configuracion-page .btn-update, .configuracion-page .config-card-save { width: 100%; justify-content: center; } }
     [data-theme="light"] .configuracion-page { background: #f4f6f9; color: #526174; }
     [data-theme="light"] .configuracion-page .configuracion-title { color: #1f2937; }
     [data-theme="light"] .configuracion-page .config-card { background: #fff; border-color: #dfe5ec; box-shadow: 0 8px 24px rgba(31, 41, 55, .08); }
