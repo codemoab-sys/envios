@@ -14,6 +14,7 @@ class ModeloEnvios{
             direccion VARCHAR(255) NULL,
             agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM',
             fecha_envio VARCHAR(50) NULL,
+            codigo VARCHAR(40) NULL,
                 estado VARCHAR(30) NOT NULL DEFAULT 'nuevo',
             mensaje TEXT NULL,
             fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -41,7 +42,45 @@ class ModeloEnvios{
             // Ignorar si la columna ya existe.
         }
 
+        try{
+            $result = $conexion->query("SHOW COLUMNS FROM envio_respuestas_formulario LIKE 'codigo'");
+            if($result && $result->rowCount() === 0){
+                $conexion->exec("ALTER TABLE envio_respuestas_formulario ADD COLUMN codigo VARCHAR(40) NULL AFTER fecha_envio");
+            }
+            $registrosSinCodigo = $conexion->query("SELECT id FROM envio_respuestas_formulario WHERE codigo IS NULL OR codigo = ''")->fetchAll(PDO::FETCH_COLUMN);
+            if($registrosSinCodigo){
+                $stmtCodigo = $conexion->prepare("UPDATE envio_respuestas_formulario SET codigo = :codigo WHERE id = :id");
+                foreach($registrosSinCodigo as $idSinCodigo){
+                    do{
+                        $codigo = self::generarCodigo();
+                        $stmtExiste = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE codigo = :codigo");
+                        $stmtExiste->bindValue(":codigo", $codigo, PDO::PARAM_STR);
+                        $stmtExiste->execute();
+                    }while((int) $stmtExiste->fetchColumn() > 0);
+                    $stmtCodigo->bindValue(":codigo", $codigo, PDO::PARAM_STR);
+                    $stmtCodigo->bindValue(":id", (int) $idSinCodigo, PDO::PARAM_INT);
+                    $stmtCodigo->execute();
+                }
+            }
+            $indicesCodigo = $conexion->query("SHOW INDEX FROM envio_respuestas_formulario WHERE Key_name = 'uk_envio_respuestas_codigo'");
+            if($indicesCodigo && $indicesCodigo->rowCount() === 0){
+                $conexion->exec("ALTER TABLE envio_respuestas_formulario ADD UNIQUE KEY uk_envio_respuestas_codigo (codigo)");
+            }
+            $conexion->exec("UPDATE envio_respuestas_formulario SET estado = 'nuevo' WHERE estado IN ('pendiente', 'completado')");
+            $conexion->exec("ALTER TABLE envio_respuestas_formulario MODIFY codigo VARCHAR(40) NOT NULL");
+        }catch(PDOException $e){
+            // Mantener el acceso disponible si la columna ya fue preparada en otra solicitud.
+        }
+
         return $conexion;
+    }
+
+    static private function generarCodigo(){
+        try{
+            return "ENV-" . strtoupper(bin2hex(random_bytes(16)));
+        }catch(Exception $e){
+            return "ENV-" . strtoupper(uniqid('', true));
+        }
     }
 
     static public function mdlContarRespuestas(){
@@ -96,7 +135,7 @@ class ModeloEnvios{
     static public function mdlPedidosRecientes($limite = 5){
         try{
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("SELECT id, nombre, agencia, estado, fecha FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id ORDER BY fecha DESC LIMIT :limite");
+            $stmt = $conexion->prepare("SELECT id, codigo, nombre, agencia, estado, fecha FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id ORDER BY fecha DESC LIMIT :limite");
             $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
             $stmt->bindValue(":limite", $limite, PDO::PARAM_INT);
             $stmt->execute();
@@ -112,16 +151,18 @@ class ModeloEnvios{
             if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
             if(!Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó");
             $conexion = self::prepararTabla();
-                $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'nuevo', :mensaje)");
+                $codigo = self::generarCodigo();
+                $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, codigo, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, :codigo, 'nuevo', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
             $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
             $stmt->bindParam(":agencia", $datos["agencia"], PDO::PARAM_STR);
             $stmt->bindParam(":fecha_envio", $datos["fecha_envio"], PDO::PARAM_STR);
+            $stmt->bindParam(":codigo", $codigo, PDO::PARAM_STR);
             $stmt->bindParam(":mensaje", $datos["mensaje"], PDO::PARAM_STR);
             if($stmt->execute()){
-                return array("estado" => "ok", "id" => $conexion->lastInsertId());
+                return array("estado" => "ok", "id" => $conexion->lastInsertId(), "codigo" => $codigo);
             }
             return array("estado" => "error", "mensaje" => "No se pudo guardar la respuesta");
         }catch(PDOException $e){

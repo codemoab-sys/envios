@@ -78,7 +78,7 @@ $nombreEmprendimientoInicio = trim((string) ($configuracionInicio["nombre_empren
                     <table style="width:100%;border-collapse:collapse;font-size:13px;">
                         <thead>
                             <tr style="border-bottom:2px solid var(--border-color);">
-                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">#</th>
+                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Código</th>
                                 <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Cliente</th>
                                 <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Agencia</th>
                                 <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Estado</th>
@@ -87,7 +87,7 @@ $nombreEmprendimientoInicio = trim((string) ($configuracionInicio["nombre_empren
                         <tbody>
                             <?php foreach($pedidosRecientes as $pedido): ?>
                             <tr style="border-bottom:1px solid var(--border-light);">
-                                <td style="padding:10px 8px;font-weight:600;color:var(--text-primary);">#<?php echo str_pad((int) $pedido["id"], 5, "0", STR_PAD_LEFT); ?></td>
+                                <td style="padding:10px 8px;font-weight:600;color:var(--text-primary);"><?php echo htmlspecialchars($pedido["codigo"] ?? "-"); ?></td>
                                 <td style="padding:10px 8px;color:var(--text-primary);"><?php echo htmlspecialchars($pedido["nombre"]); ?></td>
                                 <td style="padding:10px 8px;color:var(--text-secondary);"><?php echo htmlspecialchars($pedido["agencia"]); ?></td>
                                 <td style="padding:10px 8px;">

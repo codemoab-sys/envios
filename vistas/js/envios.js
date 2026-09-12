@@ -73,6 +73,7 @@ $(document).ready(function(){
             var estadoClase = estado === 'entregado' ? 'envios-status-completado' : 'envios-status-pendiente';
             var estadoTexto = nombreEstado(estado);
             var telefono = escaparHtml(item.telefono || '-');
+            var codigo = escaparHtml(item.codigo || '-');
             var direccion = escaparHtml(item.direccion || '-');
             var nombre = escaparHtml(item.nombre || '-');
             var agenciaTexto = (item.agencia && item.agencia.trim()) ? escaparHtml(item.agencia.trim()) : 'SHALOM';
@@ -90,6 +91,7 @@ $(document).ready(function(){
                             '<div class="envios-name">' + nombre + '</div>' +
                             '<button class="envios-status ' + estadoClase + ' btn-cambiar-estado" type="button" data-id="' + item.id + '" data-estado="' + estado + '" title="Avanzar estado">' + estadoTexto + '</button>' +
                         '</div>' +
+                        '<div class="envios-meta-row"><span class="envios-meta"><i class="fa fa-hashtag"></i><strong>' + codigo + '</strong></span></div>' +
                         '<div class="envios-meta-row">' +
                             '<span class="envios-meta"><i class="fa fa-phone"></i><strong>' + telefono + '</strong></span>' +
                             '<span class="envios-fecha"><i class="fa fa-calendar"></i><span class="envios-fecha-label">Envío:</span><span>' + fechaEnvioTexto + '</span></span>' +
@@ -292,7 +294,7 @@ $(document).ready(function(){
         var esReporteShalom = tipoReporte === 'shalom';
         var encabezados = esReporteShalom
             ? ['DESTINATARIO (DOC)', 'TELF. DESTINATARIO', 'CONTACTO (DOC)', 'TELF. CONTACTO', 'NRO GRR', 'ORIGEN', 'DESTINO', 'MERCADERIA', 'ALTO', 'ANCHO', 'LARGO', 'PESO', 'CANTIDAD']
-            : ['Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
+            : ['Codigo', 'Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
         var filas = envios.map(function(item){
             var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
             var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
@@ -314,6 +316,7 @@ $(document).ready(function(){
                 ];
             }
             return [
+                item.codigo || '',
                 item.nombre || '',
                 item.telefono || '',
                 formatearFechaEtiqueta(item.fecha_envio || item.fecha),
