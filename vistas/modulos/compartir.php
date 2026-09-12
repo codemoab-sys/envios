@@ -693,6 +693,9 @@ $('#agendarPublico').on('click', function(){
     var dniResumen = '';
     var ubicacionResumen = '';
     var direccionResumen = '';
+    var agenciaResumen = '';
+    var courierResumen = metodoTexto;
+    var tipoResumen = metodoTexto.toUpperCase();
     var fechaResumen = '';
     var fechaValor = '';
 
@@ -738,33 +741,45 @@ $('#agendarPublico').on('click', function(){
         fechaValor = $('#fechaEncomiendaPublica').val();
     }
 
-    var resumenWhatsApp = '*NUEVO ENVÍO (' + metodoTexto.toUpperCase() + ')*\n\n' +
-        'Nombre: ' + nombreResumen + '\n' +
-        'WhatsApp: +51 ' + whatsappPublico + '\n' +
-        (dniResumen ? 'DNI/CE: ' + dniResumen + '\n' : '') +
-        (ubicacionResumen ? 'Ubicación: ' + ubicacionResumen + '\n' : '') +
-        (direccionResumen ? 'Dirección: ' + direccionResumen + '\n' : '') +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? 'Fecha: ' + fechaResumen : '');
-    var mensajeCliente = 'Hola *' + nombreResumen + '*!\n\n' +
-        'Hemos registrado tu solicitud de envío correctamente.\n\n' +
-        'Método: ' + metodoTexto + '\n' +
-        'WhatsApp: +51 ' + whatsappPublico + '\n' +
-        (dniResumen ? 'DNI/CE: ' + dniResumen + '\n' : '') +
-        (ubicacionResumen ? 'Ubicación: ' + ubicacionResumen + '\n' : '') +
-        (direccionResumen ? 'Dirección: ' + direccionResumen + '\n' : '') +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? 'Fecha: ' + fechaResumen + '\n' : '') +
-        '\nGracias por tu compra.';
+    if(['shalom', 'olva', 'marvisur', 'dinsides'].indexOf(metodoSeleccionado) !== -1){
+        var partesAgencia = ubicacionResumen.split('|');
+        agenciaResumen = (partesAgencia.shift() || '').trim();
+        direccionResumen = partesAgencia.join('|').trim();
+        courierResumen = metodoTexto.replace(/^Retiro en agencia\s+/i, '').trim();
+        tipoResumen = 'AGENCIA';
+    }else{
+        agenciaResumen = ubicacionResumen;
+    }
+
+    var iconoPaquete = '▣';
+    var iconoPersona = '◉';
+    var iconoTelefono = '#';
+    var iconoDocumento = '№';
+    var iconoAgencia = '▤';
+    var iconoDireccion = '⌖';
+    var iconoCamion = '➜';
+    var iconoCalendario = '◷';
+    var resumenWhatsApp = iconoPaquete + ' *NUEVO ENVÍO (' + tipoResumen + ')*\n\n' +
+        iconoPersona + ' ' + nombreResumen + '\n' +
+        iconoTelefono + ' ' + whatsappPublico + '\n' +
+        (dniResumen ? iconoDocumento + ' DNI: ' + dniResumen + '\n' : '') +
+        (agenciaResumen ? iconoAgencia + ' Agencia: ' + agenciaResumen + '\n' : '') +
+        (direccionResumen ? iconoDireccion + ' ' + direccionResumen + '\n' : '') +
+        iconoCamion + ' ' + courierResumen + '\n' +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? iconoCalendario + ' ' + fechaResumen : '');
+    var mensajeCliente = resumenWhatsApp;
 
     var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
         '<div style="padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;color:#8b98aa;font-size:13px;font-weight:700;letter-spacing:1px">RESUMEN</div>' +
         '<div style="line-height:1.65;font-size:15px">' +
-        '<div>📦 &nbsp;<b>NUEVO ENVÍO (' + escaparResumen(metodoTexto.toUpperCase()) + ')</b></div>' +
-        '<div>👤 &nbsp;' + escaparResumen(nombreResumen) + '</div>' +
-        '<div>📱 &nbsp;+51 ' + escaparResumen(whatsappPublico) + '</div>' +
-        (dniResumen ? '<div>🪪 &nbsp;DNI: ' + escaparResumen(dniResumen) + '</div>' : '') +
-        (ubicacionResumen ? '<div>🏢 &nbsp;' + escaparResumen(ubicacionResumen) + '</div>' : '') +
-        (direccionResumen ? '<div>📍 &nbsp;' + escaparResumen(direccionResumen) + '</div>' : '') +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>🗓️ &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
+        '<div>' + iconoPaquete + ' &nbsp;<b>NUEVO ENVÍO (' + escaparResumen(tipoResumen) + ')</b></div>' +
+        '<div>' + iconoPersona + ' &nbsp;' + escaparResumen(nombreResumen) + '</div>' +
+        '<div>' + iconoTelefono + ' &nbsp;+51 ' + escaparResumen(whatsappPublico) + '</div>' +
+        (dniResumen ? '<div>' + iconoDocumento + ' &nbsp;DNI: ' + escaparResumen(dniResumen) + '</div>' : '') +
+        (agenciaResumen ? '<div>' + iconoAgencia + ' &nbsp;Agencia: ' + escaparResumen(agenciaResumen) + '</div>' : '') +
+        (direccionResumen ? '<div>' + iconoDireccion + ' &nbsp;' + escaparResumen(direccionResumen) + '</div>' : '') +
+        '<div>' + iconoCamion + ' &nbsp;' + escaparResumen(courierResumen) + '</div>' +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>' + iconoCalendario + ' &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
         '</div></div>';
 
     Swal.fire({

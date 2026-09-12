@@ -157,7 +157,9 @@ $nombreEmprendimientoEtiqueta = trim((string) ($configuracionEnvios["nombre_empr
         letter-spacing: 0.08em;
         text-transform: uppercase;
         border: 1px solid transparent;
+        cursor: pointer;
     }
+    .envios-status:hover { filter: brightness(1.12); }
     .envios-status-pendiente {
         background: rgba(251, 191, 36, 0.18);
         border-color: rgba(251, 191, 36, 0.45);
@@ -328,8 +330,13 @@ $nombreEmprendimientoEtiqueta = trim((string) ($configuracionEnvios["nombre_empr
         <div class="envios-toolbar-row">
             <select class="envios-control" id="filtroEstado" aria-label="Estado">
                 <option value="todos">TODOS</option>
-                <option value="pendiente" selected>PENDIENTES</option>
-                <option value="completado">COMPLETADOS</option>
+                <option value="nuevo" selected>NUEVOS</option>
+                <option value="pagado">PAGADOS</option>
+                <option value="preparando">PREPARANDO</option>
+                <option value="etiqueta_generada">ETIQUETA GENERADA</option>
+                <option value="enviado">ENVIADOS</option>
+                <option value="en_transito">EN TRÁNSITO</option>
+                <option value="entregado">ENTREGADOS</option>
             </select>
             <select class="envios-control" id="filtroAgencia" aria-label="Agencia o metodo de envio">
                 <option value="todos">TODAS LAS AGENCIAS</option>
@@ -379,7 +386,7 @@ $nombreEmprendimientoEtiqueta = trim((string) ($configuracionEnvios["nombre_empr
                     <button type="button" data-value="general">General (todos los envíos)</button>
                 </span>
             </span>
-            <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Completar</button>
+            <button class="envios-button envios-button-primary" type="button" id="btnMarcarCompletado"><i class="fa fa-check-circle"></i>Avanzar estado</button>
             <button class="envios-button envios-button-danger envios-button-icon" type="button" id="btnEliminar" title="Eliminar"><i class="fa fa-trash-o"></i></button>
         </div>
     </section>

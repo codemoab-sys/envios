@@ -14,7 +14,7 @@ class ModeloEnvios{
             direccion VARCHAR(255) NULL,
             agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM',
             fecha_envio VARCHAR(50) NULL,
-            estado VARCHAR(30) NOT NULL DEFAULT 'pendiente',
+                estado VARCHAR(30) NOT NULL DEFAULT 'nuevo',
             mensaje TEXT NULL,
             fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
@@ -112,7 +112,7 @@ class ModeloEnvios{
             if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
             if(!Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó");
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'pendiente', :mensaje)");
+                $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'nuevo', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);

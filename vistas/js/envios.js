@@ -69,8 +69,9 @@ $(document).ready(function(){
             var fechaRegistro = item.fecha ? item.fecha.split(' ')[0].split('-').reverse().join('/') : '-';
             var horaRegistro = item.fecha ? item.fecha.split(' ')[1] : '';
             var fechaEnvioTexto = formatearFechaEnvio(item.fecha_envio, fechaRegistro, horaRegistro);
-            var estadoClase = item.estado === 'completado' ? 'envios-status-completado' : 'envios-status-pendiente';
-            var estadoTexto = item.estado === 'completado' ? 'completado' : 'pendiente';
+            var estado = normalizarEstado(item.estado);
+            var estadoClase = estado === 'entregado' ? 'envios-status-completado' : 'envios-status-pendiente';
+            var estadoTexto = nombreEstado(estado);
             var telefono = escaparHtml(item.telefono || '-');
             var direccion = escaparHtml(item.direccion || '-');
             var nombre = escaparHtml(item.nombre || '-');
@@ -87,7 +88,7 @@ $(document).ready(function(){
                     '<div class="envios-person">' +
                         '<div class="envios-name-row">' +
                             '<div class="envios-name">' + nombre + '</div>' +
-                            '<span class="envios-status ' + estadoClase + '">' + estadoTexto + '</span>' +
+                            '<button class="envios-status ' + estadoClase + ' btn-cambiar-estado" type="button" data-id="' + item.id + '" data-estado="' + estado + '" title="Avanzar estado">' + estadoTexto + '</button>' +
                         '</div>' +
                         '<div class="envios-meta-row">' +
                             '<span class="envios-meta"><i class="fa fa-phone"></i><strong>' + telefono + '</strong></span>' +
@@ -117,6 +118,30 @@ $(document).ready(function(){
         $('#btnPaginaSiguiente').prop('disabled', paginaActual >= paginacion.total_paginas);
     }
 
+    var estadosPedido = ['nuevo', 'pagado', 'preparando', 'etiqueta_generada', 'enviado', 'en_transito', 'entregado'];
+    var nombresEstados = {
+        nuevo: 'Nuevo',
+        pagado: 'Pagado',
+        preparando: 'Preparando',
+        etiqueta_generada: 'Etiqueta generada',
+        enviado: 'Enviado',
+        en_transito: 'En tránsito',
+        entregado: 'Entregado'
+    };
+
+    function normalizarEstado(estado){
+        return estadosPedido.indexOf(estado) !== -1 ? estado : 'nuevo';
+    }
+
+    function nombreEstado(estado){
+        return nombresEstados[normalizarEstado(estado)];
+    }
+
+    function siguienteEstado(estado){
+        var indice = estadosPedido.indexOf(normalizarEstado(estado));
+        return estadosPedido[(indice + 1) % estadosPedido.length];
+    }
+
     function crearMensajeWhatsapp(item){
         var nombre = (item.nombre || '').toString().trim() || 'cliente';
         var fecha = formatearFechaMensaje(item.fecha_envio);
@@ -124,7 +149,7 @@ $(document).ready(function(){
         var agencia = (item.direccion || '').toString().trim() || '-';
         var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
         var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
-        var estado = item.estado === 'completado' ? 'Completado' : 'Programado';
+        var estado = nombreEstado(item.estado);
 
         return 'Hola *' + nombre + '*!\n\n' +
             'Tu envio esta *' + estado + '*\n\n' +
@@ -295,7 +320,7 @@ $(document).ready(function(){
                 obtenerCourier(item.agencia),
                 item.direccion || '',
                 dni,
-                item.estado === 'completado' ? 'Completado' : 'Pendiente'
+                nombreEstado(item.estado)
             ];
         });
         var contenido = [encabezados].concat(filas).map(function(fila){
@@ -418,7 +443,7 @@ $(document).ready(function(){
     $(document).on('click', '.btn-cambiar-estado', function(){
         var id = $(this).data('id');
         var estadoActual = $(this).data('estado');
-        var nuevoEstado = estadoActual === 'pendiente' ? 'completado' : 'pendiente';
+        var nuevoEstado = siguienteEstado(estadoActual);
         $.ajax({
             url: 'ajax/envios.ajax.php',
             method: 'POST',
@@ -477,7 +502,7 @@ $(document).ready(function(){
             $.ajax({
                 url: 'ajax/envios.ajax.php',
                 method: 'POST',
-                data: { cambiarEstadoAjax: 1, id: id, nuevoEstado: 'completado' },
+                data: { cambiarEstadoAjax: 1, id: id, nuevoEstado: siguienteEstado(registrosPorId[id] ? registrosPorId[id].estado : 'nuevo') },
                 dataType: 'json',
                 success: function(){
                     completados++;
