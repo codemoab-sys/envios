@@ -12,19 +12,19 @@
     ?>
         <style>
             .user-icon-header { display: block; width: 90px; height: 90px; margin: 0 auto; padding-top: 25px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 38px; text-align: center; }
-            .brand-logo-lg { display: block; width: 170px; max-width: 100%; height: auto; object-fit: contain; margin: 0 auto; }
+            .main-header .logo { overflow: visible !important; }
+            .main-header .logo .brand-logo-lg { display: block; width: 100%; max-width: 170px; height: auto; }
             .brand-logo-mini { display: none !important; }
-            .main-header .logo { display: flex; align-items: center; justify-content: center; padding: 0 8px; }
+            .sidebar-mini.sidebar-collapse .main-header .logo .logo-mini,
+            .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-mini { display: none !important; }
+            .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg,
+            .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-lg { display: block !important; }
             @media (max-width: 768px) {
                 .main-header { display: flex !important; align-items: center; height: 50px; }
-                .main-header .logo { float: none !important; width: auto !important; overflow: visible !important; flex: 1; padding: 0; height: 50px; }
-                .main-header .logo .brand-logo-lg { width: 100px; height: auto; }
+                .main-header .logo { float: none !important; width: auto !important; flex: 1; text-align: center; padding: 0 10px; }
+                .main-header .logo .brand-logo-lg { max-width: 110px; margin: 0 auto; }
                 .sidebar-mini.sidebar-collapse .main-header .logo { width: auto !important; }
-                .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg,
-                .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-lg { display: block !important; }
-                .sidebar-mini.sidebar-collapse .main-header .logo .logo-mini,
-                .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-mini { display: none !important; }
-                .main-header .navbar { float: none !important; margin-left: 0 !important; margin-right: 0 !important; flex: 0 0 auto; min-height: 50px; }
+                .main-header .navbar { float: none !important; margin-left: 0 !important; flex: 0 0 auto; min-height: 50px; }
             }
         </style>
     <header class="main-header">
