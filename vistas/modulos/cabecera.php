@@ -27,6 +27,11 @@
             .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-mini { display: none !important; }
             .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg,
             .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-lg { display: block !important; }
+            @media (min-width: 769px) {
+                .main-header .logo { position: relative; top: auto; left: auto; float: left; width: 230px !important; transform: none; }
+                .main-header .navbar { width: auto; margin-left: 230px !important; }
+                .main-header .navbar-custom-menu { position: static; float: right; height: auto; }
+            }
             @media (max-width: 768px) {
                 .main-header { display: block !important; height: 50px !important; min-height: 50px; max-height: 50px; }
                 .main-header .logo { float: none !important; left: 50%; width: 190px !important; height: 50px; text-align: center; padding: 4px 10px !important; }
