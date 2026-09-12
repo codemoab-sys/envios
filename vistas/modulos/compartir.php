@@ -179,7 +179,7 @@ if($esFormularioPublico):
 <style>.main-sidebar, .main-header { display: none !important; } .content-wrapper { margin-left: 0 !important; min-height: 100vh !important; }</style>
 <main class="formulario-publico-page" id="formularioPublico">
     <header class="formulario-publico-header">
-        <div class="formulario-publico-logo"><i class="fa fa-cube"></i></div>
+        <div class="formulario-publico-logo"><i class="fa fa-truck"></i></div>
         <div><h1><?php echo $tituloFormulario; ?></h1><p>FORMULARIO DE ENVÍO</p></div>
         <button class="formulario-publico-theme-toggle" type="button" id="cambiarTemaPublico" aria-label="Activar modo oscuro" title="Cambiar tema"><i class="fa fa-moon-o"></i></button>
     </header>
