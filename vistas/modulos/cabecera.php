@@ -16,9 +16,10 @@
             .brand-logo-mini { display: none !important; }
             .main-header .logo { display: flex; align-items: center; justify-content: center; padding: 0 8px; }
             @media (max-width: 768px) {
+                .brand-logo-lg { display: block !important; width: 120px; height: 36px; margin: 0; }
+                .brand-logo-mini { display: none !important; }
                 .main-header { display: flex; align-items: center; height: 50px; }
-                .main-header .logo { flex: 1; width: auto; height: 50px; padding: 0 10px; justify-content: center; }
-                .main-header .logo .brand-logo-lg { width: 120px; height: 36px; margin: 0; }
+                .main-header .logo { flex: 1; width: auto; height: 50px; padding: 0 10px; justify-content: center; overflow: visible; }
                 .main-header .navbar { margin: 0; padding: 0; height: 50px; flex: 0 0 auto; }
                 .main-header .navbar .sidebar-toggle { padding: 15px 10px; }
             }
