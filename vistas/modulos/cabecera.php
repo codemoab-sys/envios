@@ -16,14 +16,15 @@
             .brand-logo-mini { display: none !important; }
             .main-header .logo { display: flex; align-items: center; justify-content: center; padding: 0 8px; }
             @media (max-width: 768px) {
-                .main-header .logo { width: auto !important; overflow: visible !important; flex: 1; padding: 0; }
+                .main-header { display: flex !important; align-items: center; height: 50px; }
+                .main-header .logo { float: none !important; width: auto !important; overflow: visible !important; flex: 1; padding: 0; height: 50px; }
                 .main-header .logo .brand-logo-lg { width: 100px; height: auto; }
                 .sidebar-mini.sidebar-collapse .main-header .logo { width: auto !important; }
                 .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg,
                 .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-lg { display: block !important; }
                 .sidebar-mini.sidebar-collapse .main-header .logo .logo-mini,
                 .sidebar-mini.sidebar-collapse .main-header .logo .brand-logo-mini { display: none !important; }
-                .main-header .navbar { margin-left: 0 !important; flex: 0 0 auto; }
+                .main-header .navbar { float: none !important; margin-left: 0 !important; margin-right: 0 !important; flex: 0 0 auto; min-height: 50px; }
             }
         </style>
     <header class="main-header">
