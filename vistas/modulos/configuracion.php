@@ -165,5 +165,3 @@ $dias = array(
         </div>
     </div>
 </div>
-
-?>
