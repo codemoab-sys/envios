@@ -147,18 +147,24 @@ $(document).ready(function(){
 
     function crearMensajeWhatsapp(item){
         var nombre = (item.nombre || '').toString().trim() || 'cliente';
+        var telefono = (item.telefono || '').toString().trim() || '-';
         var fecha = formatearFechaMensaje(item.fecha_envio);
         var courier = obtenerCourier(item.agencia);
-        var agencia = (item.direccion || '').toString().trim() || '-';
+        var agencia = (item.agencia || '').toString().trim() || '-';
+        var direccion = (item.direccion || '').toString().trim() || '-';
         var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
         var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
         var estado = nombreEstado(item.estado);
 
         return 'Hola *' + nombre + '*!\n\n' +
             'Tu envio esta *' + estado + '*\n\n' +
-            '\u25A3 *Fecha:* ' + fecha + '\n\n' +
-            '\u279C *Courier:* ' + courier + '\n\n' +
-            '\u2302 *Agencia:* ' + agencia + (dni ? ' (DNI: ' + dni + ')' : '') + '\n\n' +
+            '\ud83d\udc64 *Nombre:* ' + nombre + '\n' +
+            '\ud83e\udd74 *Telefono:* ' + telefono + '\n' +
+            (dni ? '\ud83c\udd94 *DNI:* ' + dni + '\n' : '') +
+            '\ud83c\udfe2 *Agencia:* ' + agencia + '\n' +
+            '\ud83d\udccd *Direccion:* ' + direccion + '\n' +
+            '\ud83d\ude9a *Courier:* ' + courier + '\n' +
+            '\ud83d\udcc5 *Fecha:* ' + fecha + '\n\n' +
             'Gracias por tu compra!';
     }
 
