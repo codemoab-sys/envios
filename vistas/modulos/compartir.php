@@ -761,14 +761,22 @@ $('#agendarPublico').on('click', function(){
     var iconoDireccionHtml = '<i class="fa fa-map-marker"></i>';
     var iconoCamionHtml = '<i class="fa fa-truck"></i>';
     var iconoCalendarioHtml = '<i class="fa fa-calendar"></i>';
-    var resumenWhatsApp = '[NUEVO ENVIO (' + tipoResumen + ')]\n\n' +
-        '[NOMBRE] ' + nombreResumen + '\n' +
-        '[TELEFONO] ' + whatsappPublico + '\n' +
-        (dniResumen ? '[DNI] ' + dniResumen + '\n' : '') +
-        (agenciaResumen ? '[AGENCIA] ' + agenciaResumen + '\n' : '') +
-        (direccionResumen ? '[DIRECCION] ' + direccionResumen + '\n' : '') +
-        '[COURIER] ' + courierResumen + '\n' +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '[FECHA] ' + fechaResumen : '');
+    var iconoPaqueteWhatsapp = String.fromCharCode(0x2605);
+    var iconoPersonaWhatsapp = String.fromCharCode(0x25CF);
+    var iconoTelefonoWhatsapp = String.fromCharCode(0x260E);
+    var iconoDocumentoWhatsapp = String.fromCharCode(0x25A3);
+    var iconoAgenciaWhatsapp = String.fromCharCode(0x25A4);
+    var iconoDireccionWhatsapp = String.fromCharCode(0x2316);
+    var iconoCamionWhatsapp = String.fromCharCode(0x279C);
+    var iconoCalendarioWhatsapp = String.fromCharCode(0x25F7);
+    var resumenWhatsApp = iconoPaqueteWhatsapp + ' *NUEVO ENVIO (' + tipoResumen + ')*\n\n' +
+        iconoPersonaWhatsapp + ' ' + nombreResumen + '\n' +
+        iconoTelefonoWhatsapp + ' ' + whatsappPublico + '\n' +
+        (dniResumen ? iconoDocumentoWhatsapp + ' DNI: ' + dniResumen + '\n' : '') +
+        (agenciaResumen ? iconoAgenciaWhatsapp + ' Agencia: ' + agenciaResumen + '\n' : '') +
+        (direccionResumen ? iconoDireccionWhatsapp + ' ' + direccionResumen + '\n' : '') +
+        iconoCamionWhatsapp + ' ' + courierResumen + '\n' +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? iconoCalendarioWhatsapp + ' ' + fechaResumen : '');
     var mensajeCliente = resumenWhatsApp;
 
     var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
