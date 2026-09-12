@@ -753,14 +753,6 @@ $('#agendarPublico').on('click', function(){
         agenciaResumen = ubicacionResumen;
     }
 
-    var iconoPaquete = String.fromCharCode(0xD83D, 0xDCE6);
-    var iconoPersona = String.fromCharCode(0xD83D, 0xDC64);
-    var iconoTelefono = String.fromCharCode(0xD83E, 0xDD74);
-    var iconoDocumento = String.fromCharCode(0xD83C, 0xDD94);
-    var iconoAgencia = String.fromCharCode(0xD83C, 0xDFE2);
-    var iconoDireccion = String.fromCharCode(0xD83D, 0xDCCD);
-    var iconoCamion = String.fromCharCode(0xD83D, 0xDE9A);
-    var iconoCalendario = String.fromCharCode(0xD83D, 0xDCC5);
     var iconoPaqueteHtml = '<i class="fa fa-cube"></i>';
     var iconoPersonaHtml = '<i class="fa fa-user"></i>';
     var iconoTelefonoHtml = '<i class="fa fa-phone"></i>';
@@ -769,14 +761,14 @@ $('#agendarPublico').on('click', function(){
     var iconoDireccionHtml = '<i class="fa fa-map-marker"></i>';
     var iconoCamionHtml = '<i class="fa fa-truck"></i>';
     var iconoCalendarioHtml = '<i class="fa fa-calendar"></i>';
-    var resumenWhatsApp = iconoPaquete + ' *NUEVO ENVÍO (' + tipoResumen + ')*\n\n' +
-        iconoPersona + ' ' + nombreResumen + '\n' +
-        iconoTelefono + ' ' + whatsappPublico + '\n' +
-        (dniResumen ? iconoDocumento + ' DNI: ' + dniResumen + '\n' : '') +
-        (agenciaResumen ? iconoAgencia + ' Agencia: ' + agenciaResumen + '\n' : '') +
-        (direccionResumen ? iconoDireccion + ' ' + direccionResumen + '\n' : '') +
-        iconoCamion + ' ' + courierResumen + '\n' +
-        (fechaResumen && fechaResumen != 'Elige una fecha...' ? iconoCalendario + ' ' + fechaResumen : '');
+    var resumenWhatsApp = '[NUEVO ENVIO (' + tipoResumen + ')]\n\n' +
+        '[NOMBRE] ' + nombreResumen + '\n' +
+        '[TELEFONO] ' + whatsappPublico + '\n' +
+        (dniResumen ? '[DNI] ' + dniResumen + '\n' : '') +
+        (agenciaResumen ? '[AGENCIA] ' + agenciaResumen + '\n' : '') +
+        (direccionResumen ? '[DIRECCION] ' + direccionResumen + '\n' : '') +
+        '[COURIER] ' + courierResumen + '\n' +
+        (fechaResumen && fechaResumen != 'Elige una fecha...' ? '[FECHA] ' + fechaResumen : '');
     var mensajeCliente = resumenWhatsApp;
 
     var resumenHtml = '<div style="text-align:left;padding:4px 8px">' +
@@ -823,7 +815,7 @@ $('#agendarPublico').on('click', function(){
             }
             respuestaPublicaId = respuesta.id || respuestaPublicaId;
             respuestaPublicaCodigo = respuesta.codigo || respuestaPublicaCodigo;
-            var codigoHtml = respuestaPublicaCodigo ? '<div>' + iconoPaquete + ' &nbsp;<b># ' + escaparResumen(respuestaPublicaCodigo) + '</b></div>' : '';
+            var codigoHtml = respuestaPublicaCodigo ? '<div>' + iconoPaqueteHtml + ' &nbsp;<b># ' + escaparResumen(respuestaPublicaCodigo) + '</b></div>' : '';
             var resumenConCodigo = resumenHtml.replace('<div style="line-height:1.65;font-size:15px">', '<div style="line-height:1.65;font-size:15px">' + codigoHtml);
             Swal.fire({
                 title: 'Verifica tus datos', html: resumenConCodigo,
