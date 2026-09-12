@@ -753,14 +753,14 @@ $('#agendarPublico').on('click', function(){
         agenciaResumen = ubicacionResumen;
     }
 
-    var iconoPaquete = '\ud83d\udce6';
-    var iconoPersona = '\ud83d\udc64';
-    var iconoTelefono = '\ud83e\udd74';
-    var iconoDocumento = '\ud83c\udd94';
-    var iconoAgencia = '\ud83c\udfe2';
-    var iconoDireccion = '\ud83d\udccd';
-    var iconoCamion = '\ud83d\ude9a';
-    var iconoCalendario = '\ud83d\udcc5';
+    var iconoPaquete = String.fromCharCode(0xD83D, 0xDCE6);
+    var iconoPersona = String.fromCharCode(0xD83D, 0xDC64);
+    var iconoTelefono = String.fromCharCode(0xD83E, 0xDD74);
+    var iconoDocumento = String.fromCharCode(0xD83C, 0xDD94);
+    var iconoAgencia = String.fromCharCode(0xD83C, 0xDFE2);
+    var iconoDireccion = String.fromCharCode(0xD83D, 0xDCCD);
+    var iconoCamion = String.fromCharCode(0xD83D, 0xDE9A);
+    var iconoCalendario = String.fromCharCode(0xD83D, 0xDCC5);
     var iconoPaqueteHtml = '<i class="fa fa-cube"></i>';
     var iconoPersonaHtml = '<i class="fa fa-user"></i>';
     var iconoTelefonoHtml = '<i class="fa fa-phone"></i>';
