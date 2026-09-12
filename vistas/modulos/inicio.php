@@ -1,5 +1,8 @@
 <?php
-$totalRespuestasInicio = ControladorEnvios::ctrContarRespuestas();
+$statsInicio = ControladorEnvios::ctrEstadisticasDashboard();
+$pedidosRecientes = ControladorEnvios::ctrPedidosRecientes(8);
+$configuracionInicio = ControladorConfiguracion::ctrMostrarConfiguracion();
+$nombreEmprendimientoInicio = trim((string) ($configuracionInicio["nombre_emprendimiento"] ?? ""));
 ?>
 <style>
     .inicio-page { min-height: calc(100vh - 50px); box-sizing: border-box; overflow-x: hidden; padding: 68px 3.1% 20px !important; background: var(--bg-body); color: var(--text-primary); }
@@ -36,37 +39,88 @@ $totalRespuestasInicio = ControladorEnvios::ctrContarRespuestas();
 <main class="content-wrapper inicio-page">
     <section class="inicio-hero" aria-labelledby="tituloInicio">
         <div>
-            <p class="inicio-eyebrow">Gestión de envíos</p>
-            <h1 class="inicio-title" id="tituloInicio">Todo listo para trabajar</h1>
-            <p class="inicio-subtitle">Administra tus formularios, revisa respuestas y mantén tu operación en un solo lugar.</p>
+            <p class="inicio-eyebrow">Mi negocio</p>
+            <h1 class="inicio-title" id="tituloInicio"><?php echo $nombreEmprendimientoInicio !== "" ? htmlspecialchars($nombreEmprendimientoInicio) : "Panel de control"; ?></h1>
+            <p class="inicio-subtitle">Resumen de tu operación de envíos en tiempo real.</p>
         </div>
         <div class="inicio-date"><i class="fa fa-calendar-o"></i> <?php echo date("d/m/Y"); ?></div>
     </section>
 
-    <section class="inicio-grid" aria-label="Resumen de operación">
-        <div class="inicio-panel inicio-overview">
-            <div class="inicio-stat">
-                <div><div class="inicio-stat-label">Respuestas registradas</div><div class="inicio-stat-value"><?php echo (int) $totalRespuestasInicio; ?></div></div>
-                <div class="inicio-stat-caption"><i class="fa fa-inbox"></i> Registros recibidos desde tus formularios</div>
-            </div>
-            <div>
-                <h2 class="inicio-panel-title">Accesos rápidos</h2>
-                <div class="inicio-actions">
-                    <a class="inicio-action" href="envios"><i class="fa fa-truck"></i><span><strong>Ver envíos</strong><span>Revisar y actualizar respuestas</span></span></a>
-                    <a class="inicio-action" href="compartir"><i class="fa fa-share-alt"></i><span><strong>Compartir formulario</strong><span>Generar o copiar tu enlace</span></span></a>
-                    <a class="inicio-action" href="configuracion"><i class="fa fa-cog"></i><span><strong>Configuración</strong><span>Datos, horarios y apariencia</span></span></a>
-                    <?php if(isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador"): ?>
-                        <a class="inicio-action" href="usuarios"><i class="fa fa-users"></i><span><strong>Usuarios</strong><span>Gestionar cuentas y planes</span></span></a>
-                    <?php endif; ?>
+    <section class="inicio-grid" aria-label="Estadísticas">
+        <div class="inicio-panel">
+            <div class="inicio-overview">
+                <div class="inicio-stat">
+                    <div><div class="inicio-stat-label">Pedidos hoy</div><div class="inicio-stat-value"><?php echo (int) $statsInicio["hoy"]; ?></div></div>
+                    <div class="inicio-stat-caption"><i class="fa fa-calendar-check-o"></i> Registros del día</div>
                 </div>
+                <div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div style="padding:18px;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-card);">
+                            <div style="color:var(--text-secondary);font-size:12px;font-weight:700;">Pendientes</div>
+                            <div style="font-size:32px;font-weight:800;color:#f59e0b;margin-top:4px;"><?php echo (int) $statsInicio["pendientes"]; ?></div>
+                        </div>
+                        <div style="padding:18px;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-card);">
+                            <div style="color:var(--text-secondary);font-size:12px;font-weight:700;">Completados</div>
+                            <div style="font-size:32px;font-weight:800;color:#10b981;margin-top:4px;"><?php echo (int) $statsInicio["completados"]; ?></div>
+                        </div>
+                        <div style="padding:18px;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-card);grid-column:span 2;">
+                            <div style="color:var(--text-secondary);font-size:12px;font-weight:700;">Total envíos</div>
+                            <div style="font-size:32px;font-weight:800;color:var(--accent-primary);margin-top:4px;"><?php echo (int) $statsInicio["total"]; ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:18px;">
+                <h2 class="inicio-panel-title">Últimos pedidos</h2>
+                <?php if(count($pedidosRecientes) > 0): ?>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-color);">
+                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">#</th>
+                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Cliente</th>
+                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Agencia</th>
+                                <th style="text-align:left;padding:10px 8px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($pedidosRecientes as $pedido): ?>
+                            <tr style="border-bottom:1px solid var(--border-light);">
+                                <td style="padding:10px 8px;font-weight:600;color:var(--text-primary);">#<?php echo str_pad((int) $pedido["id"], 5, "0", STR_PAD_LEFT); ?></td>
+                                <td style="padding:10px 8px;color:var(--text-primary);"><?php echo htmlspecialchars($pedido["nombre"]); ?></td>
+                                <td style="padding:10px 8px;color:var(--text-secondary);"><?php echo htmlspecialchars($pedido["agencia"]); ?></td>
+                                <td style="padding:10px 8px;">
+                                    <?php if($pedido["estado"] === "pendiente"): ?>
+                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.12);color:#f59e0b;font-size:12px;font-weight:600;"><i class="fa fa-clock-o"></i> Pendiente</span>
+                                    <?php elseif($pedido["estado"] === "completado"): ?>
+                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(16,185,129,.12);color:#10b981;font-size:12px;font-weight:600;"><i class="fa fa-check-circle"></i> Completado</span>
+                                    <?php else: ?>
+                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(107,114,128,.12);color:#6b7280;font-size:12px;font-weight:600;"><?php echo htmlspecialchars($pedido["estado"]); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php else: ?>
+                <p style="color:var(--text-secondary);font-size:13px;padding:20px 0;text-align:center;">No hay pedidos registrados aún.</p>
+                <?php endif; ?>
+                <?php if((int) $statsInicio["total"] > 0): ?>
+                <a href="envios" style="display:block;text-align:center;padding:12px;margin-top:14px;border:1px solid var(--border-color);border-radius:10px;color:var(--accent-primary);font-size:13px;font-weight:600;text-decoration:none;transition:background .15s;">Ver todos los envíos <i class="fa fa-arrow-right" style="margin-left:6px;"></i></a>
+                <?php endif; ?>
             </div>
         </div>
 
-        <aside class="inicio-panel inicio-guide" aria-label="Estado del flujo">
-            <h2 class="inicio-panel-title">Flujo de trabajo</h2>
-            <div class="inicio-guide-row"><i class="fa fa-share-alt inicio-guide-icon"></i><span><strong>Comparte tu formulario</strong><span>Recibe datos de tus clientes mediante un enlace único.</span></span></div>
-            <div class="inicio-guide-row"><i class="fa fa-inbox inicio-guide-icon"></i><span><strong>Revisa las respuestas</strong><span>Filtra, busca y organiza los envíos registrados.</span></span></div>
-            <div class="inicio-guide-row"><i class="fa fa-check-circle inicio-guide-icon"></i><span><strong>Actualiza el estado</strong><span>Marca los envíos completados cuando estén listos.</span></span></div>
+        <aside class="inicio-panel inicio-guide" aria-label="Acciones rápidas">
+            <h2 class="inicio-panel-title">Acciones rápidas</h2>
+            <div class="inicio-guide-row"><a href="envios" style="text-decoration:none;color:inherit;"><i class="fa fa-truck inicio-guide-icon"></i><span><strong>Ver envíos</strong><span>Revisar y actualizar respuestas</span></span></a></div>
+            <div class="inicio-guide-row"><a href="compartir" style="text-decoration:none;color:inherit;"><i class="fa fa-share-alt inicio-guide-icon"></i><span><strong>Compartir formulario</strong><span>Generar o copiar tu enlace</span></span></a></div>
+            <div class="inicio-guide-row"><a href="configuracion" style="text-decoration:none;color:inherit;"><i class="fa fa-cog inicio-guide-icon"></i><span><strong>Configuración</strong><span>Datos, horarios y apariencia</span></span></a></div>
+            <?php if(isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador"): ?>
+            <div class="inicio-guide-row"><a href="usuarios" style="text-decoration:none;color:inherit;"><i class="fa fa-users inicio-guide-icon"></i><span><strong>Usuarios</strong><span>Gestionar cuentas y planes</span></span></a></div>
+            <?php endif; ?>
         </aside>
     </section>
 </main>

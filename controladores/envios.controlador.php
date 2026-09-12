@@ -6,6 +6,14 @@ class ControladorEnvios{
         return ModeloEnvios::mdlContarRespuestas();
     }
 
+    static public function ctrEstadisticasDashboard(){
+        return ModeloEnvios::mdlEstadisticasDashboard();
+    }
+
+    static public function ctrPedidosRecientes($limite = 5){
+        return ModeloEnvios::mdlPedidosRecientes($limite);
+    }
+
     static public function ctrGuardarRespuesta($datos){
         if($datos["nombre"] === ""){
             return array("estado" => "error", "mensaje" => "El nombre es obligatorio");

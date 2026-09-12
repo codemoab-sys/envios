@@ -55,6 +55,57 @@ class ModeloEnvios{
         }
     }
 
+    static public function mdlEstadisticasDashboard(){
+        try{
+            $conexion = self::prepararTabla();
+            $tenantId = Conexion::tenantId();
+            $hoy = date("Y-m-d");
+
+            $stmtHoy = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND DATE(fecha)=:hoy");
+            $stmtHoy->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
+            $stmtHoy->bindValue(":hoy", $hoy, PDO::PARAM_STR);
+            $stmtHoy->execute();
+            $hoyCount = (int) $stmtHoy->fetchColumn();
+
+            $stmtPendientes = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado='pendiente'");
+            $stmtPendientes->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
+            $stmtPendientes->execute();
+            $pendientes = (int) $stmtPendientes->fetchColumn();
+
+            $stmtCompletados = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado='completado'");
+            $stmtCompletados->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
+            $stmtCompletados->execute();
+            $completados = (int) $stmtCompletados->fetchColumn();
+
+            $stmtTotal = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id");
+            $stmtTotal->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
+            $stmtTotal->execute();
+            $total = (int) $stmtTotal->fetchColumn();
+
+            return array(
+                "hoy" => $hoyCount,
+                "pendientes" => $pendientes,
+                "completados" => $completados,
+                "total" => $total
+            );
+        }catch(PDOException $e){
+            return array("hoy" => 0, "pendientes" => 0, "completados" => 0, "total" => 0);
+        }
+    }
+
+    static public function mdlPedidosRecientes($limite = 5){
+        try{
+            $conexion = self::prepararTabla();
+            $stmt = $conexion->prepare("SELECT id, nombre, agencia, estado, fecha FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id ORDER BY fecha DESC LIMIT :limite");
+            $stmt->bindValue(":tenant_id", Conexion::tenantId(), PDO::PARAM_INT);
+            $stmt->bindValue(":limite", $limite, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            return array();
+        }
+    }
+
     static public function mdlGuardarRespuesta($datos){
         try{
             $tenantId = (int) ($datos["tenant_id"] ?? Conexion::tenantId());
