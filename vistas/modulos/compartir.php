@@ -441,6 +441,8 @@ function normalizarTextoAgencia(texto){
 var distritosLimaPublicos = <?php echo json_encode($distritosLima, JSON_UNESCAPED_UNICODE); ?>;
 var distritosTrujilloPublicos = <?php echo json_encode($distritosTrujillo, JSON_UNESCAPED_UNICODE); ?>;
 var whatsappEmprendimiento = <?php echo json_encode($whatsappEmprendimiento); ?>;
+var respuestaPublicaId = 0;
+var respuestaPublicaCodigo = '';
 
 function presentarTextoAgencia(texto){
     return (texto || '').toString().toLowerCase().replace(/(^|[\s\/|,-])([a-záéíóúñ])/g, function(match, separador, letra){
@@ -782,59 +784,66 @@ $('#agendarPublico').on('click', function(){
         (fechaResumen && fechaResumen != 'Elige una fecha...' ? '<div>' + iconoCalendario + ' &nbsp;' + escaparResumen(fechaResumen) + '</div>' : '') +
         '</div></div>';
 
+    var formData = new FormData();
+    formData.append(respuestaPublicaId ? 'actualizarRespuestaAjax' : 'guardarRespuestaAjax', '1');
+    if(respuestaPublicaId) formData.append('id', respuestaPublicaId);
+    formData.append('merchant', <?php echo json_encode($_GET["merchant"] ?? ""); ?>);
+    formData.append('nombre', nombreResumen);
+    formData.append('telefono', whatsappPublico);
+    formData.append('direccion', ubicacionResumen + (direccionResumen ? ' - ' + direccionResumen : ''));
+    formData.append('agencia', (metodoTexto || 'SHALOM').toString().toUpperCase());
+    formData.append('fecha_envio', fechaValor && fechaValor !== 'Elige una fecha...' ? fechaValor : '');
+    formData.append('mensaje', resumenWhatsApp);
     Swal.fire({
-        title: 'Verifica tus datos',
-        html: resumenHtml,
-        confirmButtonText: '<i class="fa fa-whatsapp"></i> Enviar por WhatsApp',
-        cancelButtonText: 'Editar',
-        showDenyButton: true,
-        denyButtonText: '<i class="fa fa-check"></i> Terminar',
-        showCancelButton: true,
-        reverseButtons: true,
-        confirmButtonColor: '#20c968',
-        width: 520
-    }).then(function(resultado){
-        if(resultado.isDenied || resultado.isConfirmed){
-            if(resultado.isConfirmed){
-                var destinosWhatsApp = [];
-                if(whatsappPublico && whatsappPublico !== whatsappEmprendimiento) destinosWhatsApp.push({numero: whatsappPublico, mensaje: mensajeCliente});
-                if(whatsappEmprendimiento) destinosWhatsApp.push({numero: whatsappEmprendimiento, mensaje: resumenWhatsApp});
-                for(var indiceWhatsApp = 0; indiceWhatsApp < destinosWhatsApp.length; indiceWhatsApp++) {
-                    var destinoWhatsApp = destinosWhatsApp[indiceWhatsApp];
-                    window.open('https://wa.me/51' + destinoWhatsApp.numero + '?text=' + encodeURIComponent(destinoWhatsApp.mensaje), '_blank');
-                }
+        title: 'Guardando...',
+        text: 'Registrando tu respuesta...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showConfirmButton: false,
+        showCancelButton: false,
+        showDenyButton: false,
+        onBeforeOpen: function(){ Swal.showLoading(); }
+    });
+    $.ajax({
+        url: 'ajax/envios.ajax.php', method: 'POST', data: formData, processData: false, contentType: false, dataType: 'json',
+        success: function(respuesta){
+            Swal.close();
+            if(respuesta.estado !== 'ok'){
+                Swal.fire({icon:'error',title:'No se pudo registrar',text:respuesta.mensaje || 'Inténtalo nuevamente.',confirmButtonText:'Cerrar'});
+                return;
             }
-            Swal.fire({title:'Guardando...',text:'Registrando tu respuesta...',allowOutsideClick:false,onBeforeOpen:function(){Swal.showLoading();}});
-            var formData = new FormData();
-            formData.append('guardarRespuestaAjax', '1');
-            formData.append('merchant', <?php echo json_encode($_GET["merchant"] ?? ""); ?>);
-            formData.append('nombre', nombreResumen);
-            formData.append('telefono', whatsappPublico);
-            formData.append('direccion', ubicacionResumen + (direccionResumen ? ' - ' + direccionResumen : ''));
-            formData.append('agencia', (metodoTexto || 'SHALOM').toString().toUpperCase());
-            formData.append('fecha_envio', fechaValor && fechaValor !== 'Elige una fecha...' ? fechaValor : '');
-            formData.append('mensaje', resumenWhatsApp);
-            $.ajax({
-                url: 'ajax/envios.ajax.php',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function(respuesta){
-                    Swal.close();
+            respuestaPublicaId = respuesta.id || respuestaPublicaId;
+            respuestaPublicaCodigo = respuesta.codigo || respuestaPublicaCodigo;
+            var codigoHtml = respuestaPublicaCodigo ? '<div>' + iconoPaquete + ' &nbsp;<b># ' + escaparResumen(respuestaPublicaCodigo) + '</b></div>' : '';
+            var resumenConCodigo = resumenHtml.replace('<div style="line-height:1.65;font-size:15px">', '<div style="line-height:1.65;font-size:15px">' + codigoHtml);
+            Swal.fire({
+                title: 'Verifica tus datos', html: resumenConCodigo,
+                confirmButtonText: '<i class="fa fa-whatsapp"></i> Enviar por WhatsApp',
+                cancelButtonText: 'Editar', showDenyButton: true,
+                denyButtonText: '<i class="fa fa-check"></i> Terminar', showCancelButton: true,
+                reverseButtons: true, confirmButtonColor: '#20c968', width: 520
+            }).then(function(resultado){
+                if(resultado.isConfirmed){
+                    var mensajeConCodigo = resumenWhatsApp + (respuestaPublicaCodigo ? '\n\n# ' + respuestaPublicaCodigo : '');
+                    var destinosWhatsApp = [];
+                    if(whatsappPublico && whatsappPublico !== whatsappEmprendimiento) destinosWhatsApp.push({numero:whatsappPublico,mensaje:mensajeConCodigo});
+                    if(whatsappEmprendimiento) destinosWhatsApp.push({numero:whatsappEmprendimiento,mensaje:mensajeConCodigo});
+                    for(var indiceWhatsApp = 0; indiceWhatsApp < destinosWhatsApp.length; indiceWhatsApp++) window.open('https://wa.me/51' + destinosWhatsApp[indiceWhatsApp].numero + '?text=' + encodeURIComponent(destinosWhatsApp[indiceWhatsApp].mensaje), '_blank');
+                }
+                if(resultado.isConfirmed || resultado.isDenied){
+                    respuestaPublicaId = 0;
+                    respuestaPublicaCodigo = '';
                     $('#formularioPublico input').val('');
                     $('#formularioPublico select').prop('selectedIndex', 0);
                     $('.formulario-publico-delivery-fields, .formulario-publico-agencia-results').removeClass('visible');
                     $('#metodoPublico').trigger('change');
-                    $('#formularioPublico')[0].scrollIntoView({behavior: 'smooth', block: 'start'});
-                },
-                error: function(){
-                    Swal.close();
-                    Swal.fire({icon:'error',title:'No se pudo registrar',text:'Inténtalo nuevamente.',confirmButtonText:'Cerrar'});
+                    $('#formularioPublico')[0].scrollIntoView({behavior:'smooth',block:'start'});
+                    Swal.fire({toast:true,position:'top-end',icon:'success',title:'Se registró tu respuesta',showConfirmButton:false,timer:2200});
                 }
             });
-        }
+        },
+        error: function(){ Swal.close(); Swal.fire({icon:'error',title:'No se pudo registrar',text:'Inténtalo nuevamente.',confirmButtonText:'Cerrar'}); }
     });
 });
 

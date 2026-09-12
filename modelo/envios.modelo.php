@@ -11,7 +11,7 @@ class ModeloEnvios{
             tenant_id INT NULL,
             nombre VARCHAR(150) NOT NULL,
             telefono VARCHAR(30) NULL,
-            direccion VARCHAR(255) NULL,
+            direccion TEXT NULL,
             agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM',
             fecha_envio VARCHAR(50) NULL,
             codigo VARCHAR(40) NULL,
@@ -40,6 +40,12 @@ class ModeloEnvios{
             }
         }catch(PDOException $e){
             // Ignorar si la columna ya existe.
+        }
+
+        try{
+            $conexion->exec("ALTER TABLE envio_respuestas_formulario MODIFY COLUMN direccion TEXT NULL");
+        }catch(PDOException $e){
+            // Ignorar si la columna ya tiene un tipo compatible.
         }
 
         try{
@@ -84,12 +90,12 @@ class ModeloEnvios{
             $stmtHoy->execute();
             $hoyCount = (int) $stmtHoy->fetchColumn();
 
-            $stmtPendientes = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado='pendiente'");
+            $stmtPendientes = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado <> 'entregado'");
             $stmtPendientes->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmtPendientes->execute();
             $pendientes = (int) $stmtPendientes->fetchColumn();
 
-            $stmtCompletados = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado='completado'");
+            $stmtCompletados = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario WHERE tenant_id=:tenant_id AND estado='entregado'");
             $stmtCompletados->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmtCompletados->execute();
             $completados = (int) $stmtCompletados->fetchColumn();
@@ -129,13 +135,16 @@ class ModeloEnvios{
             if($tenantId <= 0) return array("estado" => "error", "mensaje" => "Tenant no válido");
             if(!Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "La suscripción de esta empresa terminó");
             $conexion = self::prepararTabla();
-                $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, 'nuevo', :mensaje)");
+            $conexion->beginTransaction();
+            $codigoTemporal = "TMP-" . date("ymdHis") . "-" . mt_rand(100000, 999999);
+            $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, codigo, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, :codigo, 'nuevo', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
             $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
             $stmt->bindParam(":agencia", $datos["agencia"], PDO::PARAM_STR);
             $stmt->bindParam(":fecha_envio", $datos["fecha_envio"], PDO::PARAM_STR);
+            $stmt->bindValue(":codigo", $codigoTemporal, PDO::PARAM_STR);
             $stmt->bindParam(":mensaje", $datos["mensaje"], PDO::PARAM_STR);
             if($stmt->execute()){
                 $id = (int) $conexion->lastInsertId();
@@ -143,11 +152,14 @@ class ModeloEnvios{
                 $stmtCodigo = $conexion->prepare("UPDATE envio_respuestas_formulario SET codigo = :codigo WHERE id = :id");
                 $stmtCodigo->bindValue(":codigo", $codigo, PDO::PARAM_STR);
                 $stmtCodigo->bindValue(":id", $id, PDO::PARAM_INT);
-                $stmtCodigo->execute();
+                if(!$stmtCodigo->execute()) throw new PDOException("No se pudo asignar el código del envío");
+                $conexion->commit();
                 return array("estado" => "ok", "id" => $id, "codigo" => $codigo);
             }
+            $conexion->rollBack();
             return array("estado" => "error", "mensaje" => "No se pudo guardar la respuesta");
         }catch(PDOException $e){
+            if(isset($conexion) && $conexion->inTransaction()) $conexion->rollBack();
             return array("estado" => "error", "mensaje" => $e->getMessage());
         }
     }
@@ -210,6 +222,29 @@ class ModeloEnvios{
                 "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC),
                 "paginacion" => array("pagina" => $pagina, "limite" => $limite, "total" => $total, "total_paginas" => $totalPaginas)
             );
+        }catch(PDOException $e){
+            return array("estado" => "error", "mensaje" => $e->getMessage());
+        }
+    }
+
+    static public function mdlActualizarRespuesta($datos){
+        try{
+            $tenantId = (int) ($datos["tenant_id"] ?? 0);
+            if($tenantId <= 0 || !Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "Tu período terminó; solo puedes consultar los envíos");
+            $conexion = self::prepararTabla();
+            $stmt = $conexion->prepare("UPDATE envio_respuestas_formulario SET nombre = :nombre, telefono = :telefono, direccion = :direccion, agencia = :agencia, fecha_envio = :fecha_envio, mensaje = :mensaje WHERE id = :id AND tenant_id = :tenant_id");
+            $stmt->bindValue(":id", (int) $datos["id"], PDO::PARAM_INT);
+            $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
+            $stmt->bindValue(":nombre", $datos["nombre"], PDO::PARAM_STR);
+            $stmt->bindValue(":telefono", $datos["telefono"], PDO::PARAM_STR);
+            $stmt->bindValue(":direccion", $datos["direccion"], PDO::PARAM_STR);
+            $stmt->bindValue(":agencia", $datos["agencia"], PDO::PARAM_STR);
+            $stmt->bindValue(":fecha_envio", $datos["fecha_envio"], PDO::PARAM_STR);
+            $stmt->bindValue(":mensaje", $datos["mensaje"], PDO::PARAM_STR);
+            if(!$stmt->execute()) return array("estado" => "error", "mensaje" => "No se pudo actualizar la respuesta");
+            $codigoStmt = $conexion->prepare("SELECT codigo FROM envio_respuestas_formulario WHERE id = :id AND tenant_id = :tenant_id LIMIT 1");
+            $codigoStmt->execute(array(":id" => (int) $datos["id"], ":tenant_id" => $tenantId));
+            return array("estado" => "ok", "codigo" => (string) $codigoStmt->fetchColumn());
         }catch(PDOException $e){
             return array("estado" => "error", "mensaje" => $e->getMessage());
         }

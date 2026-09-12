@@ -36,13 +36,35 @@ if(isset($_POST["guardarRespuestaAjax"])){
     exit;
 }
 
+if(isset($_POST["actualizarRespuestaAjax"])){
+    $merchant = trim((string) ($_POST["merchant"] ?? ""));
+    $formulario = $merchant !== "" ? ModeloCompartir::mdlMostrarPorToken($merchant) : array();
+    $tenantId = (int) ($formulario["tenant_id"] ?? 0);
+    if($tenantId <= 0){
+        echo json_encode(array("estado" => "error", "mensaje" => "Enlace de formulario no válido"));
+        exit;
+    }
+    $datos = array(
+        "tenant_id" => $tenantId,
+        "id" => (int) ($_POST["id"] ?? 0),
+        "nombre" => trim($_POST["nombre"] ?? ""),
+        "telefono" => trim($_POST["telefono"] ?? ""),
+        "direccion" => trim($_POST["direccion"] ?? ""),
+        "agencia" => trim($_POST["agencia"] ?? "SHALOM"),
+        "fecha_envio" => trim($_POST["fecha_envio"] ?? ""),
+        "mensaje" => trim($_POST["mensaje"] ?? "")
+    );
+    echo json_encode(ControladorEnvios::ctrActualizarRespuesta($datos));
+    exit;
+}
+
 if(isset($_POST["listarRespuestasAjax"])){
     echo json_encode(ControladorEnvios::ctrListarRespuestas($_POST["estado"] ?? "todos", $_POST["busqueda"] ?? "", $_POST["agencia"] ?? "todos", $_POST["fecha_inicio"] ?? "", $_POST["fecha_fin"] ?? "", (int)($_POST["pagina"] ?? 1), (int)($_POST["limite"] ?? 10)));
     exit;
 }
 
 if(isset($_POST["cambiarEstadoAjax"])){
-    echo json_encode(ControladorEnvios::ctrCambiarEstado((int)($_POST["id"] ?? 0), $_POST["nuevoEstado"] ?? "pendiente"));
+    echo json_encode(ControladorEnvios::ctrCambiarEstado((int)($_POST["id"] ?? 0), $_POST["nuevoEstado"] ?? "nuevo"));
     exit;
 }
 

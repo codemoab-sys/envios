@@ -7,6 +7,16 @@ $esRegistro = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "re
 $esWeb = !isset($_GET["ruta"]) || strtolower((string) $_GET["ruta"]) === "web";
 $ruta = isset($_GET["ruta"]) ? strtolower((string) $_GET["ruta"]) : "";
 $esAdministrador = isset($_SESSION["perfil"]) && strtolower(trim((string) $_SESSION["perfil"])) === "administrador";
+$metaFormularioPublico = $esFormularioPublico ? ModeloCompartir::mdlMostrarPorToken(trim($_GET["merchant"])) : array();
+$metaConfiguracionPublica = $esFormularioPublico ? ModeloConfiguracion::mdlMostrarConfiguracionPorUsuario((int) ($metaFormularioPublico["tenant_id"] ?? 0)) : array();
+$metaNombrePublico = trim((string) ($metaConfiguracionPublica["nombre_emprendimiento"] ?? $metaFormularioPublico["titulo"] ?? ""));
+$metaNombrePublico = $metaNombrePublico !== "" ? $metaNombrePublico : "MOABCODE · Gestión de envíos";
+$metaDescripcionPublica = trim((string) ($metaFormularioPublico["descripcion"] ?? "Completa tus datos para coordinar tu envío."));
+$metaProtocolo = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
+$metaBasePublica = $metaProtocolo . "://" . ($_SERVER["HTTP_HOST"] ?? "localhost") . rtrim(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/");
+$metaLogoRuta = __DIR__ . "/../LOGO.png";
+$metaLogoVersion = file_exists($metaLogoRuta) ? (string) filemtime($metaLogoRuta) : "1";
+$metaImagenPublica = $metaBasePublica . "/LOGO.png?v=" . rawurlencode($metaLogoVersion);
 if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdministrador){
     http_response_code(403);
     $ruta = "inicio";
@@ -23,6 +33,20 @@ if(!$esRegistro && !$esFormularioPublico && $ruta === "usuarios" && !$esAdminist
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MOABCODE · Gestión de envíos</title>
+    <?php if($esFormularioPublico): ?>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<?php echo htmlspecialchars($metaNombrePublico, ENT_QUOTES, "UTF-8"); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($metaDescripcionPublica, ENT_QUOTES, "UTF-8"); ?>">
+    <meta property="og:image" content="<?php echo htmlspecialchars($metaImagenPublica, ENT_QUOTES, "UTF-8"); ?>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="2000">
+    <meta property="og:image:height" content="418">
+    <meta property="og:url" content="<?php echo htmlspecialchars($metaBasePublica . "/compartir?merchant=" . rawurlencode(trim($_GET["merchant"])), ENT_QUOTES, "UTF-8"); ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($metaNombrePublico, ENT_QUOTES, "UTF-8"); ?>">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($metaDescripcionPublica, ENT_QUOTES, "UTF-8"); ?>">
+    <meta name="twitter:image" content="<?php echo htmlspecialchars($metaImagenPublica, ENT_QUOTES, "UTF-8"); ?>">
+    <?php endif; ?>
     <link rel="icon" type="image/x-icon" href="ISOTIPO.ico">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">

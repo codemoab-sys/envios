@@ -32,6 +32,16 @@ class ControladorEnvios{
         return ModeloEnvios::mdlGuardarRespuesta($datos);
     }
 
+    static public function ctrActualizarRespuesta($datos){
+        if((int) ($datos["id"] ?? 0) <= 0) return array("estado" => "error", "mensaje" => "ID invalido");
+        if($datos["nombre"] === "") return array("estado" => "error", "mensaje" => "El nombre es obligatorio");
+        if($datos["telefono"] === "") return array("estado" => "error", "mensaje" => "El telefono es obligatorio");
+        $datos["agencia"] = trim((string)($datos["agencia"] ?? "SHALOM"));
+        $datos["fecha_envio"] = trim((string)($datos["fecha_envio"] ?? ""));
+        if($datos["fecha_envio"] === "Elige una fecha...") $datos["fecha_envio"] = "";
+        return ModeloEnvios::mdlActualizarRespuesta($datos);
+    }
+
     static public function ctrListarRespuestas($estado, $busqueda, $agencia = "todos", $fechaInicio = "", $fechaFin = "", $pagina = 1, $limite = 10){
         return ModeloEnvios::mdlListarRespuestas($estado, $busqueda, $agencia, $fechaInicio, $fechaFin, $pagina, $limite);
     }
