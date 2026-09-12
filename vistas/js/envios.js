@@ -3,10 +3,7 @@ $(document).ready(function(){
     var ventanaEtiquetas = null;
     var paginaActual = 1;
     var limitePagina = 10;
-    var fechasIniciales = obtenerFechasPorDefecto();
-    $('#filtroFechaInicio').val(fechasIniciales.inicio);
-    $('#filtroFechaFin').val(fechasIniciales.fin);
-    cargarRespuestas();
+    var filtrosCargados = false;
 
     function cargarRespuestas(){
         var estado = $('#filtroEstado').val();
@@ -14,11 +11,6 @@ $(document).ready(function(){
         var fechaInicio = $('#filtroFechaInicio').val();
         var fechaFin = $('#filtroFechaFin').val();
         var busqueda = $('#buscadorRespuestas').val();
-        if(!fechaInicio && !fechaFin){
-            var fechasPorDefecto = obtenerFechasPorDefecto();
-            fechaInicio = fechasPorDefecto.inicio;
-            fechaFin = fechasPorDefecto.fin;
-        }
         $.ajax({
             url: 'ajax/envios.ajax.php',
             method: 'POST',
