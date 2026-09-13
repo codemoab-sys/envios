@@ -126,6 +126,42 @@ class ModeloEnvios{
         }
     }
 
+    static public function mdlDetalleReporte($fechaInicio = "", $fechaFin = "", $estado = "todos"){
+        try{
+            $conexion = self::prepararTabla();
+            $where = " WHERE tenant_id = :tenant_id";
+            $parametros = array(":tenant_id" => Conexion::tenantId());
+            if($fechaInicio !== ""){
+                $where .= " AND (fecha_envio >= :fecha_inicio OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) >= :fecha_inicio_registro))";
+                $parametros[":fecha_inicio"] = $fechaInicio;
+                $parametros[":fecha_inicio_registro"] = $fechaInicio;
+            }
+            if($fechaFin !== ""){
+                $where .= " AND (fecha_envio <= :fecha_fin OR (COALESCE(fecha_envio, '') = '' AND DATE(fecha) <= :fecha_fin_registro))";
+                $parametros[":fecha_fin"] = $fechaFin;
+                $parametros[":fecha_fin_registro"] = $fechaFin;
+            }
+            if(in_array($estado, array("nuevo", "etiqueta", "entregado"), true)){
+                $estados = $estado === "nuevo" ? array("nuevo", "pagado", "preparando") : ($estado === "etiqueta" ? array("etiqueta", "etiqueta_generada", "enviado", "en_transito") : array("entregado"));
+                $marcadores = array();
+                foreach($estados as $indice => $estadoFiltro){
+                    $marcador = ":estado_" . $indice;
+                    $marcadores[] = $marcador;
+                    $parametros[$marcador] = $estadoFiltro;
+                }
+                $where .= " AND estado IN (" . implode(",", $marcadores) . ")";
+            }
+            $stmt = $conexion->prepare("SELECT agencia, estado, COUNT(*) AS cantidad FROM envio_respuestas_formulario" . $where . " GROUP BY agencia, estado ORDER BY cantidad DESC, agencia ASC");
+            $stmt->execute($parametros);
+            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $total = 0;
+            foreach($filas as $fila) $total += (int) $fila["cantidad"];
+            return array("estado" => "ok", "datos" => $filas, "total" => $total);
+        }catch(PDOException $e){
+            return array("estado" => "error", "mensaje" => $e->getMessage());
+        }
+    }
+
     static public function mdlPedidosRecientes($limite = 5){
         try{
             $conexion = self::prepararTabla();

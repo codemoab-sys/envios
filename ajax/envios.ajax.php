@@ -102,6 +102,11 @@ if(isset($_POST["listarRespuestasAjax"])){
     exit;
 }
 
+if(isset($_POST["detalleReporteAjax"])){
+    echo json_encode(ModeloEnvios::mdlDetalleReporte($_POST["fecha_inicio"] ?? "", $_POST["fecha_fin"] ?? "", $_POST["estado"] ?? "todos"));
+    exit;
+}
+
 if(isset($_POST["cambiarEstadoAjax"])){
     echo json_encode(ControladorEnvios::ctrCambiarEstado((int)($_POST["id"] ?? 0), $_POST["nuevoEstado"] ?? "nuevo"));
     exit;
