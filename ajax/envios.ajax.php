@@ -26,6 +26,7 @@ if(isset($_POST["guardarRespuestaAjax"])){
     $datos = array(
         "tenant_id" => $tenantId,
         "nombre" => trim($_POST["nombre"] ?? ""),
+        "doc" => trim($_POST["doc"] ?? ""),
         "telefono" => trim($_POST["telefono"] ?? ""),
         "direccion" => trim($_POST["direccion"] ?? ""),
         "agencia" => trim($_POST["agencia"] ?? "SHALOM"),
@@ -48,6 +49,7 @@ if(isset($_POST["actualizarRespuestaAjax"])){
         "tenant_id" => $tenantId,
         "id" => (int) ($_POST["id"] ?? 0),
         "nombre" => trim($_POST["nombre"] ?? ""),
+        "doc" => trim($_POST["doc"] ?? ""),
         "telefono" => trim($_POST["telefono"] ?? ""),
         "direccion" => trim($_POST["direccion"] ?? ""),
         "agencia" => trim($_POST["agencia"] ?? "SHALOM"),

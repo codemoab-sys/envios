@@ -797,6 +797,7 @@ $('#agendarPublico').on('click', function(){
     if(respuestaPublicaId) formData.append('id', respuestaPublicaId);
     formData.append('merchant', <?php echo json_encode($_GET["merchant"] ?? ""); ?>);
     formData.append('nombre', nombreResumen);
+    formData.append('doc', dniResumen);
     formData.append('telefono', whatsappPublico);
     formData.append('direccion', ubicacionResumen + (direccionResumen ? ' - ' + direccionResumen : ''));
     formData.append('agencia', (metodoTexto || 'SHALOM').toString().toUpperCase());

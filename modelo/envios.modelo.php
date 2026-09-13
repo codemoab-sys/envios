@@ -10,6 +10,7 @@ class ModeloEnvios{
             id INT NOT NULL AUTO_INCREMENT,
             tenant_id INT NULL,
             nombre VARCHAR(150) NOT NULL,
+            doc VARCHAR(30) NULL,
             telefono VARCHAR(30) NULL,
             direccion TEXT NULL,
             agencia VARCHAR(100) NOT NULL DEFAULT 'SHALOM',
@@ -31,6 +32,15 @@ class ModeloEnvios{
             }
         }catch(PDOException $e){
             // Ignorar si la tabla ya está creada con la columna o si la BD no admite la verificación.
+        }
+
+        try{
+            $result = $conexion->query("SHOW COLUMNS FROM envio_respuestas_formulario LIKE 'doc'");
+            if($result && $result->rowCount() === 0){
+                $conexion->exec("ALTER TABLE envio_respuestas_formulario ADD COLUMN doc VARCHAR(30) NULL AFTER nombre");
+            }
+        }catch(PDOException $e){
+            // Ignorar si la columna ya existe.
         }
 
         try{
@@ -137,9 +147,10 @@ class ModeloEnvios{
             $conexion = self::prepararTabla();
             $conexion->beginTransaction();
             $codigoTemporal = "TMP-" . date("ymdHis") . "-" . mt_rand(100000, 999999);
-            $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, telefono, direccion, agencia, fecha_envio, codigo, estado, mensaje) VALUES (:tenant_id, :nombre, :telefono, :direccion, :agencia, :fecha_envio, :codigo, 'nuevo', :mensaje)");
+            $stmt = $conexion->prepare("INSERT INTO envio_respuestas_formulario (tenant_id, nombre, doc, telefono, direccion, agencia, fecha_envio, codigo, estado, mensaje) VALUES (:tenant_id, :nombre, :doc, :telefono, :direccion, :agencia, :fecha_envio, :codigo, 'nuevo', :mensaje)");
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
+            $stmt->bindParam(":doc", $datos["doc"], PDO::PARAM_STR);
             $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
             $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
             $stmt->bindParam(":agencia", $datos["agencia"], PDO::PARAM_STR);
@@ -206,11 +217,12 @@ class ModeloEnvios{
             }
 
             if($busqueda !== ""){
-                $where .= " AND (nombre LIKE :busqueda OR telefono LIKE :busqueda2 OR direccion LIKE :busqueda3 OR agencia LIKE :busqueda4)";
+                $where .= " AND (nombre LIKE :busqueda OR doc LIKE :busqueda2 OR telefono LIKE :busqueda3 OR direccion LIKE :busqueda4 OR agencia LIKE :busqueda5)";
                 $parametros[":busqueda"] = "%" . $busqueda . "%";
                 $parametros[":busqueda2"] = "%" . $busqueda . "%";
                 $parametros[":busqueda3"] = "%" . $busqueda . "%";
                 $parametros[":busqueda4"] = "%" . $busqueda . "%";
+                $parametros[":busqueda5"] = "%" . $busqueda . "%";
             }
 
             $totalStmt = $conexion->prepare("SELECT COUNT(*) FROM envio_respuestas_formulario" . $where);
@@ -240,10 +252,11 @@ class ModeloEnvios{
             $tenantId = (int) ($datos["tenant_id"] ?? 0);
             if($tenantId <= 0 || !Conexion::tenantPuedeEscribir($tenantId)) return array("estado" => "error", "mensaje" => "Tu período terminó; solo puedes consultar los envíos");
             $conexion = self::prepararTabla();
-            $stmt = $conexion->prepare("UPDATE envio_respuestas_formulario SET nombre = :nombre, telefono = :telefono, direccion = :direccion, agencia = :agencia, fecha_envio = :fecha_envio, mensaje = :mensaje WHERE id = :id AND tenant_id = :tenant_id");
+            $stmt = $conexion->prepare("UPDATE envio_respuestas_formulario SET nombre = :nombre, doc = :doc, telefono = :telefono, direccion = :direccion, agencia = :agencia, fecha_envio = :fecha_envio, mensaje = :mensaje WHERE id = :id AND tenant_id = :tenant_id");
             $stmt->bindValue(":id", (int) $datos["id"], PDO::PARAM_INT);
             $stmt->bindValue(":tenant_id", $tenantId, PDO::PARAM_INT);
             $stmt->bindValue(":nombre", $datos["nombre"], PDO::PARAM_STR);
+            $stmt->bindValue(":doc", $datos["doc"], PDO::PARAM_STR);
             $stmt->bindValue(":telefono", $datos["telefono"], PDO::PARAM_STR);
             $stmt->bindValue(":direccion", $datos["direccion"], PDO::PARAM_STR);
             $stmt->bindValue(":agencia", $datos["agencia"], PDO::PARAM_STR);

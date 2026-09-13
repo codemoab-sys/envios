@@ -73,6 +73,7 @@ $(document).ready(function(){
             var estadoClase = estado === 'entregado' ? 'envios-status-completado' : 'envios-status-pendiente';
             var estadoTexto = nombreEstado(estado);
             var telefono = escaparHtml(item.telefono || '-');
+            var documento = escaparHtml(item.doc || '-');
             var codigoCompleto = (item.codigo || '').toString();
             var codigo = escaparHtml(codigoCompleto);
             var direccion = escaparHtml(item.direccion || '-');
@@ -95,6 +96,7 @@ $(document).ready(function(){
                         '<div class="envios-meta-row"><span class="envios-meta" title="' + escaparHtml(codigoCompleto) + '"><i class="fa fa-hashtag"></i><strong>' + codigo + '</strong></span></div>' +
                         '<div class="envios-meta-row">' +
                             '<span class="envios-meta"><i class="fa fa-phone"></i><strong>' + telefono + '</strong></span>' +
+                            '<span class="envios-meta"><i class="fa fa-id-card-o"></i><strong>' + documento + '</strong></span>' +
                             '<span class="envios-fecha"><i class="fa fa-calendar"></i><span class="envios-fecha-label">Envío:</span><span>' + fechaEnvioTexto + '</span></span>' +
                         '</div>' +
                         '<div class="envios-agencia-mini"><i class="fa fa-building-o"></i><span>Agencia: ' + agenciaTexto + '</span></div>' +
@@ -156,15 +158,15 @@ $(document).ready(function(){
         var courier = obtenerCourier(item.agencia);
         var agencia = (item.agencia || '').toString().trim() || '-';
         var direccion = (item.direccion || '').toString().trim() || '-';
-        var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
-        var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+        var dniCoincidencia = (item.mensaje || '').toString().match(/(?:DNI|DOC)\s*:\s*([^\n]+)/i);
+        var dni = (item.doc || '').toString().trim() || (dniCoincidencia ? dniCoincidencia[1].trim() : '');
         var estado = nombreEstado(item.estado);
 
         return 'Hola *' + nombre + '*!\n\n' +
             'Tu envio esta *' + estado + '*\n\n' +
             '\ud83d\udc64 *Nombre:* ' + nombre + '\n' +
             '\ud83e\udd74 *Telefono:* ' + telefono + '\n' +
-            (dni ? '\ud83c\udd94 *DNI:* ' + dni + '\n' : '') +
+            (dni ? '\ud83c\udd94 *DOC:* ' + dni + '\n' : '') +
             '\ud83c\udfe2 *Agencia:* ' + agencia + '\n' +
             '\ud83d\udccd *Direccion:* ' + direccion + '\n' +
             '\ud83d\ude9a *Courier:* ' + courier + '\n' +
@@ -307,8 +309,8 @@ $(document).ready(function(){
             ? ['DESTINATARIO (DOC)', 'TELF. DESTINATARIO', 'CONTACTO (DOC)', 'TELF. CONTACTO', 'NRO GRR', 'ORIGEN', 'DESTINO', 'MERCADERIA', 'ALTO', 'ANCHO', 'LARGO', 'PESO', 'CANTIDAD']
             : ['Codigo', 'Nombre', 'Telefono', 'Fecha de envio', 'Courier', 'Agencia / direccion', 'DNI/CE', 'Estado'];
         var filas = envios.map(function(item){
-            var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
-            var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+            var dniCoincidencia = (item.mensaje || '').toString().match(/(?:DNI|DOC)\s*:\s*([^\n]+)/i);
+            var dni = (item.doc || '').toString().trim() || (dniCoincidencia ? dniCoincidencia[1].trim() : '');
             if(esReporteShalom){
                 return [
                     item.nombre || '',
@@ -373,8 +375,8 @@ $(document).ready(function(){
     function imprimirEtiquetas(envios, formato){
         var remitente = escaparHtmlTexto((window.nombreEmprendimientoEtiqueta || '').toString().trim() || 'Emprendimiento');
         var etiquetas = envios.map(function(item){
-            var dniCoincidencia = (item.mensaje || '').toString().match(/DNI(?:\/CE)?\s*:\s*([^\n]+)/i);
-            var dni = dniCoincidencia ? dniCoincidencia[1].trim() : '';
+            var dniCoincidencia = (item.mensaje || '').toString().match(/(?:DNI|DOC)\s*:\s*([^\n]+)/i);
+            var dni = (item.doc || '').toString().trim() || (dniCoincidencia ? dniCoincidencia[1].trim() : '');
             var fecha = formatearFechaEtiqueta(item.fecha_envio || item.fecha);
             var courier = escaparHtmlTexto(obtenerCourier(item.agencia));
             var nombre = escaparHtmlTexto(item.nombre || '-');
