@@ -14,6 +14,11 @@
 	.rotulados-table td { color: #eaf0ff; }
 	.rotulados-client-button { padding: 7px 11px; border: 1px solid #5575a6; border-radius: 7px; background: #223555; color: #fff; cursor: pointer; }
 	.rotulados-client-actions { display: flex; align-items: center; gap: 7px; }
+	.rotulados-client-toolbar { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+	.rotulados-client-search { max-width: 360px; }
+	.rotulados-pagination { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; color: #9fb2d2; }
+	.rotulados-page-button { min-width: 34px; height: 32px; border: 1px solid #40516d; border-radius: 6px; background: #223555; color: #fff; cursor: pointer; }
+	.rotulados-page-button:disabled { opacity: .45; cursor: not-allowed; }
 	.rotulados-empty { padding: 28px 10px; color: #9fb2d2; text-align: center; }
 	.rotulados-lista { margin-top: 26px; }
 	.rotulados-lista h3 { margin: 0 0 10px; color: #fff; }
@@ -45,7 +50,12 @@
 				</label>
 				<button class="rotulados-button" type="submit"><i class="fa fa-upload"></i> Subir PDF</button>
 			</form>
-			<div id="listaClientesRotulados" class="rotulados-lista"></div>
+			<div id="listaClientesRotulados" class="rotulados-lista">
+				<h3>Clientes</h3>
+				<div class="rotulados-client-toolbar"><input id="buscadorClientesRotulados" class="rotulados-control rotulados-client-search" type="search" placeholder="Buscar por nombre o DOC" aria-label="Buscar cliente"></div>
+				<div id="tablaClientesRotulados"></div>
+				<div id="paginacionClientesRotulados" class="rotulados-pagination"></div>
+			</div>
 		</section>
 	</main>
 </div>
@@ -66,22 +76,49 @@
 
 <script>
 $(function(){
+	var clientesRotulados = [];
+	var paginaClientes = 1;
+	var limiteClientes = 10;
+
 	function cargarClientes(){
 		$.post('ajax/envios.ajax.php', {listarClientesRotuladosAjax: 1}, function(respuesta){
-			var contenedor = $('#listaClientesRotulados').empty();
+			var contenedor = $('#listaClientesRotulados');
 			if(respuesta.estado !== 'ok' || !respuesta.datos.length){
-				contenedor.html('<div class="rotulados-empty">No hay clientes con DOC registrado.</div>');
+				clientesRotulados = [];
+				$('#tablaClientesRotulados').html('<div class="rotulados-empty">No hay clientes con DOC registrado.</div>');
+				$('#paginacionClientesRotulados').empty();
 				return;
 			}
-			var html = '<h3>Clientes</h3><table class="rotulados-table"><thead><tr><th>Cliente</th><th>DOC</th><th>Rotulados</th><th></th></tr></thead><tbody>';
-			$.each(respuesta.datos, function(_, cliente){
-				html += '<tr><td>' + escapar(cliente.nombre) + '</td><td>' + escapar(cliente.doc) + '</td><td>' + cliente.total_rotulados + '</td><td><div class="rotulados-client-actions"><button type="button" class="rotulados-client-button btn-ver-rotulados" data-doc="' + escapar(cliente.doc) + '" data-nombre="' + escapar(cliente.nombre) + '"><i class="fa fa-folder-open"></i> Ver rotulados</button>' + (cliente.ultimo_rotulado ? '<button type="button" class="rotulado-whatsapp ' + (!cliente.telefono ? 'is-disabled' : '') + ' btn-enviar-rotulado" data-url="' + escapar(cliente.ultimo_rotulado) + '" data-nombre="' + escapar(cliente.nombre) + '" data-telefono="' + escapar(cliente.telefono || '') + '" title="Enviar rotulado más reciente por WhatsApp" aria-label="Enviar rotulado más reciente por WhatsApp"><i class="fa fa-whatsapp"></i></button>' : '') + '</div></td></tr>';
-			});
-			contenedor.html(html + '</tbody></table>');
+			clientesRotulados = respuesta.datos;
+			paginaClientes = 1;
+			renderizarClientes();
 		}, 'json');
 	}
 
+	function renderizarClientes(){
+		var busqueda = ($('#buscadorClientesRotulados').val() || '').toLowerCase().trim();
+		var filtrados = clientesRotulados.filter(function(cliente){
+			return !busqueda || (String(cliente.nombre || '') + ' ' + String(cliente.doc || '')).toLowerCase().indexOf(busqueda) !== -1;
+		});
+		var totalPaginas = Math.max(1, Math.ceil(filtrados.length / limiteClientes));
+		paginaClientes = Math.min(paginaClientes, totalPaginas);
+		var inicio = (paginaClientes - 1) * limiteClientes;
+		var visibles = filtrados.slice(inicio, inicio + limiteClientes);
+		if(!visibles.length){ $('#tablaClientesRotulados').html('<div class="rotulados-empty">No se encontraron clientes.</div>'); }
+		else {
+			var html = '<table class="rotulados-table"><thead><tr><th>Cliente</th><th>DOC</th><th>Rotulados</th><th></th></tr></thead><tbody>';
+			$.each(visibles, function(_, cliente){
+				html += '<tr><td>' + escapar(cliente.nombre) + '</td><td>' + escapar(cliente.doc) + '</td><td>' + cliente.total_rotulados + '</td><td><div class="rotulados-client-actions"><button type="button" class="rotulados-client-button btn-ver-rotulados" data-doc="' + escapar(cliente.doc) + '" data-nombre="' + escapar(cliente.nombre) + '"><i class="fa fa-folder-open"></i> Ver rotulados</button>' + (cliente.ultimo_rotulado ? '<button type="button" class="rotulado-whatsapp ' + (!cliente.telefono ? 'is-disabled' : '') + ' btn-enviar-rotulado" data-url="' + escapar(cliente.ultimo_rotulado) + '" data-nombre="' + escapar(cliente.nombre) + '" data-telefono="' + escapar(cliente.telefono || '') + '" title="Enviar rotulado más reciente por WhatsApp" aria-label="Enviar rotulado más reciente por WhatsApp"><i class="fa fa-whatsapp"></i></button>' : '') + '</div></td></tr>';
+			});
+			$('#tablaClientesRotulados').html(html + '</tbody></table>');
+		}
+		$('#paginacionClientesRotulados').html('<button type="button" class="rotulados-page-button" id="btnClientesAnterior"' + (paginaClientes <= 1 ? ' disabled' : '') + '><i class="fa fa-chevron-left"></i></button><span>Pagina ' + paginaClientes + ' de ' + totalPaginas + '</span><button type="button" class="rotulados-page-button" id="btnClientesSiguiente"' + (paginaClientes >= totalPaginas ? ' disabled' : '') + '><i class="fa fa-chevron-right"></i></button>');
+	}
+
 	function escapar(valor){ return $('<div>').text(valor || '').html(); }
+	$('#buscadorClientesRotulados').on('input', function(){ paginaClientes = 1; renderizarClientes(); });
+	$(document).on('click', '#btnClientesAnterior', function(){ if(paginaClientes > 1){ paginaClientes--; renderizarClientes(); } });
+	$(document).on('click', '#btnClientesSiguiente', function(){ paginaClientes++; renderizarClientes(); });
 
 	$('#formSubirRotulado').on('submit', function(event){
 		event.preventDefault();
