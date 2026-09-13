@@ -330,9 +330,9 @@ $nombreEmprendimientoEtiqueta = trim((string) ($configuracionEnvios["nombre_empr
         <div class="envios-toolbar-row">
             <select class="envios-control" id="filtroEstado" aria-label="Estado">
                 <option value="todos">TODOS</option>
-                <option value="nuevo" selected>NUEVOS</option>
-                <option value="etiqueta">ETIQUETAS</option>
-                <option value="entregado">ENTREGADOS</option>
+                <option value="nuevo" selected>NUEVO</option>
+                <option value="etiqueta">ETIQUETA</option>
+                <option value="entregado">ENTREGADO</option>
             </select>
             <select class="envios-control" id="filtroAgencia" aria-label="Agencia o metodo de envio">
                 <option value="todos">TODAS LAS AGENCIAS</option>
