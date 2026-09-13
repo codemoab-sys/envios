@@ -13,6 +13,7 @@
 	.rotulados-table th { color: #9fb2d2; font-size: 12px; text-transform: uppercase; }
 	.rotulados-table td { color: #eaf0ff; }
 	.rotulados-client-button { padding: 7px 11px; border: 1px solid #5575a6; border-radius: 7px; background: #223555; color: #fff; cursor: pointer; }
+	.rotulados-client-actions { display: flex; align-items: center; gap: 7px; }
 	.rotulados-empty { padding: 28px 10px; color: #9fb2d2; text-align: center; }
 	.rotulados-lista { margin-top: 26px; }
 	.rotulados-lista h3 { margin: 0 0 10px; color: #fff; }
@@ -74,7 +75,7 @@ $(function(){
 			}
 			var html = '<h3>Clientes</h3><table class="rotulados-table"><thead><tr><th>Cliente</th><th>DOC</th><th>Rotulados</th><th></th></tr></thead><tbody>';
 			$.each(respuesta.datos, function(_, cliente){
-				html += '<tr><td>' + escapar(cliente.nombre) + '</td><td>' + escapar(cliente.doc) + '</td><td>' + cliente.total_rotulados + '</td><td><button type="button" class="rotulados-client-button btn-ver-rotulados" data-doc="' + escapar(cliente.doc) + '" data-nombre="' + escapar(cliente.nombre) + '"><i class="fa fa-folder-open"></i> Ver rotulados</button></td></tr>';
+				html += '<tr><td>' + escapar(cliente.nombre) + '</td><td>' + escapar(cliente.doc) + '</td><td>' + cliente.total_rotulados + '</td><td><div class="rotulados-client-actions"><button type="button" class="rotulados-client-button btn-ver-rotulados" data-doc="' + escapar(cliente.doc) + '" data-nombre="' + escapar(cliente.nombre) + '"><i class="fa fa-folder-open"></i> Ver rotulados</button>' + (cliente.ultimo_rotulado ? '<button type="button" class="rotulado-whatsapp ' + (!cliente.telefono ? 'is-disabled' : '') + ' btn-enviar-rotulado" data-url="' + escapar(cliente.ultimo_rotulado) + '" data-nombre="' + escapar(cliente.nombre) + '" data-telefono="' + escapar(cliente.telefono || '') + '" title="Enviar rotulado más reciente por WhatsApp" aria-label="Enviar rotulado más reciente por WhatsApp"><i class="fa fa-whatsapp"></i></button>' : '') + '</div></td></tr>';
 			});
 			contenedor.html(html + '</tbody></table>');
 		}, 'json');

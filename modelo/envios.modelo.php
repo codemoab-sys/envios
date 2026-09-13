@@ -350,7 +350,7 @@ class ModeloEnvios{
 
     static public function mdlListarClientesRotulados(){
         try{
-            $stmt = self::prepararTablaRotulados()->prepare("SELECT e.doc, e.nombre, COUNT(r.id) AS total_rotulados FROM envio_respuestas_formulario e LEFT JOIN envio_rotulados r ON r.tenant_id = e.tenant_id AND r.doc = e.doc WHERE e.tenant_id = :tenant_id AND e.doc IS NOT NULL AND e.doc <> '' GROUP BY e.doc, e.nombre ORDER BY e.nombre ASC");
+            $stmt = self::prepararTablaRotulados()->prepare("SELECT e.doc, e.nombre, e.telefono, COUNT(r.id) AS total_rotulados, (SELECT r2.url FROM envio_rotulados r2 WHERE r2.tenant_id = e.tenant_id AND r2.doc = e.doc ORDER BY r2.fecha DESC, r2.id DESC LIMIT 1) AS ultimo_rotulado FROM envio_respuestas_formulario e LEFT JOIN envio_rotulados r ON r.tenant_id = e.tenant_id AND r.doc = e.doc WHERE e.tenant_id = :tenant_id AND e.doc IS NOT NULL AND e.doc <> '' GROUP BY e.doc, e.nombre, e.telefono ORDER BY e.nombre ASC");
             $stmt->execute(array(":tenant_id" => Conexion::tenantId()));
             return array("estado" => "ok", "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC));
         }catch(PDOException $e){
