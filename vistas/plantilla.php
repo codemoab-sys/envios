@@ -114,6 +114,7 @@ if($esWeb){
                 $ruta == "compartir"||
                 $ruta == "envios" ||
                 $ruta == "subir-rotulados" ||
+                $ruta == "detalle-reporte" ||
                 $ruta == "registro"){
 
                 include "modulos/".$ruta.".php";

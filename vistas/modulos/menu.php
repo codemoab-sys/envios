@@ -49,6 +49,11 @@
                       <i class="fa fa-upload"></i> <span>Subir rotulados</span>
                   </a>
               </li>
+              <li>
+                  <a href="detalle-reporte" title="Detalle y reporte">
+                      <i class="fa fa-file-text-o"></i> <span>Detalle y reporte</span>
+                  </a>
+              </li>
             
 
 
