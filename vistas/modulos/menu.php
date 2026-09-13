@@ -44,6 +44,11 @@
                       <i class="fa fa-truck"></i> <span>Envios</span>
                   </a>
               </li>
+              <li>
+                  <a href="subir-rotulados" title="Subir rotulados">
+                      <i class="fa fa-upload"></i> <span>Subir rotulados</span>
+                  </a>
+              </li>
             
 
 
