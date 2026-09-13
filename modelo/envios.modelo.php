@@ -302,6 +302,72 @@ class ModeloEnvios{
         }
     }
 
+    static private function prepararTablaRotulados(){
+        $conexion = self::prepararTabla();
+        $conexion->exec("CREATE TABLE IF NOT EXISTS envio_rotulados (
+            id INT NOT NULL AUTO_INCREMENT,
+            tenant_id INT NOT NULL,
+            envio_id INT NOT NULL,
+            doc VARCHAR(30) NOT NULL,
+            nombre_archivo VARCHAR(255) NOT NULL,
+            archivo VARCHAR(255) NOT NULL,
+            url VARCHAR(500) NOT NULL,
+            fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_rotulados_tenant_doc (tenant_id, doc),
+            INDEX idx_rotulados_envio (envio_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        return $conexion;
+    }
+
+    static public function mdlBuscarEnvioPorDoc($doc){
+        try{
+            $stmt = self::prepararTablaRotulados()->prepare("SELECT id, nombre, doc FROM envio_respuestas_formulario WHERE tenant_id = :tenant_id AND doc = :doc ORDER BY fecha DESC, id DESC LIMIT 1");
+            $stmt->execute(array(":tenant_id" => Conexion::tenantId(), ":doc" => $doc));
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: array();
+        }catch(PDOException $e){
+            return array();
+        }
+    }
+
+    static public function mdlGuardarRotulado($datos){
+        try{
+            $conexion = self::prepararTablaRotulados();
+            $stmt = $conexion->prepare("INSERT INTO envio_rotulados (tenant_id, envio_id, doc, nombre_archivo, archivo, url) VALUES (:tenant_id, :envio_id, :doc, :nombre_archivo, :archivo, :url)");
+            $stmt->execute(array(
+                ":tenant_id" => Conexion::tenantId(),
+                ":envio_id" => (int) $datos["envio_id"],
+                ":doc" => $datos["doc"],
+                ":nombre_archivo" => $datos["nombre_archivo"],
+                ":archivo" => $datos["archivo"],
+                ":url" => $datos["url"]
+            ));
+            return array("estado" => "ok", "id" => (int) $conexion->lastInsertId());
+        }catch(PDOException $e){
+            return array("estado" => "error", "mensaje" => "No se pudo guardar el rotulado");
+        }
+    }
+
+    static public function mdlListarClientesRotulados(){
+        try{
+            $stmt = self::prepararTablaRotulados()->prepare("SELECT e.doc, e.nombre, COUNT(r.id) AS total_rotulados FROM envio_respuestas_formulario e LEFT JOIN envio_rotulados r ON r.tenant_id = e.tenant_id AND r.doc = e.doc WHERE e.tenant_id = :tenant_id AND e.doc IS NOT NULL AND e.doc <> '' GROUP BY e.doc, e.nombre ORDER BY e.nombre ASC");
+            $stmt->execute(array(":tenant_id" => Conexion::tenantId()));
+            return array("estado" => "ok", "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC));
+        }catch(PDOException $e){
+            return array("estado" => "error", "mensaje" => $e->getMessage());
+        }
+    }
+
+    static public function mdlListarRotuladosCliente($doc){
+        try{
+            $stmt = self::prepararTablaRotulados()->prepare("SELECT r.*, e.codigo FROM envio_rotulados r INNER JOIN envio_respuestas_formulario e ON e.id = r.envio_id AND e.tenant_id = r.tenant_id WHERE r.tenant_id = :tenant_id AND r.doc = :doc ORDER BY r.fecha DESC, r.id DESC");
+            $stmt->execute(array(":tenant_id" => Conexion::tenantId(), ":doc" => $doc));
+            return array("estado" => "ok", "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC));
+        }catch(PDOException $e){
+            return array("estado" => "error", "mensaje" => $e->getMessage());
+        }
+    }
+
 }
 
 ?>

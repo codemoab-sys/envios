@@ -75,4 +75,58 @@ if(isset($_POST["eliminarRespuestaAjax"])){
     exit;
 }
 
+if(isset($_POST["listarClientesRotuladosAjax"])){
+    echo json_encode(ModeloEnvios::mdlListarClientesRotulados());
+    exit;
+}
+
+if(isset($_POST["listarRotuladosClienteAjax"])){
+    $doc = strtoupper(preg_replace('/[^0-9A-Z]/i', '', trim((string) ($_POST["doc"] ?? ""))));
+    echo json_encode(ModeloEnvios::mdlListarRotuladosCliente($doc));
+    exit;
+}
+
+if(isset($_POST["subirRotuladoAjax"])){
+    if(!Conexion::puedeEscribir()){
+        echo json_encode(array("estado" => "error", "mensaje" => "Tu período terminó; solo puedes consultar los envíos"));
+        exit;
+    }
+    $doc = strtoupper(preg_replace('/[^0-9A-Z]/i', '', trim((string) ($_POST["doc"] ?? ""))));
+    if($doc === "" || empty($_FILES["pdf"]) || $_FILES["pdf"]["error"] !== UPLOAD_ERR_OK){
+        echo json_encode(array("estado" => "error", "mensaje" => "Indica el DOC y selecciona un PDF válido"));
+        exit;
+    }
+    $archivo = $_FILES["pdf"];
+    if((int) $archivo["size"] > 15 * 1024 * 1024){
+        echo json_encode(array("estado" => "error", "mensaje" => "El PDF no puede superar 15 MB"));
+        exit;
+    }
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    if($finfo->file($archivo["tmp_name"]) !== "application/pdf"){
+        echo json_encode(array("estado" => "error", "mensaje" => "Solo se permiten archivos PDF"));
+        exit;
+    }
+    $envio = ModeloEnvios::mdlBuscarEnvioPorDoc($doc);
+    if(empty($envio)){
+        echo json_encode(array("estado" => "error", "mensaje" => "No existe un envío de esta empresa con ese DOC"));
+        exit;
+    }
+    $directorio = dirname(__DIR__) . DIRECTORY_SEPARATOR . "rotulados" . DIRECTORY_SEPARATOR . Conexion::tenantId();
+    if(!is_dir($directorio) && !mkdir($directorio, 0750, true)){
+        echo json_encode(array("estado" => "error", "mensaje" => "No se pudo crear la carpeta de rotulados"));
+        exit;
+    }
+    $nombreSeguro = $doc . "-" . date("YmdHis") . "-" . bin2hex(random_bytes(4)) . ".pdf";
+    $rutaLocal = $directorio . DIRECTORY_SEPARATOR . $nombreSeguro;
+    if(!move_uploaded_file($archivo["tmp_name"], $rutaLocal)){
+        echo json_encode(array("estado" => "error", "mensaje" => "No se pudo guardar el PDF"));
+        exit;
+    }
+    $url = "rotulados/" . Conexion::tenantId() . "/" . $nombreSeguro;
+    $resultado = ModeloEnvios::mdlGuardarRotulado(array("envio_id" => $envio["id"], "doc" => $doc, "nombre_archivo" => $archivo["name"], "archivo" => $rutaLocal, "url" => $url));
+    if($resultado["estado"] !== "ok") @unlink($rutaLocal);
+    echo json_encode($resultado);
+    exit;
+}
+
 echo json_encode(array("estado" => "error", "mensaje" => "Solicitud no valida"));
