@@ -16,7 +16,16 @@
 	.rotulados-empty { padding: 28px 10px; color: #9fb2d2; text-align: center; }
 	.rotulados-lista { margin-top: 26px; }
 	.rotulados-lista h3 { margin: 0 0 10px; color: #fff; }
-	.rotulado-link { display: inline-flex; align-items: center; gap: 7px; margin: 5px 8px 5px 0; padding: 8px 10px; border-radius: 7px; background: #223555; color: #dce8ff; text-decoration: none; }
+	.rotulados-modal { display: none; position: fixed; inset: 0; z-index: 1100; padding: 5vh 16px; background: rgba(0,0,0,.72); }
+	.rotulados-modal.is-open { display: flex; align-items: flex-start; justify-content: center; }
+	.rotulados-modal-box { width: min(760px, 100%); max-height: 90vh; overflow: auto; border: 1px solid #40516d; border-radius: 14px; background: #101a2d; box-shadow: 0 18px 45px rgba(0,0,0,.4); }
+	.rotulados-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 18px; border-bottom: 1px solid #2a3850; }
+	.rotulados-modal-header h3 { margin: 0; color: #fff; }
+	.rotulados-modal-close { width: 34px; height: 34px; border: 0; border-radius: 7px; background: #263852; color: #fff; font-size: 20px; cursor: pointer; }
+	.rotulados-modal-body { padding: 18px; }
+	.rotulado-link { display: flex; align-items: center; gap: 7px; width: 100%; margin: 5px 0; padding: 10px 12px; border: 1px solid #334d75; border-radius: 7px; background: #223555; color: #dce8ff; text-align: left; cursor: pointer; }
+	.rotulado-link:hover { background: #2b4770; }
+	.rotulado-visor { width: 100%; height: 75vh; border: 0; background: #fff; }
 	@media (max-width: 700px) { .rotulados-form { grid-template-columns: 1fr; } .rotulados-table { font-size: 13px; } .rotulados-table th:nth-child(3), .rotulados-table td:nth-child(3) { display: none; } }
 </style>
 
@@ -32,9 +41,22 @@
 				<button class="rotulados-button" type="submit"><i class="fa fa-upload"></i> Subir PDF</button>
 			</form>
 			<div id="listaClientesRotulados" class="rotulados-lista"></div>
-			<div id="rotuladosCliente" class="rotulados-lista"></div>
 		</section>
 	</main>
+</div>
+
+<div id="modalListaRotulados" class="rotulados-modal" role="dialog" aria-modal="true" aria-hidden="true">
+	<div class="rotulados-modal-box">
+		<div class="rotulados-modal-header"><h3 id="tituloListaRotulados">Rotulados</h3><button type="button" class="rotulados-modal-close" data-cerrar-modal="modalListaRotulados" aria-label="Cerrar">&times;</button></div>
+		<div id="rotuladosCliente" class="rotulados-modal-body"></div>
+	</div>
+</div>
+
+<div id="modalVisorRotulado" class="rotulados-modal" role="dialog" aria-modal="true" aria-hidden="true">
+	<div class="rotulados-modal-box">
+		<div class="rotulados-modal-header"><h3 id="tituloVisorRotulado">Rotulado</h3><button type="button" class="rotulados-modal-close" data-cerrar-modal="modalVisorRotulado" aria-label="Cerrar">&times;</button></div>
+		<div class="rotulados-modal-body"><iframe id="visorRotulado" class="rotulado-visor" title="Vista del rotulado"></iframe></div>
+	</div>
 </div>
 
 <script>
@@ -77,16 +99,39 @@ $(function(){
 		var nombre = $(this).data('nombre');
 		$.post('ajax/envios.ajax.php', {listarRotuladosClienteAjax:1, doc:doc}, function(respuesta){
 			var contenedor = $('#rotuladosCliente').empty();
+			$('#tituloListaRotulados').text('Rotulados de ' + nombre + ' (' + doc + ')');
 			if(respuesta.estado !== 'ok' || !respuesta.datos.length){
-				contenedor.html('<h3>Rotulados de ' + escapar(nombre) + '</h3><div class="rotulados-empty">No tiene rotulados subidos.</div>');
+				contenedor.html('<div class="rotulados-empty">No tiene rotulados subidos.</div>');
+				abrirModal('modalListaRotulados');
 				return;
 			}
-			var html = '<h3>Rotulados de ' + escapar(nombre) + ' (' + escapar(doc) + ')</h3>';
+			var html = '';
 			$.each(respuesta.datos, function(_, rotulado){
-				html += '<a class="rotulado-link" href="' + escapar(rotulado.url) + '" target="_blank" rel="noopener"><i class="fa fa-file-pdf-o"></i> ' + escapar(rotulado.nombre_archivo) + '</a>';
+				html += '<button type="button" class="rotulado-link btn-ver-pdf" data-url="' + escapar(rotulado.url) + '" data-nombre="' + escapar(rotulado.nombre_archivo) + '"><i class="fa fa-file-pdf-o"></i> ' + escapar(rotulado.nombre_archivo) + '</button>';
 			});
 			contenedor.html(html);
+			abrirModal('modalListaRotulados');
 		}, 'json');
+	});
+
+	function abrirModal(id){ $('#' + id).addClass('is-open').attr('aria-hidden', 'false'); }
+	function cerrarModal(id){
+		$('#' + id).removeClass('is-open').attr('aria-hidden', 'true');
+		if(id === 'modalVisorRotulado') $('#visorRotulado').attr('src', '');
+	}
+
+	$(document).on('click', '.btn-ver-pdf', function(){
+		$('#tituloVisorRotulado').text($(this).data('nombre'));
+		$('#visorRotulado').attr('src', $(this).data('url'));
+		abrirModal('modalVisorRotulado');
+	});
+	$(document).on('click', '[data-cerrar-modal]', function(){ cerrarModal($(this).data('cerrar-modal')); });
+	$('.rotulados-modal').on('click', function(event){ if(event.target === this) cerrarModal(this.id); });
+	$(document).on('keydown', function(event){
+		if(event.key === 'Escape'){
+			cerrarModal('modalVisorRotulado');
+			cerrarModal('modalListaRotulados');
+		}
 	});
 
 	cargarClientes();
