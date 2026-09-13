@@ -7,6 +7,43 @@ require_once "../modelo/compartir.modelo.php";
 
 header("Content-Type: application/json; charset=UTF-8");
 
+function localizarEjecutableRotulado($rutas){
+    foreach($rutas as $ruta){
+        if($ruta !== "" && is_file($ruta)) return $ruta;
+    }
+    return "";
+}
+
+function leerDocDesdeRotulado($pdf){
+    $pdftoppm = localizarEjecutableRotulado(array(
+        getenv("POPPLER_PDFTOPPM") ?: "",
+        "C:\\Program Files\\poppler\\Library\\bin\\pdftoppm.exe",
+        "C:\\Program Files\\poppler\\bin\\pdftoppm.exe",
+        "C:\\Users\\moabc\\AppData\\Local\\Microsoft\\WinGet\\Packages\\oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe\\poppler-25.07.0\\Library\\bin\\pdftoppm.exe"
+    ));
+    $tesseract = localizarEjecutableRotulado(array(
+        getenv("TESSERACT_PATH") ?: "",
+        "C:\\Program Files\\Tesseract-OCR\\tesseract.exe",
+        "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe"
+    ));
+    if($pdftoppm === "" || $tesseract === "") return "";
+    $base = tempnam(sys_get_temp_dir(), "rotulado_");
+    @unlink($base);
+    $salidaImagen = $base . "_pagina";
+    $comandoPdf = escapeshellarg($pdftoppm) . " -f 1 -l 1 -singlefile -png " . escapeshellarg($pdf) . " " . escapeshellarg($salidaImagen) . " 2>&1";
+    exec($comandoPdf, $salidaPdf, $codigoPdf);
+    $imagen = $salidaImagen . ".png";
+    if($codigoPdf !== 0 || !is_file($imagen)) return "";
+    $comandoOcr = escapeshellarg($tesseract) . " " . escapeshellarg($imagen) . " stdout --psm 6 2>&1";
+    exec($comandoOcr, $salidaOcr, $codigoOcr);
+    @unlink($imagen);
+    if($codigoOcr !== 0) return "";
+    $texto = implode("\n", $salidaOcr);
+    if(preg_match('/N\s*[°ºo]?\s*DOC\.?\s*[:.]?\s*([0-9]{8,11})/iu', $texto, $coincidencia)) return $coincidencia[1];
+    if(preg_match('/(?:DOC|DNI|RUC)\D{0,8}([0-9]{8,11})/iu', $texto, $coincidencia)) return $coincidencia[1];
+    return "";
+}
+
 if(isset($_POST["guardarRespuestaAjax"])){
     $merchant = trim((string) ($_POST["merchant"] ?? ""));
     if($merchant === ""){
@@ -92,8 +129,8 @@ if(isset($_POST["subirRotuladoAjax"])){
         exit;
     }
     $doc = strtoupper(preg_replace('/[^0-9A-Z]/i', '', trim((string) ($_POST["doc"] ?? ""))));
-    if($doc === "" || empty($_FILES["pdf"]) || $_FILES["pdf"]["error"] !== UPLOAD_ERR_OK){
-        echo json_encode(array("estado" => "error", "mensaje" => "Indica el DOC y selecciona un PDF válido"));
+    if(empty($_FILES["pdf"]) || $_FILES["pdf"]["error"] !== UPLOAD_ERR_OK){
+        echo json_encode(array("estado" => "error", "mensaje" => "Selecciona un PDF válido"));
         exit;
     }
     $archivo = $_FILES["pdf"];
@@ -104,6 +141,12 @@ if(isset($_POST["subirRotuladoAjax"])){
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     if($finfo->file($archivo["tmp_name"]) !== "application/pdf"){
         echo json_encode(array("estado" => "error", "mensaje" => "Solo se permiten archivos PDF"));
+        exit;
+    }
+    if($doc === "") $doc = leerDocDesdeRotulado($archivo["tmp_name"]);
+    $doc = strtoupper(preg_replace('/[^0-9A-Z]/i', '', $doc));
+    if($doc === ""){
+        echo json_encode(array("estado" => "error", "mensaje" => "No se pudo leer el DNI o RUC junto a N°DOC en el PDF"));
         exit;
     }
     $envio = ModeloEnvios::mdlBuscarEnvioPorDoc($doc);

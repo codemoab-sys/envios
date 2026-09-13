@@ -24,11 +24,8 @@
 	<main class="rotulados-page">
 		<section class="rotulados-panel">
 			<h1 class="rotulados-title"><i class="fa fa-upload"></i> Subir rotulados</h1>
-			<p class="rotulados-help">Carga un PDF y relacionarlo con el envío usando su DOC, DNI o RUC.</p>
+			<p class="rotulados-help">Carga el PDF del rotulado. El sistema leerá el DNI o RUC que aparece junto a N°DOC.</p>
 			<form id="formSubirRotulado" class="rotulados-form" enctype="multipart/form-data">
-				<label class="rotulados-field">DOC, DNI o RUC
-					<input class="rotulados-control" id="docRotulado" name="doc" type="text" maxlength="30" required>
-				</label>
 				<label class="rotulados-field">Archivo PDF
 					<input class="rotulados-control" id="pdfRotulado" name="pdf" type="file" accept="application/pdf,.pdf" required>
 				</label>
@@ -58,11 +55,6 @@ $(function(){
 	}
 
 	function escapar(valor){ return $('<div>').text(valor || '').html(); }
-
-	$('#pdfRotulado').on('change', function(){
-		var coincidencia = (this.files[0] ? this.files[0].name : '').match(/(?:^|[^0-9])(\d{8}|\d{11})(?:[^0-9]|$)/);
-		if(coincidencia && !$('#docRotulado').val().trim()) $('#docRotulado').val(coincidencia[1]);
-	});
 
 	$('#formSubirRotulado').on('submit', function(event){
 		event.preventDefault();
