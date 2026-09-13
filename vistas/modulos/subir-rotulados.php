@@ -38,7 +38,7 @@
 	<main class="rotulados-page">
 		<section class="rotulados-panel">
 			<h1 class="rotulados-title"><i class="fa fa-upload"></i> Subir rotulados</h1>
-			<p class="rotulados-help">Carga el PDF del rotulado. El sistema leerá el DNI o RUC que aparece junto a N°DOC.</p>
+			<p class="rotulados-help">Sube un PDF por vez. El sistema leerá automáticamente el DNI o RUC que aparece junto a N°DOC.</p>
 			<form id="formSubirRotulado" class="rotulados-form" enctype="multipart/form-data">
 				<label class="rotulados-field">Archivo PDF
 					<input class="rotulados-control" id="pdfRotulado" name="pdf" type="file" accept="application/pdf,.pdf" required>
