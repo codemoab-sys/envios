@@ -763,7 +763,7 @@ $('#agendarPublico').on('click', function(){
     var iconoCalendarioHtml = '<i class="fa fa-calendar"></i>';
     var iconoPaqueteWhatsapp = String.fromCodePoint(0x1F4E6);
     var iconoPersonaWhatsapp = String.fromCodePoint(0x1F464);
-    var iconoTelefonoWhatsapp = String.fromCodePoint(0x1F974);
+    var iconoTelefonoWhatsapp = String.fromCodePoint(0x1F4F1);
     var iconoDocumentoWhatsapp = String.fromCodePoint(0x1F194);
     var iconoAgenciaWhatsapp = String.fromCodePoint(0x1F3E2);
     var iconoDireccionWhatsapp = String.fromCodePoint(0x1F4CD);
