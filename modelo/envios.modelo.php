@@ -360,7 +360,7 @@ class ModeloEnvios{
 
     static public function mdlListarRotuladosCliente($doc){
         try{
-            $stmt = self::prepararTablaRotulados()->prepare("SELECT r.*, e.codigo FROM envio_rotulados r INNER JOIN envio_respuestas_formulario e ON e.id = r.envio_id AND e.tenant_id = r.tenant_id WHERE r.tenant_id = :tenant_id AND r.doc = :doc ORDER BY r.fecha DESC, r.id DESC");
+            $stmt = self::prepararTablaRotulados()->prepare("SELECT r.*, e.codigo, e.telefono, e.nombre FROM envio_rotulados r INNER JOIN envio_respuestas_formulario e ON e.id = r.envio_id AND e.tenant_id = r.tenant_id WHERE r.tenant_id = :tenant_id AND r.doc = :doc ORDER BY r.fecha DESC, r.id DESC");
             $stmt->execute(array(":tenant_id" => Conexion::tenantId(), ":doc" => $doc));
             return array("estado" => "ok", "datos" => $stmt->fetchAll(PDO::FETCH_ASSOC));
         }catch(PDOException $e){

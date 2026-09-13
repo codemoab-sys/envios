@@ -25,6 +25,10 @@
 	.rotulados-modal-body { padding: 18px; }
 	.rotulado-link { display: flex; align-items: center; gap: 7px; width: 100%; margin: 5px 0; padding: 10px 12px; border: 1px solid #334d75; border-radius: 7px; background: #223555; color: #dce8ff; text-align: left; cursor: pointer; }
 	.rotulado-link:hover { background: #2b4770; }
+	.rotulado-item { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+	.rotulado-item .rotulado-link { flex: 1; margin: 0; }
+	.rotulado-whatsapp { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 7px; background: #20c968; color: #fff; cursor: pointer; }
+	.rotulado-whatsapp.is-disabled { background: #536174; cursor: not-allowed; }
 	.rotulado-visor { width: 100%; height: 75vh; border: 0; background: #fff; }
 	@media (max-width: 700px) { .rotulados-form { grid-template-columns: 1fr; } .rotulados-table { font-size: 13px; } .rotulados-table th:nth-child(3), .rotulados-table td:nth-child(3) { display: none; } }
 </style>
@@ -107,7 +111,7 @@ $(function(){
 			}
 			var html = '';
 			$.each(respuesta.datos, function(_, rotulado){
-				html += '<button type="button" class="rotulado-link btn-ver-pdf" data-url="' + escapar(rotulado.url) + '" data-nombre="' + escapar(rotulado.nombre_archivo) + '"><i class="fa fa-file-pdf-o"></i> ' + escapar(rotulado.nombre_archivo) + '</button>';
+				html += '<div class="rotulado-item"><button type="button" class="rotulado-link btn-ver-pdf" data-url="' + escapar(rotulado.url) + '" data-nombre="' + escapar(rotulado.nombre_archivo) + '"><i class="fa fa-file-pdf-o"></i> ' + escapar(rotulado.nombre_archivo) + '</button><button type="button" class="rotulado-whatsapp ' + (!rotulado.telefono ? 'is-disabled' : '') + ' btn-enviar-rotulado" data-url="' + escapar(rotulado.url) + '" data-nombre="' + escapar(rotulado.nombre || nombre) + '" data-telefono="' + escapar(rotulado.telefono || '') + '" title="Enviar por WhatsApp" aria-label="Enviar por WhatsApp"><i class="fa fa-whatsapp"></i></button></div>';
 			});
 			contenedor.html(html);
 			abrirModal('modalListaRotulados');
@@ -124,6 +128,14 @@ $(function(){
 		$('#tituloVisorRotulado').text($(this).data('nombre'));
 		$('#visorRotulado').attr('src', $(this).data('url'));
 		abrirModal('modalVisorRotulado');
+	});
+	$(document).on('click', '.btn-enviar-rotulado', function(){
+		var telefono = String($(this).data('telefono') || '').replace(/[^0-9]/g, '');
+		if(!telefono){ Swal.fire('Sin teléfono', 'Este envío no tiene un número registrado', 'info'); return; }
+		if(telefono.length === 9) telefono = '51' + telefono;
+		var url = new URL($(this).data('url'), window.location.href).href;
+		var mensaje = 'Hola *' + ($(this).data('nombre') || 'cliente') + '*, aquí está tu rotulado:\n' + url;
+		window.open('https://wa.me/' + telefono + '?text=' + encodeURIComponent(mensaje), '_blank');
 	});
 	$(document).on('click', '[data-cerrar-modal]', function(){ cerrarModal($(this).data('cerrar-modal')); });
 	$('.rotulados-modal').on('click', function(event){ if(event.target === this) cerrarModal(this.id); });
