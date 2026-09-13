@@ -121,19 +121,23 @@ $(document).ready(function(){
         $('#btnPaginaSiguiente').prop('disabled', paginaActual >= paginacion.total_paginas);
     }
 
-    var estadosPedido = ['nuevo', 'pagado', 'preparando', 'etiqueta_generada', 'enviado', 'en_transito', 'entregado'];
+    var estadosPedido = ['nuevo', 'etiqueta', 'entregado'];
     var nombresEstados = {
         nuevo: 'Nuevo',
-        pagado: 'Pagado',
-        preparando: 'Preparando',
-        etiqueta_generada: 'Etiqueta generada',
-        enviado: 'Enviado',
-        en_transito: 'En tránsito',
+        etiqueta: 'Etiqueta',
         entregado: 'Entregado'
     };
 
     function normalizarEstado(estado){
-        return estadosPedido.indexOf(estado) !== -1 ? estado : 'nuevo';
+        var equivalencias = {
+            pagado: 'nuevo',
+            preparando: 'nuevo',
+            etiqueta_generada: 'etiqueta',
+            enviado: 'etiqueta',
+            en_transito: 'etiqueta'
+        };
+        var estadoNormalizado = equivalencias[estado] || estado;
+        return estadosPedido.indexOf(estadoNormalizado) !== -1 ? estadoNormalizado : 'nuevo';
     }
 
     function nombreEstado(estado){

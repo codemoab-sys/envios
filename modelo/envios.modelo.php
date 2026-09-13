@@ -176,8 +176,16 @@ class ModeloEnvios{
             $parametros[":tenant_id"] = Conexion::tenantId();
 
             if($estado !== "todos"){
-                $where .= " AND estado = :estado";
-                $parametros[":estado"] = $estado;
+                $estadosFiltro = array($estado);
+                if($estado === "nuevo") $estadosFiltro = array("nuevo", "pagado", "preparando");
+                if($estado === "etiqueta") $estadosFiltro = array("etiqueta", "etiqueta_generada", "enviado", "en_transito");
+                $marcadoresEstado = array();
+                foreach($estadosFiltro as $indiceEstado => $estadoFiltro){
+                    $marcadorEstado = ":estado_" . $indiceEstado;
+                    $marcadoresEstado[] = $marcadorEstado;
+                    $parametros[$marcadorEstado] = $estadoFiltro;
+                }
+                $where .= " AND estado IN (" . implode(",", $marcadoresEstado) . ")";
             }
 
             if($agencia !== "todos"){

@@ -51,7 +51,7 @@ class ControladorEnvios{
         if($id <= 0){
             return array("estado" => "error", "mensaje" => "ID invalido");
         }
-            $estadosPermitidos = array("nuevo", "pagado", "preparando", "etiqueta_generada", "enviado", "en_transito", "entregado");
+        $estadosPermitidos = array("nuevo", "etiqueta", "entregado");
         if(!in_array($nuevoEstado, $estadosPermitidos)){
             return array("estado" => "error", "mensaje" => "Estado no valido");
         }
