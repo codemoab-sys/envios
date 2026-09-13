@@ -762,13 +762,13 @@ $('#agendarPublico').on('click', function(){
     var iconoCamionHtml = '<i class="fa fa-truck"></i>';
     var iconoCalendarioHtml = '<i class="fa fa-calendar"></i>';
     var iconoPaqueteWhatsapp = String.fromCharCode(0x2605);
-    var iconoPersonaWhatsapp = String.fromCharCode(0x25CF);
-    var iconoTelefonoWhatsapp = String.fromCharCode(0x2706);
-    var iconoDocumentoWhatsapp = String.fromCharCode(0x25A3);
-    var iconoAgenciaWhatsapp = String.fromCharCode(0x25A4);
-    var iconoDireccionWhatsapp = String.fromCharCode(0x2316);
-    var iconoCamionWhatsapp = String.fromCharCode(0x279C);
-    var iconoCalendarioWhatsapp = String.fromCharCode(0x25F7);
+    var iconoPersonaWhatsapp = String.fromCodePoint(0x1F464);
+    var iconoTelefonoWhatsapp = String.fromCodePoint(0x1F974);
+    var iconoDocumentoWhatsapp = String.fromCodePoint(0x1F194);
+    var iconoAgenciaWhatsapp = String.fromCodePoint(0x1F3E2);
+    var iconoDireccionWhatsapp = String.fromCodePoint(0x1F4CD);
+    var iconoCamionWhatsapp = String.fromCodePoint(0x1F69A);
+    var iconoCalendarioWhatsapp = String.fromCodePoint(0x1F4C5);
     var resumenWhatsApp = iconoPaqueteWhatsapp + ' *NUEVO ENVIO (' + tipoResumen + ')*\n\n' +
         iconoPersonaWhatsapp + ' ' + nombreResumen + '\n' +
         iconoTelefonoWhatsapp + ' ' + whatsappPublico + '\n' +
