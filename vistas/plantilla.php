@@ -3,8 +3,8 @@
 session_start();
 Conexion::actualizarEstadoSuscripcionSesion();
 $esFormularioPublico = isset($_GET["ruta"]) && strtolower((string) $_GET["ruta"]) === "compartir" && isset($_GET["merchant"]);
+header("Content-Type: text/html; charset=UTF-8");
 if($esFormularioPublico){
-    header("Content-Type: text/html; charset=UTF-8");
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
     header("Pragma: no-cache");
 }
